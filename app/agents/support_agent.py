@@ -41,6 +41,7 @@ from typing import Callable
 
 from app.schemas.agent import AgentResponse, Intent
 from app.schemas.agent_state import AgentState
+from app.agents.intent_classifier import classifier
 from app.tools.ticket_tools import create_ticket_tool
 
 # Type alias for handler functions (nodes).
@@ -75,25 +76,6 @@ class SupportAgent:
     # Intent Detection Keywords
     # ------------------------------------------------------------------
 
-    _REFUND_KEYWORDS = {"refund", "charged", "overcharged", "money back", "reimburs"}
-
-    # "delivered" is intentionally excluded — too ambiguous.
-    # "The wrong item was delivered" is ORDER_ISSUE, not DELIVERY_ISSUE.
-    # Delivery keywords require a stronger missing/late shipment signal.
-    _DELIVERY_KEYWORDS = {
-        "never arrived", "not arrived", "not delivered",
-        "missing package", "lost package", "where is my package",
-        "shipping delay", "not received", "delivery delay",
-        "late delivery", "shipment",
-    }
-
-    # "wrong", "incorrect", "damaged", "broken" capture cases where
-    # something was delivered but was the wrong or defective item.
-    _ORDER_KEYWORDS = {
-        "order", "purchase", "bought", "item", "product",
-        "wrong", "incorrect", "damaged", "broken",
-    }
-
     # ------------------------------------------------------------------
     # Node 1 — Intent Detection
     # Reads:  state.message
@@ -114,20 +96,9 @@ class SupportAgent:
         returns a new state with intent populated.
         """
 
-        lowered = state.message.lower()
-
-        if any(kw in lowered for kw in self._REFUND_KEYWORDS):
-            state.intent = Intent.REFUND_REQUEST
-
-        elif any(kw in lowered for kw in self._DELIVERY_KEYWORDS):
-            state.intent = Intent.DELIVERY_ISSUE
-
-        elif any(kw in lowered for kw in self._ORDER_KEYWORDS):
-            state.intent = Intent.ORDER_ISSUE
-
-        else:
-            state.intent = Intent.GENERAL_INQUIRY
-
+        # Delegates to IntentClassifier — the single source of truth.
+        # Keyword sets and priority order are defined only there.
+        state.intent = classifier.classify(state.message)
         return state
 
     # ------------------------------------------------------------------
