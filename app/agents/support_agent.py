@@ -3,7 +3,7 @@ app/agents/support_agent.py
 
 Responsibility:
     - Receive a customer message and ID.
-    - Detect the customer's intent (rule-based for Milestone 1).
+    - Detect the customer's intent (rule-based for Milestone 2).
     - Select and call the appropriate tool.
     - Return a structured AgentResponse.
 
@@ -13,194 +13,191 @@ Should NOT:
     - Own business rules (e.g., setting ticket status to OPEN).
     - Contain SQL, database logic, or prompt templates.
 
-Architecture:
+Architecture (Milestone 2 — State-Based):
     Customer Message
           ↓
-    SupportAgent.handle_message()
+    handle_message()   — initializes AgentState
           ↓
-    Intent Detection (rule-based)
+    _detect_intent()   — Node 1: reads state.message, writes state.intent
           ↓
-    Tool Selection + Execution
+    _route()           — Node 2: dispatches to correct handler via intent
           ↓
-    AgentResponse (structured)
+    _handle_*()        — Node 3: reads state, calls tool, writes tool results
+          ↓
+    _build_response()  — converts final internal state → external AgentResponse
 
-Why rule-based intent detection first?
-    Adding an LLM immediately would obscure whether failures come from
-    agent design, tool design, prompt design, or model behavior.
-    Rule-based logic removes that uncertainty while the architecture
-    is still being established. LLM reasoning replaces this later.
+Why state-based before LangGraph?
+    LangGraph is fundamentally: State → Node → Updated State.
+    Building this pattern manually means LangGraph's nodes, edges,
+    and conditional routing become immediately recognizable rather
+    than abstract framework concepts to memorize.
+
+Key rule:
+    AgentState  = internal pipeline object (never returned to callers).
+    AgentResponse = external contract         (the only thing callers see).
 """
 
 from typing import Callable
 
 from app.schemas.agent import AgentResponse, Intent
+from app.schemas.agent_state import AgentState
 from app.tools.ticket_tools import create_ticket_tool
 
-# Type alias for handler functions.
-# Every handler receives (customer_id, message, intent) and returns AgentResponse.
-# Defined here so _INTENT_HANDLERS is readable at a glance.
-HandlerFn = Callable[[str, str, Intent], AgentResponse]
+# Type alias for handler functions (nodes).
+# Every handler receives AgentState and returns AgentState.
+# Signatures are now uniform — _route() doesn't need to know
+# what arguments each handler needs; it just passes state through.
+HandlerFn = Callable[[AgentState], AgentState]
 
 
 class SupportAgent:
     """
-    Rule-based customer support agent for Milestone 1.
+    State-based customer support agent (Milestone 2).
 
-    Detects intent from the customer's message using keyword matching,
-    dispatches to a dedicated handler via _INTENT_HANDLERS, and returns
-    a typed AgentResponse.
+    Each private method is a "node" in the workflow:
+        - Receives AgentState.
+        - Reads only what it needs from state.
+        - Writes its output back onto state.
+        - Returns the updated state.
 
-    Architectural change from first version:
-        The original _route() coupled routing logic (which handler?)
-        with response logic (what does each handler say?).
-        This version separates them:
-            - _INTENT_HANDLERS  → owns routing (intent → handler mapping)
-            - _handle_*()       → each owns one intent's tool call + response
-            - _route()          → a single dispatch lookup, never grows
+    This mirrors LangGraph's node contract exactly.
+    When we introduce LangGraph, each of these methods becomes
+    a graph node with minimal changes required.
 
-        Adding a new intent now means:
-            1. Add keywords to _detect_intent().
-            2. Add a _handle_new_intent() method.
-            3. Add one entry to _INTENT_HANDLERS.
-        _route() and handle_message() never need to change.
-
-    The agent interacts ONLY with tools — never with services or the
-    database directly. This keeps the agent swappable (rule-based today,
-    LangGraph tomorrow) without touching the layers beneath it.
+    Adding a new intent:
+        1. Add keywords to the relevant keyword set.
+        2. Add a _handle_new_intent(state) method.
+        3. Add one entry to _INTENT_HANDLERS.
+        _route(), handle_message(), and _build_response() never change.
     """
 
     # ------------------------------------------------------------------
-    # Intent Detection
+    # Intent Detection Keywords
     # ------------------------------------------------------------------
 
-    _REFUND_KEYWORDS   = {"refund", "charged", "overcharged", "money back", "reimburs"}
+    _REFUND_KEYWORDS = {"refund", "charged", "overcharged", "money back", "reimburs"}
 
-    # "delivered" is intentionally excluded from delivery keywords.
-    # "The wrong item was delivered" is an ORDER_ISSUE, not a DELIVERY_ISSUE.
-    # Delivery keywords now require a stronger signal: late/missing shipment context.
-    # "delivered" alone is too ambiguous — it appears in order-issue messages too.
-    _DELIVERY_KEYWORDS = {"never arrived", "not arrived", "not delivered",
-                          "missing package", "lost package", "where is my package",
-                          "shipping delay", "not received", "delivery delay",
-                          "late delivery", "shipment"}
+    # "delivered" is intentionally excluded — too ambiguous.
+    # "The wrong item was delivered" is ORDER_ISSUE, not DELIVERY_ISSUE.
+    # Delivery keywords require a stronger missing/late shipment signal.
+    _DELIVERY_KEYWORDS = {
+        "never arrived", "not arrived", "not delivered",
+        "missing package", "lost package", "where is my package",
+        "shipping delay", "not received", "delivery delay",
+        "late delivery", "shipment",
+    }
 
-    # "wrong", "incorrect", "damaged", "broken" capture order-issue messages
-    # where something was delivered but was the wrong or defective thing.
-    _ORDER_KEYWORDS    = {"order", "purchase", "bought", "item", "product",
-                          "wrong", "incorrect", "damaged", "broken"}
+    # "wrong", "incorrect", "damaged", "broken" capture cases where
+    # something was delivered but was the wrong or defective item.
+    _ORDER_KEYWORDS = {
+        "order", "purchase", "bought", "item", "product",
+        "wrong", "incorrect", "damaged", "broken",
+    }
 
-    def _detect_intent(self, message: str) -> Intent:
+    # ------------------------------------------------------------------
+    # Node 1 — Intent Detection
+    # Reads:  state.message
+    # Writes: state.intent
+    # ------------------------------------------------------------------
+
+    def _detect_intent(self, state: AgentState) -> AgentState:
         """
-        Detect intent via keyword matching, evaluated in priority order:
+        Detect intent via keyword matching and write it onto state.
+
+        Priority order (evaluated top to bottom):
             1. Refund   — financial impact, highest priority.
-            2. Delivery — physical fulfilment issues.
-            3. Order    — general order/product issues.
+            2. Delivery — late/missing shipment context.
+            3. Order    — wrong/damaged item issues.
             4. General  — fallback for anything unrecognised.
+
+        LangGraph equivalent: a graph node that reads state and
+        returns a new state with intent populated.
         """
 
-        lowered = message.lower()
+        lowered = state.message.lower()
 
         if any(kw in lowered for kw in self._REFUND_KEYWORDS):
-            return Intent.REFUND_REQUEST
+            state.intent = Intent.REFUND_REQUEST
 
-        if any(kw in lowered for kw in self._DELIVERY_KEYWORDS):
-            return Intent.DELIVERY_ISSUE
+        elif any(kw in lowered for kw in self._DELIVERY_KEYWORDS):
+            state.intent = Intent.DELIVERY_ISSUE
 
-        if any(kw in lowered for kw in self._ORDER_KEYWORDS):
-            return Intent.ORDER_ISSUE
+        elif any(kw in lowered for kw in self._ORDER_KEYWORDS):
+            state.intent = Intent.ORDER_ISSUE
 
-        return Intent.GENERAL_INQUIRY
+        else:
+            state.intent = Intent.GENERAL_INQUIRY
+
+        return state
 
     # ------------------------------------------------------------------
-    # Intent Handlers
-    # Each handler owns exactly one intent's tool call and response text.
-    # No handler knows about any other intent.
+    # Node 3 variants — Intent Handlers
+    # Each handler is a self-contained node.
+    # Reads:  state.customer_id, state.message, state.intent
+    # Writes: state.tool_used, state.ticket_id, state.response
     # ------------------------------------------------------------------
 
-    def _handle_refund_request(
-        self,
-        customer_id: str,
-        message: str,
-        intent: Intent,
-    ) -> AgentResponse:
-        ticket = create_ticket_tool(customer_id=customer_id, issue=message)
-        return AgentResponse(
-            intent=intent,
-            tool_used="create_ticket_tool",
-            ticket_id=ticket.ticket_id,
-            response=(
-                f"I've raised a refund request for you. "
-                f"Your ticket ID is {ticket.ticket_id}. "
-                f"Our team will review it and get back to you shortly."
-            ),
+    def _handle_refund_request(self, state: AgentState) -> AgentState:
+        ticket = create_ticket_tool(
+            customer_id=state.customer_id,
+            issue=state.message,
         )
-
-    def _handle_delivery_issue(
-        self,
-        customer_id: str,
-        message: str,
-        intent: Intent,
-    ) -> AgentResponse:
-        ticket = create_ticket_tool(customer_id=customer_id, issue=message)
-        return AgentResponse(
-            intent=intent,
-            tool_used="create_ticket_tool",
-            ticket_id=ticket.ticket_id,
-            response=(
-                f"I've logged a delivery issue for you. "
-                f"Your ticket ID is {ticket.ticket_id}. "
-                f"We'll investigate and update you as soon as possible."
-            ),
+        state.tool_used  = "create_ticket_tool"
+        state.ticket_id  = ticket.ticket_id
+        state.response   = (
+            f"I've raised a refund request for you. "
+            f"Your ticket ID is {ticket.ticket_id}. "
+            f"Our team will review it and get back to you shortly."
         )
+        return state
 
-    def _handle_order_issue(
-        self,
-        customer_id: str,
-        message: str,
-        intent: Intent,
-    ) -> AgentResponse:
-        ticket = create_ticket_tool(customer_id=customer_id, issue=message)
-        return AgentResponse(
-            intent=intent,
-            tool_used="create_ticket_tool",
-            ticket_id=ticket.ticket_id,
-            response=(
-                f"I've created a support ticket for your order issue. "
-                f"Your ticket ID is {ticket.ticket_id}. "
-                f"A support specialist will follow up with you soon."
-            ),
+    def _handle_delivery_issue(self, state: AgentState) -> AgentState:
+        ticket = create_ticket_tool(
+            customer_id=state.customer_id,
+            issue=state.message,
         )
+        state.tool_used  = "create_ticket_tool"
+        state.ticket_id  = ticket.ticket_id
+        state.response   = (
+            f"I've logged a delivery issue for you. "
+            f"Your ticket ID is {ticket.ticket_id}. "
+            f"We'll investigate and update you as soon as possible."
+        )
+        return state
 
-    def _handle_general_inquiry(
-        self,
-        customer_id: str,
-        message: str,
-        intent: Intent,
-    ) -> AgentResponse:
+    def _handle_order_issue(self, state: AgentState) -> AgentState:
+        ticket = create_ticket_tool(
+            customer_id=state.customer_id,
+            issue=state.message,
+        )
+        state.tool_used  = "create_ticket_tool"
+        state.ticket_id  = ticket.ticket_id
+        state.response   = (
+            f"I've created a support ticket for your order issue. "
+            f"Your ticket ID is {ticket.ticket_id}. "
+            f"A support specialist will follow up with you soon."
+        )
+        return state
+
+    def _handle_general_inquiry(self, state: AgentState) -> AgentState:
         # No ticket created. No tool used.
-        # The agent responds directly with a clarifying question.
-        return AgentResponse(
-            intent=intent,
-            tool_used=None,
-            ticket_id=None,
-            response=(
-                "Thank you for reaching out. Could you provide more details "
-                "about your issue so I can assist you better?"
-            ),
+        # tool_used and ticket_id remain None (default from AgentState).
+        state.response = (
+            "Thank you for reaching out. Could you provide more details "
+            "about your issue so I can assist you better?"
         )
+        return state
 
     # ------------------------------------------------------------------
     # Dispatch Table
+    # Maps each Intent to its handler node.
+    # _route() performs a single lookup — it never grows.
     #
-    # Maps each Intent to its handler method.
-    # _route() performs a single lookup here — it never grows as new
-    # intents are added. Adding a new intent = one new entry below.
-    #
-    # Why a property and not a class-level dict?
-    # Handler methods are instance methods (self._handle_*).
-    # At class definition time, self doesn't exist yet, so we can't
-    # reference instance methods directly as class-level values.
-    # A property resolves this cleanly without any extra machinery.
+    # Why @property?
+    # Handlers are instance methods (self._handle_*), which require
+    # self to exist. At class definition time, self doesn't exist yet,
+    # so a class-level dict can't reference them directly.
+    # A property resolves this cleanly.
     # ------------------------------------------------------------------
 
     @property
@@ -213,27 +210,60 @@ class SupportAgent:
         }
 
     # ------------------------------------------------------------------
-    # Routing
+    # Node 2 — Routing
+    # Reads:  state.intent
+    # Writes: delegates to the matched handler node
     # ------------------------------------------------------------------
 
-    def _route(
-        self,
-        intent: Intent,
-        customer_id: str,
-        message: str,
-    ) -> AgentResponse:
+    def _route(self, state: AgentState) -> AgentState:
         """
-        Dispatch to the correct handler via _INTENT_HANDLERS.
+        Dispatch to the correct handler node via _INTENT_HANDLERS.
 
-        This method never grows. Adding new intents only requires
-        adding a new handler and a new entry in _INTENT_HANDLERS.
+        Notice the signature change from Milestone 1:
+            Before: _route(intent, customer_id, message) → AgentResponse
+            After:  _route(state)                        → AgentState
 
-        Falls back to _handle_general_inquiry if an unmapped intent
-        is somehow passed in — defensive, not speculative.
+        This method never grows. All routing knowledge lives in
+        _INTENT_HANDLERS; _route() is just the mechanism.
+
+        Falls back to _handle_general_inquiry defensively if an
+        unmapped intent somehow arrives.
+
+        LangGraph equivalent: a conditional edge that reads state.intent
+        and routes to the matching node.
         """
 
-        handler = self._INTENT_HANDLERS.get(intent, self._handle_general_inquiry)
-        return handler(customer_id, message, intent)
+        handler = self._INTENT_HANDLERS.get(intent := state.intent, self._handle_general_inquiry) # type: ignore
+        return handler(state)
+
+    # ------------------------------------------------------------------
+    # State → Response Converter
+    # Reads:  final AgentState
+    # Returns: AgentResponse (external contract)
+    #
+    # This is the boundary between internal pipeline state and the
+    # external API contract. Nothing above this line is visible to callers.
+    # ------------------------------------------------------------------
+
+    def _build_response(self, state: AgentState) -> AgentResponse:
+        """
+        Convert the completed internal AgentState into an AgentResponse.
+
+        AgentState  = internal — carries full pipeline context.
+        AgentResponse = external — the stable contract callers depend on.
+
+        Keeping this conversion explicit in one place means the internal
+        state structure can evolve (e.g., adding error fields, confidence
+        scores, memory references) without changing the external contract.
+        """
+
+        return AgentResponse(
+            intent=state.intent, # type: ignore
+            tool_used=state.tool_used,
+            ticket_id=state.ticket_id,
+            response=state.response or "",
+            needs_human=state.needs_human,
+        )
 
     # ------------------------------------------------------------------
     # Public Interface
@@ -247,13 +277,23 @@ class SupportAgent:
         """
         Entry point for all customer interactions.
 
-        Workflow:
-            1. Detect intent from the message.
-            2. Dispatch to the correct handler via _route().
-            3. Return a structured AgentResponse.
+        Workflow (each step is a node operating on shared state):
+            1. Initialize AgentState from caller inputs.
+            2. _detect_intent(state)  — populate state.intent.
+            3. _route(state)          — dispatch to handler node.
+            4. _build_response(state) — convert state → AgentResponse.
 
-        This is the only public method on SupportAgent.
+        External signature is unchanged from Milestone 1.
+        All existing validation tests pass without modification.
+        Only the internal architecture changed.
         """
 
-        intent = self._detect_intent(message)
-        return self._route(intent, customer_id, message)
+        state = AgentState(
+            customer_id=customer_id,
+            message=message,
+        )
+
+        state = self._detect_intent(state)
+        state = self._route(state)
+
+        return self._build_response(state)
