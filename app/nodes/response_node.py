@@ -153,6 +153,8 @@ def response_node(state: AgentState) -> AgentState:
     )
 
     # Case 1: LLM chose no_tool — no ticket was created, no result to read.
+    # The `or` short-circuits: if tool_decision is None, is_no_tool() is never called.
+    # Pylance understands this pattern — no separate assert needed here.
     if state.tool_decision is None or state.tool_decision.is_no_tool():
         state.response = _NO_TOOL_RESPONSE
         logger.info("response_node: no_tool path — returning clarification response.")

@@ -193,6 +193,10 @@ def tool_executor_node(state: AgentState) -> AgentState:
         )
         return state
 
+    # Explicit narrowing — the None guard above already confirms this,
+    # but Pylance requires an assert to track it through attribute access.
+    assert state.tool_decision is not None
+
     tool_name = state.tool_decision.tool_name
 
     # No-tool path: LLM determined no action is needed.
