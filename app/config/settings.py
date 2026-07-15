@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str
     model_name: str
+    openai_model: str
 
     # PostgreSQL
     postgres_host: str

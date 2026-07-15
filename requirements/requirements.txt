@@ -1,3 +1,6 @@
 pydantic-settings
 sqlalchemy
+
 langgraph
+
+openai

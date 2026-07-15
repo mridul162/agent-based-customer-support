@@ -204,7 +204,11 @@ class SupportAgent:
         and routes to the matching node.
         """
 
-        handler = self._INTENT_HANDLERS.get(intent := state.intent, self._handle_general_inquiry) # type: ignore
+        intent = state.intent
+        if intent is None:
+            handler = self._handle_general_inquiry
+        else:
+            handler = self._INTENT_HANDLERS.get(intent, self._handle_general_inquiry)
         return handler(state)
 
     # ------------------------------------------------------------------
@@ -229,7 +233,7 @@ class SupportAgent:
         """
 
         return AgentResponse(
-            intent=state.intent, # type: ignore
+            intent=state.intent or Intent.GENERAL_INQUIRY,
             tool_used=state.tool_used,
             ticket_id=state.ticket_id,
             response=state.response or "",
