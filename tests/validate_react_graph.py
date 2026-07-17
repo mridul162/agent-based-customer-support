@@ -97,13 +97,15 @@ def validate_refund_request() -> None:
     check("ticket_id extracted into state",
           bool(state.ticket_id))
     check("ticket_id in state matches tool_result",
-          state.ticket_id == state.tool_result.ticket_id) # type: ignore
+          state.ticket_id == state.tool_result.ticket_id)  # type: ignore
     check("needs_human is False on success",
           state.needs_human is False)
 
     # State preservation — prior node contributions must survive
     check("tool_decision preserved after executor ran",
           state.tool_decision is not None)
+    check("extracted_arguments populated by extraction node",
+          state.extracted_arguments is not None)
     check("tool_result not mutated (still a TicketResponse)",
           hasattr(state.tool_result, "ticket_id"))
 
@@ -186,19 +188,20 @@ def validate_state_completeness() -> None:
     state = run_graph(customer_id="C004", message="I was charged twice.")
 
     # Every node's output must coexist in the final state.
-    check("tool_decision (from llm_decision_node) present",   state.tool_decision is not None)
+    check("tool_decision (from llm_decision_node) present",        state.tool_decision is not None)
     assert state.tool_decision is not None  # Pylance narrowing
-    check("tool_used (from tool_executor_node) present",      state.tool_used is not None)
-    check("tool_result (from tool_executor_node) present",    state.tool_result is not None)
-    check("response (from response_node) present",            bool(state.response))
-    check("ticket_id (from response_node) present",           bool(state.ticket_id))
+    check("extracted_arguments (from extraction node) present",    state.extracted_arguments is not None)
+    check("tool_used (from tool_executor_node) present",           state.tool_used is not None)
+    check("tool_result (from tool_executor_node) present",         state.tool_result is not None)
+    check("response (from response_node) present",                 bool(state.response))
+    check("ticket_id (from response_node) present",                bool(state.ticket_id))
 
     # Input fields must be untouched
     check("customer_id unchanged",    state.customer_id == "C004")
     check("message unchanged",        state.message == "I was charged twice.")
 
-    print(f"  ℹ️  State fields populated: tool_decision ✓ tool_used ✓ "
-          f"tool_result ✓ response ✓ ticket_id ✓")
+    print(f"  ℹ️  State fields populated: tool_decision ✓ extracted_arguments ✓ "
+          f"tool_used ✓ tool_result ✓ response ✓ ticket_id ✓")
 
 
 # ---------------------------------------------------------------------------

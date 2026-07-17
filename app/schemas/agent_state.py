@@ -56,6 +56,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from app.schemas.agent import Intent
+from app.schemas.extracted_arguments import ExtractedArguments
 from app.schemas.tool_decision import ToolDecision
 
 
@@ -74,6 +75,11 @@ class AgentState(BaseModel):
 
     LLM Decision (written by llm_decision_node):
         tool_decision: The structured action decision from the LLM.
+
+    Argument Extraction (written by argument_extraction_node):
+        extracted_arguments: Structured values extracted from the customer's
+                             message. Tool-agnostic — stores what was found,
+                             not how it will be used.
                        Contains tool_name, reasoning, and arguments.
                        None until the LLM node runs.
                        Kept separate from execution results so decision
@@ -104,6 +110,14 @@ class AgentState(BaseModel):
     # This separation is important for evaluation: if execution fails,
     # we still have the LLM's original decision for debugging.
     tool_decision: ToolDecision | None = None
+
+    # -- Argument Extraction --
+    # Stores structured values extracted from the customer's message
+    # by argument_extraction_node. Kept separate from workflow state
+    # to avoid state pollution as tools multiply.
+    # Written by: argument_extraction_node
+    # Read by:    tool_executor_node (via extracted_arguments.get())
+    extracted_arguments: ExtractedArguments | None = None
 
     # -- Tool Execution --
     # tool_result preserves the raw object returned by the executed tool.
