@@ -48,6 +48,9 @@ Why extraction always runs (not conditional):
 Why linear edges (no conditional routing):
     The LLM decision node handles no_tool internally.
     tool_executor_node skips on is_no_tool().
+    argument_validation_node may set needs_clarification=True when required
+    arguments are missing — tool_executor_node checks this flag and skips
+    execution, and response_node generates a targeted clarification prompt.
     response_node handles None tool_result gracefully.
     Conditional edges are introduced when routing to specialist agents
     or escalation workflows is genuinely needed.

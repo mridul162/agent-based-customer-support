@@ -53,7 +53,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas.agent import Intent
 from app.schemas.extracted_arguments import ExtractedArguments
@@ -150,7 +150,7 @@ class AgentState(BaseModel):
     # The executor is skipped; response_node produces a clarification prompt.
     # missing_arguments lists the field names the customer must supply.
     needs_clarification: bool = False
-    missing_arguments: list[str] = []
+    missing_arguments: list[str] = Field(default_factory=list)
 
     # -- Control --
     needs_human: bool = False
