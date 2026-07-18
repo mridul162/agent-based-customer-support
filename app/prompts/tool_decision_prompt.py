@@ -66,7 +66,15 @@ Available tools:
    follow-up action: refund requests, delivery problems, order issues,
    billing errors, or any complaint that needs to be tracked.
 
-2. no_tool
+2. get_ticket_tool
+   Use this when the customer is asking about an existing ticket.
+   Use when:
+     - The customer asks about ticket status
+     - The customer references an existing ticket ID (e.g. TICKET-123)
+     - The customer wants an update on a previously created ticket
+   Do NOT use for creating a new issue.
+
+3. no_tool
    Use this only when no action is needed: greetings, thank-you messages,
    or messages that are clearly not support requests.
 
@@ -80,7 +88,7 @@ No explanation. No markdown. No code fences. Just the JSON.
 
 Response format:
 {
-  "tool_name": "create_ticket_tool" or "no_tool",
+  "tool_name": "create_ticket_tool" or "get_ticket_tool" or "no_tool",
   "reasoning": "one sentence explaining your choice"
 }
 """.strip()

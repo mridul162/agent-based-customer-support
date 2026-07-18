@@ -89,7 +89,7 @@ from typing import Any, Callable
 
 from app.schemas.agent_state import AgentState
 from app.schemas.tool_decision import NO_TOOL
-from app.tools.ticket_tools import create_ticket_tool
+from app.tools.ticket_tools import create_ticket_tool, get_ticket_tool
 
 logger = logging.getLogger(__name__)
 
@@ -126,6 +126,19 @@ _ARGUMENT_BUILDERS: dict[str, Callable[[AgentState], dict[str, Any]]] = {
         "customer_id": state.customer_id,
         "issue":       state.message,
     },
+
+    # get_ticket_tool is the first real consumer of state.extracted_arguments.
+    # ticket_id was extracted from language by argument_extraction_node —
+    # the executor reads it here without doing any language understanding itself.
+    # If extraction found nothing, ticket_id will be None and the tool
+    # will return None, which response_node handles as a not-found case.
+    "get_ticket_tool": lambda state: {
+        "ticket_id": (
+            state.extracted_arguments.get("ticket_id")
+            if state.extracted_arguments is not None
+            else None
+        ),
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -142,6 +155,7 @@ _ARGUMENT_BUILDERS: dict[str, Callable[[AgentState], dict[str, Any]]] = {
 # ---------------------------------------------------------------------------
 _TOOL_REGISTRY: dict[str, ToolFn] = {
     "create_ticket_tool": create_ticket_tool,
+    "get_ticket_tool":    get_ticket_tool,
 }
 
 

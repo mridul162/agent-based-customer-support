@@ -85,7 +85,14 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 def _build_ticket_response(tool_result: Any) -> str:
-    """Build a customer confirmation message from a TicketResponse."""
+    """
+    Build a customer confirmation message from a TicketResponse.
+
+    For create_ticket_tool, None means execution failed (not a user error).
+    Return empty string — response_node detects this and escalates.
+    """
+    if tool_result is None:
+        return ""   # Signals failure to response_node → escalation
     return (
         f"Your support ticket has been created successfully.\n\n"
         f"Ticket ID: {tool_result.ticket_id}\n\n"
@@ -93,8 +100,34 @@ def _build_ticket_response(tool_result: Any) -> str:
     )
 
 
+def _build_ticket_lookup_response(tool_result: Any) -> str:
+    """
+    Build a customer-facing response from a get_ticket_tool result.
+
+    Two cases:
+        - tool_result is None: ticket not found (bad ID or not yet created).
+        - tool_result is TicketResponse: return status and issue summary.
+
+    The not-found case is handled here (not in response_node) because
+    this builder owns the communication for this tool — it knows what
+    a None result means for get_ticket_tool specifically.
+    """
+    if tool_result is None:
+        return (
+            "We could not find a ticket with that ID. "
+            "Please verify the ticket number and try again."
+        )
+    return (
+        f"Here is the status of your ticket:\n\n"
+        f"Ticket ID: {tool_result.ticket_id}\n"
+        f"Status:    {tool_result.status.value}\n"
+        f"Issue:     {tool_result.issue}"
+    )
+
+
 _RESPONSE_BUILDERS: dict[str, Any] = {
     "create_ticket_tool": _build_ticket_response,
+    "get_ticket_tool":    _build_ticket_lookup_response,
 }
 
 # Response used when the LLM chose no_tool — no action was needed.
@@ -162,27 +195,24 @@ def response_node(state: AgentState) -> AgentState:
 
     tool_name = state.tool_used
 
-    # Case 2: tool was selected but execution failed (tool_result is None).
-    # Failure becomes a workflow state change, not just an error message.
-    # state.needs_human = True assigns ownership: a human agent takes over.
-    # The customer is not left with "please try again" and no path forward.
-    if tool_name is None or state.tool_result is None:
+    # Case 2: no tool_name means the executor couldn't identify the tool.
+    # This is a system-level failure — escalate to human.
+    if tool_name is None:
         state.needs_human = True
         state.response = _FALLBACK_RESPONSE
         logger.warning(
-            "response_node: tool_result is None for tool '%s' — "
+            "response_node: tool_used is None after non-no_tool decision — "
             "escalating to human agent (needs_human=True).",
-            tool_name,
             extra={"customer_id": state.customer_id},
         )
         return state
 
-    # Case 3: tool succeeded — build response from the observation.
+    # Case 3: look up the response builder for this tool.
     builder = _RESPONSE_BUILDERS.get(tool_name)
 
     if builder is None:
-        # Tool ran successfully but no response builder is registered.
-        # Developer oversight — escalate to human so the customer isn't stuck.
+        # No builder registered — developer oversight.
+        # Escalate so the customer isn't left without help.
         state.needs_human = True
         state.response = _FALLBACK_RESPONSE
         logger.error(
@@ -193,14 +223,34 @@ def response_node(state: AgentState) -> AgentState:
         )
         return state
 
+    # Pass tool_result directly to the builder — including None.
+    #
+    # Why: tool_result being None has different meanings per tool:
+    #   create_ticket_tool → None means execution failed  → escalate
+    #   get_ticket_tool    → None means ticket not found  → polite not-found message
+    #
+    # Each builder owns what None means for its specific tool.
+    # response_node must not make that decision centrally.
     state.response = builder(state.tool_result)
+
+    # Escalate only if the builder itself signals failure via a sentinel.
+    # For now: if response is still empty after building, treat as failure.
+    if not state.response:
+        state.needs_human = True
+        state.response = _FALLBACK_RESPONSE
+        logger.error(
+            "response_node: builder for '%s' returned empty response — escalating.",
+            tool_name,
+            extra={"customer_id": state.customer_id},
+        )
+        return state
 
     # Extract ticket_id from the tool result for the API layer.
     # The API response needs ticket_id as a top-level field (AgentResponse.ticket_id).
     # This is the appropriate place to extract it: this node is the first
     # consumer that needs it, and it reads from the preserved observation.
     if hasattr(state.tool_result, "ticket_id"):
-        state.ticket_id = state.tool_result.ticket_id
+        state.ticket_id = state.tool_result.ticket_id #type: ignore
 
     logger.info(
         "response_node completed",
