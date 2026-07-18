@@ -90,6 +90,11 @@ class AgentState(BaseModel):
         ticket_id:     ID of the created ticket, if any.
         response:      Final response text to return to the customer.
 
+    Argument Validation (written by argument_validation_node):
+        needs_clarification: True if required arguments were missing after extraction.
+                             Executor is skipped; response prompts the customer.
+        missing_arguments:   Names of the required fields that were not found.
+
     Control (set by any node that determines escalation is needed):
         needs_human:   True if the agent cannot handle this and a human
                        agent should take over.
@@ -138,6 +143,14 @@ class AgentState(BaseModel):
     tool_used: str | None = None
     ticket_id: str | None = None
     response: str | None = None
+
+    # -- Validation --
+    # Written by argument_validation_node.
+    # needs_clarification = True means required arguments were not extracted.
+    # The executor is skipped; response_node produces a clarification prompt.
+    # missing_arguments lists the field names the customer must supply.
+    needs_clarification: bool = False
+    missing_arguments: list[str] = []
 
     # -- Control --
     needs_human: bool = False

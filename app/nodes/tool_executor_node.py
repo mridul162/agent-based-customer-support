@@ -221,6 +221,19 @@ def tool_executor_node(state: AgentState) -> AgentState:
             extra={"customer_id": state.customer_id},
         )
         return state
+    
+    # Clarification path: argument_validation_node determined required
+    # arguments are missing from state.extracted_arguments.
+    # Skip execution — response_node will prompt the customer.
+    # This guard is what allows tools to assume arguments are never None.
+    if state.needs_clarification:
+        logger.info(
+            "tool_executor_node: needs_clarification=True — skipping execution. "
+            "Missing: %s",
+            state.missing_arguments,
+            extra={"customer_id": state.customer_id},
+        )
+        return state
 
     logger.info(
         "tool_executor_node started",

@@ -27,6 +27,9 @@ Architecture — ReAct loop wired as a graph:
       ↓                                     writes: state.tool_decision
     argument_extraction_node    → Extract:  regex extracts entities from message
       ↓                                     writes: state.extracted_arguments
+    argument_validation_node    → Validate: checks required args are present
+      ↓                                     writes: state.needs_clarification,
+      ↓                                             state.missing_arguments
     tool_executor_node          → Act:      executes the selected tool
       ↓                                     writes: state.tool_used, state.tool_result
     response_node               → Observe   reads tool_result (observation)
@@ -89,6 +92,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from app.nodes.argument_extraction_node import argument_extraction_node
+from app.nodes.argument_validation_node import argument_validation_node
 from app.nodes.llm_decision_node import llm_decision_node
 from app.nodes.response_node import response_node
 from app.nodes.tool_executor_node import tool_executor_node
@@ -115,8 +119,9 @@ def build_react_graph() -> CompiledStateGraph:
     # ------------------------------------------------------------------
 
     graph.add_node("llm_decision_node",        llm_decision_node)
-    graph.add_node("argument_extraction_node", argument_extraction_node)
-    graph.add_node("tool_executor_node",       tool_executor_node)
+    graph.add_node("argument_extraction_node",  argument_extraction_node)
+    graph.add_node("argument_validation_node",  argument_validation_node)
+    graph.add_node("tool_executor_node",        tool_executor_node)
     graph.add_node("response_node",            response_node)
 
     # ------------------------------------------------------------------
@@ -125,7 +130,8 @@ def build_react_graph() -> CompiledStateGraph:
 
     graph.add_edge(START,                        "llm_decision_node")
     graph.add_edge("llm_decision_node",          "argument_extraction_node")
-    graph.add_edge("argument_extraction_node",   "tool_executor_node")
+    graph.add_edge("argument_extraction_node",   "argument_validation_node")
+    graph.add_edge("argument_validation_node",   "tool_executor_node")
     graph.add_edge("tool_executor_node",         "response_node")
     graph.add_edge("response_node",              END)
 

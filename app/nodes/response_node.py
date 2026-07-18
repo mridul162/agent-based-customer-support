@@ -130,6 +130,24 @@ _RESPONSE_BUILDERS: dict[str, Any] = {
     "get_ticket_tool":    _build_ticket_lookup_response,
 }
 
+# Maps missing argument names to human-readable clarification prompts.
+# Owned here (not in validation node) because customer communication
+# is always response_node's responsibility.
+_CLARIFICATION_PROMPTS: dict[str, str] = {
+    "ticket_id": (
+        "Could you please provide your ticket ID? "
+        "It looks like TICKET- followed by letters and numbers (e.g. TICKET-123)."
+    ),
+    "order_id": (
+        "Could you please provide your order ID so I can look that up for you?"
+    ),
+}
+
+_DEFAULT_CLARIFICATION = (
+    "Could you provide more details so I can assist you? "
+    "I'm missing some information needed to complete your request."
+)
+
 # Response used when the LLM chose no_tool — no action was needed.
 _NO_TOOL_RESPONSE = (
     "Thank you for reaching out. "
@@ -191,6 +209,22 @@ def response_node(state: AgentState) -> AgentState:
     if state.tool_decision is None or state.tool_decision.is_no_tool():
         state.response = _NO_TOOL_RESPONSE
         logger.info("response_node: no_tool path — returning clarification response.")
+        return state
+
+    # Case 1b: validation determined required arguments are missing.
+    # Execution was skipped by tool_executor_node.
+    # Produce a targeted clarification prompt for the first missing argument.
+    if state.needs_clarification and state.missing_arguments:
+        first_missing = state.missing_arguments[0]
+        state.response = _CLARIFICATION_PROMPTS.get(
+            first_missing, _DEFAULT_CLARIFICATION
+        )
+        logger.info(
+            "response_node: needs_clarification=True — returning clarification prompt. "
+            "Missing: %s",
+            state.missing_arguments,
+            extra={"customer_id": state.customer_id},
+        )
         return state
 
     tool_name = state.tool_used
