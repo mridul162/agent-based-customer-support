@@ -8,229 +8,90 @@ raw result as an observation in AgentState.
 
 Responsibilities:
 -----------------
-- Read state.tool_decision (set by llm_decision_node).
-- Look up the tool in _TOOL_REGISTRY by tool_name.
-- Build tool arguments from state (Design B: executor owns argument construction).
-- Execute the tool.
-- Write state.tool_used and state.tool_result (the observation).
+- Read state.tool_decision.
+- Look up the ToolSpec in TOOL_REGISTRY.
+- Build arguments via spec.argument_builder(state).
+- Execute spec.tool_fn(**arguments).
+- Write state.tool_used and state.tool_result.
 - Return updated state.
 
 This module DOES NOT:
 ---------------------
-- Decide which tool to call (llm_decision_node's responsibility).
-- Generate customer-facing response text (response node's responsibility).
-- Modify ticket status or business data beyond what the tool itself does.
-- Build prompts or call the LLM.
-- Flatten tool results into individual state fields (consumers do that).
+- Define tool functions, argument builders, or response builders
+  (tool_registry.py owns all of that via ToolSpec).
+- Generate customer-facing responses.
+- Validate argument presence (argument_validation_node's responsibility).
+- Call the LLM.
 
-Architecture Philosophy:
-------------------------
-The agent loop this node completes:
-
-    State
-      ↓
-    LLM Decision Node   → answers: "What should happen?"
-      ↓
-    Tool Executor Node  → answers: "Execute it. What was observed?"  ← this file
-      ↓
-    Response Node       → answers: "How do we communicate this?"
-
-This is the ReAct pattern (Reason → Act → Observe → Respond),
-arrived at organically through architectural decisions rather than
-introduced as a named framework.
-
-Tool Registry:
---------------
-A dict mapping tool_name strings to callable functions.
-
-    _TOOL_REGISTRY = {
-        "create_ticket_tool": create_ticket_tool,
-    }
-
-Why a registry instead of if/elif?
-    - Adding a new tool = one new entry. The executor never changes.
-    - The LLM's tool_name string maps directly to a callable.
-    - Testable: the registry can be inspected to verify registered tools.
-    - Mirrors how production tool-calling systems work (OpenAI function
-      registry, LangChain tool lists, LangGraph ToolNode).
-
-Design B — executor builds arguments:
+Architecture change from Milestone 7:
 --------------------------------------
-Today's tools (create_ticket_tool) need customer_id and issue.
-Both already exist in state — the LLM did not derive them.
+Before: _TOOL_REGISTRY and _ARGUMENT_BUILDERS lived in this file.
+After:  spec.tool_fn and spec.argument_builder are read from TOOL_REGISTRY.
 
-Executor builds:
-    arguments = _ARGUMENT_BUILDERS[tool_name](state)
-
-rather than reading from state.tool_decision.arguments,
-because the LLM copying state values into arguments is wasted
-tokens and an extra failure surface (Design B from architecture review).
-
-When tools need LLM-derived arguments (order_id, reason, etc.),
-those values will be added to state.tool_decision.arguments by the
-decision node (Design A), and the argument builder will read them.
-Both patterns coexist cleanly in this structure.
+The execution logic is unchanged. Only the source of truth moved.
+Adding a new tool no longer requires editing this file.
 
 Observation pattern:
 --------------------
-state.tool_result stores the raw object returned by the tool.
-This is the observation. Downstream nodes extract what they need:
-
-    response_node reads:  state.tool_result.ticket_id
-    eval_node reads:      state.tool_result.status
-    audit_node reads:     state.tool_result  (full object)
-
-The executor cannot predict what consumers will need.
-Flattening prematurely discards information. Preserve and let consumers decide.
+state.tool_result stores the full raw object returned by the tool.
+Consumers (response_node, eval_node, audit_node) extract what they need.
+The executor never flattens or interprets the result.
 """
 
 import logging
-from typing import Any, Callable
 
 from app.schemas.agent_state import AgentState
-from app.schemas.tool_decision import NO_TOOL
-from app.tools.ticket_tools import create_ticket_tool, get_ticket_tool
+from app.tools.tool_registry import TOOL_REGISTRY
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Type alias for tool callables.
-# Every registered tool takes keyword arguments and returns Any.
-# ---------------------------------------------------------------------------
-ToolFn = Callable[..., Any]
-
-# ---------------------------------------------------------------------------
-# Argument Builders
-#
-# Maps tool_name → a function that builds that tool's keyword arguments
-# from AgentState.
-#
-# Why separate from _TOOL_REGISTRY?
-#     Argument construction is a different concern from tool execution.
-#     A tool's signature may change without the tool's registry entry
-#     changing, and vice versa. Separating them keeps each dict focused.
-#
-# Design B in practice:
-#     The builder reads directly from state, not from
-#     state.tool_decision.arguments. The LLM is not asked to re-state
-#     values that already exist in state.
-#
-# Future Design A extension:
-#     When a tool needs LLM-derived values, the builder reads them from
-#     state.tool_decision.arguments:
-#         "order_id": state.tool_decision.arguments.get("order_id")
-#     Both patterns are addable here without changing the executor logic.
-# ---------------------------------------------------------------------------
-_ARGUMENT_BUILDERS: dict[str, Callable[[AgentState], dict[str, Any]]] = {
-    "create_ticket_tool": lambda state: {
-        "customer_id": state.customer_id,
-        "issue":       state.message,
-    },
-
-    # get_ticket_tool is the first real consumer of state.extracted_arguments.
-    # ticket_id was extracted from language by argument_extraction_node —
-    # the executor reads it here without doing any language understanding itself.
-    # If extraction found nothing, ticket_id will be None and the tool
-    # will return None, which response_node handles as a not-found case.
-    "get_ticket_tool": lambda state: {
-        "ticket_id": (
-            state.extracted_arguments.get("ticket_id")
-            if state.extracted_arguments is not None
-            else None
-        ),
-    },
-}
-
-# ---------------------------------------------------------------------------
-# Tool Registry
-#
-# Maps tool_name strings to callable tool functions.
-# The LLM's tool_name in ToolDecision must match a key here exactly.
-#
-# Adding a new tool:
-#     1. Import the tool function.
-#     2. Add one entry to _TOOL_REGISTRY.
-#     3. Add one entry to _ARGUMENT_BUILDERS.
-#     The executor node never changes.
-# ---------------------------------------------------------------------------
-_TOOL_REGISTRY: dict[str, ToolFn] = {
-    "create_ticket_tool": create_ticket_tool,
-    "get_ticket_tool":    get_ticket_tool,
-}
-
-
-# ---------------------------------------------------------------------------
-# Node: tool_executor_node
-#
-# LangGraph node contract: (state: AgentState) -> AgentState
-#
-# Reads:  state.tool_decision
-# Writes: state.tool_used, state.tool_result
-#
-# Does NOT write: state.response (response node's responsibility)
-# ---------------------------------------------------------------------------
 
 def tool_executor_node(state: AgentState) -> AgentState:
     """
-    Execute the tool selected by the LLM and store the raw result.
+    Execute the selected tool and store the raw result as an observation.
 
-    Workflow:
-        1. Check for no_tool — skip execution if the LLM chose no action.
-        2. Look up the tool in _TOOL_REGISTRY.
-        3. Build arguments via _ARGUMENT_BUILDERS.
-        4. Execute the tool.
-        5. Write state.tool_used and state.tool_result.
+    Skip conditions (return state unchanged):
+        1. tool_decision is None      — graph wiring error
+        2. is_no_tool() is True       — LLM chose no action
+        3. needs_clarification True   — required arguments missing
 
-    On unknown tool_name:
-        Logs an error and leaves state.tool_result as None.
-        This surfaces as a missing response downstream rather than a crash.
-        A future improvement is setting state.needs_human = True here.
-
-    On tool execution failure:
-        Logs the error and leaves state.tool_result as None.
-        Same reasoning: fail gracefully, stay observable, don't crash the graph.
-
-    Args:
-        state: Current AgentState. Reads tool_decision.
-
-    Returns:
-        Updated AgentState with tool_used and tool_result populated.
+    On unknown tool_name or execution failure:
+        Logs the error, leaves tool_result as None.
+        response_node detects None and handles gracefully.
     """
 
-    # Guard: tool_decision must have been set by llm_decision_node.
-    # If it's None, the graph is wired incorrectly — log and return.
     if state.tool_decision is None:
         logger.error(
-            "tool_executor_node called with no tool_decision in state. "
+            "tool_executor_node called with no tool_decision. "
             "Check graph wiring — llm_decision_node must run first.",
             extra={"customer_id": state.customer_id},
         )
         return state
 
-    # Explicit narrowing — the None guard above already confirms this,
-    # but Pylance requires an assert to track it through attribute access.
-    assert state.tool_decision is not None
+    assert state.tool_decision is not None  # Pylance narrowing
 
-    tool_name = state.tool_decision.tool_name
-
-    # No-tool path: LLM determined no action is needed.
-    # Leave tool_used and tool_result as None — response node handles this.
     if state.tool_decision.is_no_tool():
         logger.info(
-            "tool_executor_node: no_tool decision — skipping execution.",
+            "tool_executor_node: no_tool — skipping execution.",
             extra={"customer_id": state.customer_id},
         )
         return state
-    
-    # Clarification path: argument_validation_node determined required
-    # arguments are missing from state.extracted_arguments.
-    # Skip execution — response_node will prompt the customer.
-    # This guard is what allows tools to assume arguments are never None.
+
     if state.needs_clarification:
         logger.info(
-            "tool_executor_node: needs_clarification=True — skipping execution. "
-            "Missing: %s",
+            "tool_executor_node: needs_clarification=True — skipping. Missing: %s",
             state.missing_arguments,
+            extra={"customer_id": state.customer_id},
+        )
+        return state
+
+    tool_name = state.tool_decision.tool_name
+    spec      = TOOL_REGISTRY.get(tool_name)
+
+    if spec is None:
+        logger.error(
+            "tool_executor_node: tool '%s' not found in TOOL_REGISTRY.",
+            tool_name,
             extra={"customer_id": state.customer_id},
         )
         return state
@@ -240,35 +101,16 @@ def tool_executor_node(state: AgentState) -> AgentState:
         extra={"customer_id": state.customer_id, "tool_name": tool_name},
     )
 
-    # Registry lookup.
-    tool_fn   = _TOOL_REGISTRY.get(tool_name)
-    arg_builder = _ARGUMENT_BUILDERS.get(tool_name)
-
-    if tool_fn is None or arg_builder is None:
-        logger.error(
-            "tool_executor_node: tool '%s' not found in registry.",
-            tool_name,
-            extra={"customer_id": state.customer_id},
-        )
-        # Do not raise — return state with tool_result = None.
-        # Downstream response node will detect missing result and handle it.
-        return state
-
     try:
-        arguments = arg_builder(state)
-        result    = tool_fn(**arguments)
+        arguments = spec.argument_builder(state)
+        result    = spec.tool_fn(**arguments)
 
-        # Store the full raw result as the observation.
-        # Do not flatten. Consumers extract what they need.
         state.tool_used   = tool_name
         state.tool_result = result
 
         logger.info(
             "tool_executor_node completed",
-            extra={
-                "tool_name":  tool_name,
-                "tool_result": repr(result),
-            },
+            extra={"tool_name": tool_name, "tool_result": repr(result)},
         )
 
     except Exception as e:
@@ -277,7 +119,5 @@ def tool_executor_node(state: AgentState) -> AgentState:
             tool_name, type(e).__name__, e,
             extra={"customer_id": state.customer_id},
         )
-        # tool_used and tool_result remain None.
-        # Graph continues; response node handles missing result.
 
     return state
