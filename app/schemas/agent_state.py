@@ -57,6 +57,7 @@ from pydantic import BaseModel, Field
 
 from app.schemas.agent import Intent
 from app.schemas.extracted_arguments import ExtractedArguments
+from app.schemas.routing_decision import RoutingDecision
 from app.schemas.tool_decision import ToolDecision
 
 
@@ -103,6 +104,11 @@ class AgentState(BaseModel):
     # -- Input --
     customer_id: str
     message: str
+
+    # -- Routing --
+    # Written by router_node. Identifies which specialist agent
+    # should handle this request. None until router runs.
+    routing_decision: RoutingDecision | None = None
 
     # -- Intent Detection --
     intent: Intent | None = None
