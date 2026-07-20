@@ -72,6 +72,7 @@ import logging
 import re
 
 from app.schemas.agent_state import AgentState
+from app.schemas.conversation_message import ConversationMessage
 from app.schemas.extracted_arguments import ExtractedArguments
 
 logger = logging.getLogger(__name__)
@@ -165,6 +166,29 @@ def _extract_all(message: str) -> dict[str, str]:
 # This enforces message-driven extraction.
 # ---------------------------------------------------------------------------
 
+def _recover_ticket_id_from_history(
+    history: list,
+) -> str | None:
+    """
+    Search prior assistant messages for a ticket ID.
+
+    Scans from most recent to oldest so the latest ticket is preferred
+    when a customer has created multiple tickets in one conversation.
+
+    Args:
+        history: list[ConversationMessage] from state.conversation_history.
+
+    Returns:
+        Extracted ticket_id string or None if not found in history.
+    """
+    for message in reversed(history):
+        if message.role == "assistant":
+            match = _TICKET_ID_PATTERN.search(message.content)
+            if match:
+                return match.group(0).upper()
+    return None
+
+
 def argument_extraction_node(state: AgentState) -> AgentState:
     """
     Extract structured entities from the customer's message.
@@ -189,6 +213,19 @@ def argument_extraction_node(state: AgentState) -> AgentState:
     )
 
     found = _extract_all(state.message)
+
+    # Memory fallback: if ticket_id was not found in the current message,
+    # search conversation history for a prior assistant response containing one.
+    # This handles "What's the status?" after "Ticket TICKET-123 created."
+    if "ticket_id" not in found:
+        recovered = _recover_ticket_id_from_history(state.conversation_history)
+        if recovered:
+            found["ticket_id"] = recovered
+            logger.info(
+                "argument_extraction_node: recovered ticket_id '%s' from history.",
+                recovered,
+                extra={"customer_id": state.customer_id},
+            )
 
     state.extracted_arguments = ExtractedArguments(values=found)
 

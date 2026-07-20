@@ -59,6 +59,8 @@ from app.schemas.agent import Intent
 from app.schemas.extracted_arguments import ExtractedArguments
 from app.schemas.routing_decision import RoutingDecision
 from app.schemas.tool_decision import ToolDecision
+from app.schemas.conversation_message import ConversationMessage
+
 
 
 class AgentState(BaseModel):
@@ -109,6 +111,13 @@ class AgentState(BaseModel):
     # Written by router_node. Identifies which specialist agent
     # should handle this request. None until router runs.
     routing_decision: RoutingDecision | None = None
+
+    # -- Conversation Memory --
+    # Loaded by memory_loader_node from ConversationService.
+    # Written by memory_writer_node after response is generated.
+    # Available to all nodes — extraction can use prior turns
+    # to recover entities like ticket_id when not in the current message.
+    conversation_history: list[ConversationMessage] = Field(default_factory=list)
 
     # -- Intent Detection --
     intent: Intent | None = None

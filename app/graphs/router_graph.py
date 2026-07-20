@@ -12,10 +12,14 @@ Architecture:
 -------------
     START
       ↓
+    memory_loader_node    → loads conversation history into state
+      ↓                     writes: state.conversation_history
     router_node           → LLM selects which agent handles this
       ↓                     writes: state.routing_decision
     agent_dispatch_node   → invokes the selected specialist agent
       ↓                     merges: agent's state output into parent state
+    memory_writer_node    → persists this turn to ConversationService
+      ↓
     END
 
 Why no conditional edges at the router level?
@@ -42,6 +46,8 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from app.nodes.agent_dispatch_node import agent_dispatch_node
+from app.nodes.memory_loader_node import memory_loader_node
+from app.nodes.memory_writer_node import memory_writer_node
 from app.nodes.router_node import router_node
 from app.schemas.agent_state import AgentState
 
@@ -60,12 +66,16 @@ def build_router_graph() -> CompiledStateGraph:
 
     graph = StateGraph(AgentState)
 
+    graph.add_node("memory_loader_node",  memory_loader_node)
     graph.add_node("router_node",         router_node)
     graph.add_node("agent_dispatch_node", agent_dispatch_node)
+    graph.add_node("memory_writer_node",  memory_writer_node)
 
-    graph.add_edge(START,                "router_node")
-    graph.add_edge("router_node",        "agent_dispatch_node")
-    graph.add_edge("agent_dispatch_node", END)
+    graph.add_edge(START,                  "memory_loader_node")
+    graph.add_edge("memory_loader_node",   "router_node")
+    graph.add_edge("router_node",          "agent_dispatch_node")
+    graph.add_edge("agent_dispatch_node",  "memory_writer_node")
+    graph.add_edge("memory_writer_node",   END)
 
     return graph.compile()
 
