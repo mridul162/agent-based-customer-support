@@ -3,66 +3,72 @@ app/services/conversation_service.py
 
 Purpose:
 --------
-Store and retrieve conversation history per customer.
+Manage conversation history for customers.
 
 Responsibilities:
 -----------------
-- Maintain per-customer conversation history in memory.
-- Provide save, load, and append operations.
-- Return typed ConversationMessage lists.
+- Retrieve conversation history.
+- Append conversation turns.
+- Clear conversation history (tests/admin operations).
+- Define transaction boundaries for conversation operations.
 
-This module DOES NOT:
----------------------
-- Know about AgentState or the graph.
-- Generate responses or make LLM calls.
-- Own business logic about tickets or orders.
+This service DOES NOT:
+----------------------
+- Execute SQL directly (except temporary maintenance operations).
+- Know ORM implementation details.
+- Manage commits or rollbacks manually.
+- Contain agent logic.
 
 Architecture:
 -------------
-Same pattern as TicketService: in-memory dict for Milestone 10,
-replaced by PostgreSQL in a future milestone without changing node code.
+    Agent / API
+          ↓
+    ConversationService
+          ↓
+    ConversationRepository
+          ↓
+      SQLAlchemy
 
-    memory_loader_node → ConversationService.get_history(customer_id)
-    memory_writer_node → ConversationService.append_turn(customer_id, ...)
+Session Management:
+-------------------
+Every public method executes inside a transaction-scoped session
+provided by get_session().
 
-The service is the single owner of persistence.
-Nodes never store history themselves.
+Transaction behavior:
 
-Technical debt (intentional):
-------------------------------
-In-memory storage resets on service restart.
-Acceptable for Milestone 10 — PostgreSQL persistence comes later.
+    Success:
+        commit automatically
+
+    Failure:
+        rollback automatically
+
+    Always:
+        session closes automatically
+
+Repositories are responsible only for persistence operations.
+Transaction ownership belongs to the service layer.
 """
 
+from app.database.connection import get_session
+from app.models.conversation_message_model import ConversationMessageDB
+from app.repositories.conversation_repository import ConversationRepository
 from app.schemas.conversation_message import ConversationMessage
 
 
 class ConversationService:
     """
-    In-memory store of conversation history keyed by customer_id.
+    Service layer for conversation history management.
 
-    Each customer's history is a list of ConversationMessages in
-    chronological order (oldest first).
+    Delegates persistence to ConversationRepository while owning
+    transaction boundaries through get_session().
     """
 
-    def __init__(self) -> None:
-        # dict[customer_id, list[ConversationMessage]]
-        self._history: dict[str, list[ConversationMessage]] = {}
-
-    def get_history(self, customer_id: str) -> list[ConversationMessage]:
-        """
-        Return the full conversation history for a customer.
-
-        Returns an empty list if the customer has no prior history.
-        Never returns None — callers can always iterate the result.
-
-        Args:
-            customer_id: The customer's unique identifier.
-
-        Returns:
-            List of ConversationMessage, oldest first.
-        """
-        return list(self._history.get(customer_id, []))
+    def get_history(
+        self,
+        customer_id: str,
+    ) -> list[ConversationMessage]:
+        with get_session() as session:
+            return ConversationRepository(session).get_history(customer_id)
 
     def append_turn(
         self,
@@ -70,39 +76,27 @@ class ConversationService:
         user_message: str,
         assistant_response: str,
     ) -> None:
-        """
-        Append one user + assistant turn to the customer's history.
-
-        Both messages are appended together so history always contains
-        complete turns (no orphaned user messages without a response).
-
-        Args:
-            customer_id:        The customer's unique identifier.
-            user_message:       The customer's raw message text.
-            assistant_response: The agent's response text.
-        """
-        if customer_id not in self._history:
-            self._history[customer_id] = []
-
-        self._history[customer_id].append(
-            ConversationMessage(role="user", content=user_message)
-        )
-        self._history[customer_id].append(
-            ConversationMessage(role="assistant", content=assistant_response)
-        )
+        with get_session() as session:
+            ConversationRepository(session).append_turn(
+                customer_id=customer_id,
+                user_message=user_message,
+                assistant_response=assistant_response,
+            )
 
     def clear_history(self, customer_id: str) -> None:
         """
-        Clear all history for a customer.
-
-        Used in testing and for future session management.
+        Delete all messages for a customer.
+        Args:
+            customer_id: The customer's unique identifier.
         """
-        self._history.pop(customer_id, None)
+        with get_session() as session:
+            ConversationRepository(session).clear_history(customer_id)
 
 
 # ---------------------------------------------------------------------------
-# Module-level singleton.
-# Shared across all nodes in the same process.
-# Replaced by a per-request injected instance when PostgreSQL is introduced.
+# Module-Level Singleton
+#
+# Preserves the same interface used throughout the application.
 # ---------------------------------------------------------------------------
+
 conversation_service = ConversationService()
