@@ -80,7 +80,10 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
         logger.error(
             "agent_dispatch_node: routing_decision is None. "
             "Check graph wiring — router_node must run first.",
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+            },
         )
         state.needs_human = True
         state.response    = _FALLBACK_RESPONSE
@@ -93,7 +96,10 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
         logger.error(
             "agent_dispatch_node: agent '%s' not found in AGENT_REGISTRY.",
             agent_name,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+            },
         )
         state.needs_human = True
         state.response    = _FALLBACK_RESPONSE
@@ -102,7 +108,10 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
     logger.info(
         "agent_dispatch_node: invoking '%s'.",
         agent_name,
-        extra={"customer_id": state.customer_id},
+        extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+            },
     )
 
     try:
@@ -121,7 +130,10 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
         logger.info(
             "agent_dispatch_node: '%s' completed.",
             agent_name,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+            },
         )
 
         return merged
@@ -130,7 +142,10 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
         logger.error(
             "agent_dispatch_node: agent '%s' raised %s: %s",
             agent_name, type(e).__name__, e,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+            },
         )
         state.needs_human = True
         state.response    = _FALLBACK_RESPONSE

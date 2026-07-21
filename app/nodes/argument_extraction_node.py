@@ -209,7 +209,10 @@ def argument_extraction_node(state: AgentState) -> AgentState:
 
     logger.info(
         "argument_extraction_node started",
-        extra={"customer_id": state.customer_id},
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id
+        },
     )
 
     found = _extract_all(state.message)
@@ -224,7 +227,10 @@ def argument_extraction_node(state: AgentState) -> AgentState:
             logger.info(
                 "argument_extraction_node: recovered ticket_id '%s' from history.",
                 recovered,
-                extra={"customer_id": state.customer_id},
+                extra={
+                    "request_id": state.request_id,
+                    "customer_id": state.customer_id
+                },
             )
 
     state.extracted_arguments = ExtractedArguments(values=found)
@@ -232,6 +238,7 @@ def argument_extraction_node(state: AgentState) -> AgentState:
     logger.info(
         "argument_extraction_node completed",
         extra={
+            "request_id": state.request_id,
             "customer_id": state.customer_id,
             "extracted_keys": list(found.keys()),
             "extracted_count": len(found),

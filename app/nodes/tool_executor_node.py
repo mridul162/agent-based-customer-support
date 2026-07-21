@@ -64,7 +64,10 @@ def tool_executor_node(state: AgentState) -> AgentState:
         logger.error(
             "tool_executor_node called with no tool_decision. "
             "Check graph wiring — llm_decision_node must run first.",
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
@@ -73,7 +76,10 @@ def tool_executor_node(state: AgentState) -> AgentState:
     if state.tool_decision.is_no_tool():
         logger.info(
             "tool_executor_node: no_tool — skipping execution.",
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
@@ -81,7 +87,10 @@ def tool_executor_node(state: AgentState) -> AgentState:
         logger.info(
             "tool_executor_node: needs_clarification=True — skipping. Missing: %s",
             state.missing_arguments,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
@@ -92,13 +101,20 @@ def tool_executor_node(state: AgentState) -> AgentState:
         logger.error(
             "tool_executor_node: tool '%s' not found in TOOL_REGISTRY.",
             tool_name,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
     logger.info(
         "tool_executor_node started",
-        extra={"customer_id": state.customer_id, "tool_name": tool_name},
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
+            "tool_name": tool_name
+        },
     )
 
     try:
@@ -110,14 +126,22 @@ def tool_executor_node(state: AgentState) -> AgentState:
 
         logger.info(
             "tool_executor_node completed",
-            extra={"tool_name": tool_name, "tool_result": repr(result)},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+                "tool_name": tool_name,
+                "tool_result": repr(result)
+            },
         )
 
     except Exception as e:
         logger.error(
             "tool_executor_node: tool '%s' raised %s: %s",
             tool_name, type(e).__name__, e,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
 
     return state

@@ -56,11 +56,10 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from app.schemas.agent import Intent
+from app.schemas.conversation_message import ConversationMessage
 from app.schemas.extracted_arguments import ExtractedArguments
 from app.schemas.routing_decision import RoutingDecision
 from app.schemas.tool_decision import ToolDecision
-from app.schemas.conversation_message import ConversationMessage
-
 
 
 class AgentState(BaseModel):
@@ -72,6 +71,17 @@ class AgentState(BaseModel):
     Input (set by handle_message / graph entry):
         customer_id:   The customer's unique identifier.
         message:       The raw customer message.
+        request_id:    UUID generated per request by RouterService.
+                       Flows through all nodes for tracing, observability,
+                       evaluation, and debugging. None for direct graph calls.
+
+    Conversation Memory (loaded by memory_loader_node):
+        conversation_history: Prior turns for this customer, oldest first.
+                              Available to extraction and agent nodes.
+
+    Routing (written by router_node):
+        routing_decision: Which specialist agent handles this request.
+                          Carries agent_name and reasoning for observability.
 
     Intent Detection (written by detect_intent_node):
         intent:        Classified Intent enum value. None until detected.
@@ -106,6 +116,7 @@ class AgentState(BaseModel):
     # -- Input --
     customer_id: str
     message: str
+    request_id: str | None = None   # set by RouterService; flows through all nodes
 
     # -- Routing --
     # Written by router_node. Identifies which specialist agent

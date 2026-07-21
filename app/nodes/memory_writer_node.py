@@ -77,6 +77,10 @@ def memory_writer_node(state: AgentState) -> AgentState:
         "History now has %d messages.",
         state.customer_id,
         len(conversation_service.get_history(state.customer_id)),
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
+        },
     )
 
     return state

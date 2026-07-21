@@ -79,7 +79,10 @@ def router_node(state: AgentState) -> AgentState:
 
     logger.info(
         "router_node started",
-        extra={"customer_id": state.customer_id},
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
+        },
     )
 
     try:
@@ -105,7 +108,10 @@ def router_node(state: AgentState) -> AgentState:
         logger.error(
             "router_node failed: %s — falling back to '%s'.",
             repr(e), _FALLBACK_AGENT,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+            },
         )
         routing_decision = RoutingDecision(
             agent_name=_FALLBACK_AGENT,
@@ -117,6 +123,8 @@ def router_node(state: AgentState) -> AgentState:
     logger.info(
         "router_node completed",
         extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
             "agent_name": routing_decision.agent_name,
             "reasoning":  routing_decision.reasoning,
         },

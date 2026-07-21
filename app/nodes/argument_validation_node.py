@@ -65,7 +65,11 @@ def argument_validation_node(state: AgentState) -> AgentState:
 
     logger.info(
         "argument_validation_node started",
-        extra={"customer_id": state.customer_id, "tool_name": tool_name},
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
+            "tool_name": tool_name
+        },
     )
 
     missing: list[str] = [

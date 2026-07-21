@@ -2,7 +2,7 @@ pydantic-settings
 sqlalchemy
 
 langgraph
-
 openai
-
 psycopg
+fastapi
+uvicorn

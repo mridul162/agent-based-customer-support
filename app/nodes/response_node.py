@@ -87,7 +87,10 @@ def response_node(state: AgentState) -> AgentState:
         5.  success            → builder produces response
     """
 
-    logger.info("response_node started", extra={"customer_id": state.customer_id})
+    logger.info("response_node started", extra={
+        "request_id": state.request_id,
+        "customer_id": state.customer_id
+    })
 
     # Case 1: no_tool
     if state.tool_decision is None or state.tool_decision.is_no_tool():
@@ -102,7 +105,10 @@ def response_node(state: AgentState) -> AgentState:
         logger.info(
             "response_node: needs_clarification=True. Missing: %s",
             state.missing_arguments,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
@@ -114,7 +120,10 @@ def response_node(state: AgentState) -> AgentState:
         state.response    = _FALLBACK_RESPONSE
         logger.warning(
             "response_node: tool_used is None — escalating.",
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
@@ -127,7 +136,10 @@ def response_node(state: AgentState) -> AgentState:
         logger.error(
             "response_node: tool '%s' not found in TOOL_REGISTRY — escalating.",
             tool_name,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
@@ -142,7 +154,10 @@ def response_node(state: AgentState) -> AgentState:
         logger.error(
             "response_node: builder for '%s' returned empty — escalating.",
             tool_name,
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id
+            },
         )
         return state
 
@@ -152,7 +167,12 @@ def response_node(state: AgentState) -> AgentState:
 
     logger.info(
         "response_node completed",
-        extra={"tool_name": tool_name, "ticket_id": state.ticket_id},
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
+            "tool_name": tool_name,
+            "ticket_id": state.ticket_id
+        },
     )
 
     return state

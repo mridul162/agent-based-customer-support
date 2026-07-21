@@ -65,9 +65,14 @@ def memory_loader_node(state: AgentState) -> AgentState:
     state.conversation_history = history
 
     logger.info(
-        "memory_loader_node: loaded %d messages for customer '%s'.",
+        "memory_loader_node: loaded %d messages for customer '%s' and request '%s'.",
         len(history),
         state.customer_id,
+        state.request_id,
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id
+        },
     )
 
     return state

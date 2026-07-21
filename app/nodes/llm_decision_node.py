@@ -109,7 +109,10 @@ def llm_decision_node(state: AgentState) -> AgentState:
 
     logger.info(
         "llm_decision_node started",
-        extra={"customer_id": state.customer_id},
+        extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id
+        },
     )
 
     try:
@@ -144,7 +147,10 @@ def llm_decision_node(state: AgentState) -> AgentState:
         logger.error(
             "llm_decision_node failed: %s — falling back to no_tool",
             repr(e),
-            extra={"customer_id": state.customer_id},
+            extra={
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
+            },
         )
         tool_decision = ToolDecision(
             tool_name=NO_TOOL,
@@ -156,6 +162,8 @@ def llm_decision_node(state: AgentState) -> AgentState:
     logger.info(
         "llm_decision_node completed",
         extra={
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
             "tool_name": tool_decision.tool_name,
             "reasoning": tool_decision.reasoning,
         },
