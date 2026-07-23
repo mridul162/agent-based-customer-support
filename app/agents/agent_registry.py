@@ -27,6 +27,8 @@ from langgraph.graph.state import CompiledStateGraph
 
 from app.graphs.react_graph import react_graph
 from app.schemas.agent_state import AgentState
+from app.graphs.escalation_agent import escalation_agent_graph  # ← add this
+from app.graphs.react_graph import react_graph
 
 
 # ---------------------------------------------------------------------------
@@ -91,4 +93,5 @@ AGENT_REGISTRY: dict[str, CompiledStateGraph] = {
     "ticket_agent": react_graph,          # Full implementation — Milestones 4–8
     "faq_agent":    _build_faq_stub(),    # Stub — future milestone
     "order_agent":  _build_order_stub(),  # Stub — future milestone
+    "escalation_agent": escalation_agent_graph,  # Full implementation — Milestone 13
 }

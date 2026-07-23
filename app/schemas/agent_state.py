@@ -60,6 +60,7 @@ from app.schemas.conversation_message import ConversationMessage
 from app.schemas.extracted_arguments import ExtractedArguments
 from app.schemas.routing_decision import RoutingDecision
 from app.schemas.tool_decision import ToolDecision
+from app.schemas.escalation import EscalationResponse
 
 
 class AgentState(BaseModel):
@@ -177,6 +178,31 @@ class AgentState(BaseModel):
     # missing_arguments lists the field names the customer must supply.
     needs_clarification: bool = False
     missing_arguments: list[str] = Field(default_factory=list)
+
+    # -- Escalation --
+    # Written by escalation_detection_node.
+    #
+    # escalation_reason:
+    #     Human-readable explanation for why escalation was triggered.
+    #
+    # escalation_queue:
+    #     Which specialist queue should receive the escalation
+    #     (general, legal, safety, billing).
+    #
+    # escalation_response:
+    #     Result returned by escalation_agent after the escalation
+    #     record is created in PostgreSQL.
+    #
+    # These fields are separate from needs_human:
+    #     needs_human answers:
+    #         "Should a human be involved?"
+    #
+    #     escalation_response answers:
+    #         "What escalation record was actually created?"
+    #
+    escalation_reason: str | None = None
+    escalation_queue: str | None = None
+    escalation_response: EscalationResponse | None = None
 
     # -- Control --
     needs_human: bool = False

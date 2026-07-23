@@ -18,6 +18,7 @@ from app.database.connection import Base, engine
 # If a model is not imported here, its table will not be created.
 from app.models.conversation_message_model import ConversationMessageDB  # noqa: F401
 from app.models.ticket_model import Ticket  # noqa: F401
+from app.models.escalation_model import Escalation  # noqa: F401
 
 
 def init_db() -> None:
