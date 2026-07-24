@@ -99,6 +99,7 @@ from app.nodes.argument_validation_node import argument_validation_node
 from app.nodes.llm_decision_node import llm_decision_node
 from app.nodes.response_node import response_node
 from app.nodes.tool_executor_node import tool_executor_node
+from app.observability.tracing import traced
 from app.schemas.agent_state import AgentState
 
 
@@ -121,11 +122,11 @@ def build_react_graph() -> CompiledStateGraph:
     # String names are used in add_edge() calls below.
     # ------------------------------------------------------------------
 
-    graph.add_node("llm_decision_node",        llm_decision_node)
-    graph.add_node("argument_extraction_node",  argument_extraction_node)
-    graph.add_node("argument_validation_node",  argument_validation_node)
-    graph.add_node("tool_executor_node",        tool_executor_node)
-    graph.add_node("response_node",            response_node)
+    graph.add_node("llm_decision_node",        traced("llm_decision_node")(llm_decision_node))
+    graph.add_node("argument_extraction_node",  traced("argument_extraction_node")(argument_extraction_node))
+    graph.add_node("argument_validation_node",  traced("argument_validation_node")(argument_validation_node))
+    graph.add_node("tool_executor_node",        traced("tool_executor_node")(tool_executor_node))
+    graph.add_node("response_node",            traced("response_node")(response_node))
 
     # ------------------------------------------------------------------
     # Define Edges — linear sequence, no conditional routing yet.

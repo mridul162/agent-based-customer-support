@@ -34,18 +34,19 @@ memory_loader_node
 
 from app.observability.tracer import ExecutionTracer
 from app.schemas.agent_state import AgentState
+from datetime import UTC, datetime
+from app.schemas.execution_trace import ExecutionTrace
 
 
 def trace_initializer_node(state: AgentState) -> AgentState:
     """
-    Initialize execution tracing for this request.
+    Create the execution trace for the current request.
     """
 
-    tracer = ExecutionTracer(
-        request_id=state.request_id, #type: ignore
+    state.execution_trace = ExecutionTrace(
+        request_id=state.request_id, # type: ignore
         customer_id=state.customer_id,
+        started_at=datetime.now(UTC),
     )
-
-    state.execution_trace = tracer.trace
 
     return state

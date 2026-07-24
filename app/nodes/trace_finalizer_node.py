@@ -23,19 +23,16 @@ from app.schemas.agent_state import AgentState
 
 
 def trace_finalizer_node(state: AgentState) -> AgentState:
-    """
-    Finalize execution timing.
-    """
+    trace = state.execution_trace
 
-    if state.execution_trace is None:
+    if trace is None:
         return state
 
     finished = datetime.now(UTC)
 
-    state.execution_trace.finished_at = finished
-
-    state.execution_trace.total_duration_ms = (
-        finished - state.execution_trace.started_at
+    trace.finished_at = finished
+    trace.total_duration_ms = (
+        finished - trace.started_at
     ).total_seconds() * 1000
 
     return state

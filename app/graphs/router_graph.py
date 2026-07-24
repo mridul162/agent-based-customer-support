@@ -42,6 +42,7 @@ router_graph is a new top-level graph that delegates to react_graph
 (and future specialist agents) via agent_dispatch_node.
 """
 
+from langgraph import graph
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
@@ -49,11 +50,13 @@ from app.nodes.agent_dispatch_node import agent_dispatch_node
 from app.nodes.memory_loader_node import memory_loader_node
 from app.nodes.memory_writer_node import memory_writer_node
 from app.nodes.router_node import router_node
+from app.observability.tracing import traced
 from app.schemas.agent_state import AgentState
 from app.graphs.escalation_agent import escalation_agent_graph
 from app.nodes.escalation_detection_node import escalation_detection_node
 from app.nodes.trace_initializer_node import trace_initializer_node
 from app.nodes.trace_finalizer_node import trace_finalizer_node
+from app.nodes.subgraph_node import subgraph_node
 
 
 def build_router_graph() -> CompiledStateGraph:
@@ -70,14 +73,21 @@ def build_router_graph() -> CompiledStateGraph:
 
     graph = StateGraph(AgentState)
 
-    graph.add_node("memory_loader_node",  memory_loader_node)
-    graph.add_node("router_node",         router_node)
-    graph.add_node("agent_dispatch_node", agent_dispatch_node)
-    graph.add_node("memory_writer_node",  memory_writer_node)
-    graph.add_node("escalation_detection_node", escalation_detection_node)
-    graph.add_node("escalation_agent", escalation_agent_graph)
-    graph.add_node("trace_initializer_node", trace_initializer_node)
-    graph.add_node("trace_finalizer_node", trace_finalizer_node)
+    graph.add_node("memory_loader_node",  traced("memory_loader_node")(memory_loader_node))
+    graph.add_node("router_node",         traced("router_node")(router_node))
+    graph.add_node("agent_dispatch_node", traced("agent_dispatch_node")(agent_dispatch_node))
+    graph.add_node("memory_writer_node",  traced("memory_writer_node")(memory_writer_node))
+    graph.add_node("escalation_detection_node", traced("escalation_detection_node")(escalation_detection_node))
+    
+    graph.add_node(
+        "escalation_agent",
+        traced("escalation_agent")(
+            subgraph_node(escalation_agent_graph)
+        ),
+    )
+
+    graph.add_node("trace_initializer_node", traced("trace_initializer_node")(trace_initializer_node))
+    graph.add_node("trace_finalizer_node", traced("trace_finalizer_node")(trace_finalizer_node))
 
     graph.add_edge(START,                  "trace_initializer_node")
     graph.add_edge("trace_initializer_node", "memory_loader_node")
@@ -85,6 +95,7 @@ def build_router_graph() -> CompiledStateGraph:
     graph.add_conditional_edges("escalation_detection_node", lambda state: ("escalation_agent" if state.needs_human else "router_node"))
     graph.add_edge("router_node",          "agent_dispatch_node")
     graph.add_edge("agent_dispatch_node",  "memory_writer_node")
+    graph.add_edge("escalation_agent",     "memory_writer_node")
     graph.add_edge("memory_writer_node",   "trace_finalizer_node")
     graph.add_edge("trace_finalizer_node",   END)
 
