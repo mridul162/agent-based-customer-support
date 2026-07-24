@@ -57,6 +57,7 @@ from pydantic import BaseModel, Field
 
 from app.schemas.agent import Intent
 from app.schemas.conversation_message import ConversationMessage
+from app.schemas.execution_trace import ExecutionTrace
 from app.schemas.extracted_arguments import ExtractedArguments
 from app.schemas.routing_decision import RoutingDecision
 from app.schemas.tool_decision import ToolDecision
@@ -170,6 +171,19 @@ class AgentState(BaseModel):
     tool_used: str | None = None
     ticket_id: str | None = None
     response: str | None = None
+
+    # -------------------------------------------------------------------------
+# Observability
+# -------------------------------------------------------------------------
+
+    execution_trace: ExecutionTrace | None = Field(
+        default=None,
+        description=(
+            "Execution timeline for the current graph invocation. "
+            "Created at the start of the request and populated by the "
+            "ExecutionTracer as nodes execute."
+        ),
+    )
 
     # -- Validation --
     # Written by argument_validation_node.
