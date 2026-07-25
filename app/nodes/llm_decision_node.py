@@ -62,7 +62,7 @@ extracts or synthesizes that don't already exist in state.
 import logging
 
 from app.config.settings import settings
-from app.llm.openai_client import get_openai_client
+from app.llm.llm_service import LLMService
 from app.prompts.tool_decision_prompt import TOOL_DECISION_SYSTEM_PROMPT
 from app.schemas.agent_state import AgentState
 from app.schemas.tool_decision import NO_TOOL, ToolDecision
@@ -116,13 +116,11 @@ def llm_decision_node(state: AgentState) -> AgentState:
     )
 
     try:
-        client = get_openai_client()
-
         # client.beta.chat.completions.parse() asks the LLM to return
         # a response that conforms to the ToolDecision Pydantic schema.
         # The SDK handles serialization and validation internally.
         # No json.loads(), no ToolDecision(**parsed) — one step.
-        completion = client.beta.chat.completions.parse(
+        completion = LLMService.parse_chat_completion(
             model=settings.openai_model,
             temperature=0,      # Deterministic: tool selection is not creative.
             max_tokens=200,     # ToolDecision (tool_name + reasoning) is small.
@@ -132,6 +130,8 @@ def llm_decision_node(state: AgentState) -> AgentState:
                 {"role": "user",   "content": state.message},
             ],
             response_format=ToolDecision,
+            execution_trace=state.execution_trace,
+            node_name="llm_decision_node",
         )
 
         tool_decision = completion.choices[0].message.parsed

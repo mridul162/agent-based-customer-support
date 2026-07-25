@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     # Environment
     app_env: str
 
+    # LLM Provider
+    llm_provider: str = "OpenAI"
+
     # OpenAI
     openai_api_key: str
     openai_model: str

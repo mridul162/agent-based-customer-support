@@ -29,13 +29,10 @@ HTTP Request
       │
       ▼
 ExecutionTrace
-    ├── NodeTrace (...)
-    ├── NodeTrace (...)
-    ├── ExecutionMetrics
-    └── ToolMetrics[]
-            ├── create_ticket_tool
-            ├── get_ticket_tool
-            └── ...
+├── NodeTrace[]
+├── ExecutionMetrics
+├── ToolMetrics[]
+└── LLMMetrics[]
 
 Later Milestones:
 -----------------
@@ -53,6 +50,7 @@ from pydantic import BaseModel, Field
 from app.schemas.execution_metrics import ExecutionMetrics
 from app.schemas.node_trace import NodeTrace
 from app.schemas.tool_metrics import ToolMetrics
+from app.schemas.llm_metrics import LLMMetrics
 
 
 class ExecutionTrace(BaseModel):
@@ -99,4 +97,9 @@ class ExecutionTrace(BaseModel):
     tool_metrics: list[ToolMetrics] = Field(
         default_factory=list,
         description="Execution metrics for each tool invoked during the request.",
+    )
+
+    llm_metrics: list[LLMMetrics] = Field(
+        default_factory=list,
+        description="Execution metrics for each LLM invocation during the request.",
     )
