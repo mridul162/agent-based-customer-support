@@ -43,6 +43,8 @@ import logging
 from app.schemas.agent_state import AgentState
 from app.tools.tool_registry import TOOL_REGISTRY
 from app.schemas.ticket import TicketResponse
+from datetime import UTC, datetime
+from app.schemas.tool_metrics import ToolMetrics
 
 logger = logging.getLogger(__name__)
 
@@ -119,15 +121,28 @@ def tool_executor_node(state: AgentState) -> AgentState:
     )
 
     try:
+        started = datetime.now(UTC)
         arguments = spec.argument_builder(state)
         result    = spec.tool_fn(**arguments)
+        finished = datetime.now(UTC)
 
         state.tool_used   = tool_name
         state.tool_result = result
 
+        metrics = ToolMetrics(
+            tool_name=tool_name,
+            started_at=started,
+            finished_at=finished,
+            duration_ms=(
+                finished - started
+            ).total_seconds() * 1000,
+            success=True,
+        )
+
         trace = state.execution_trace
 
         if trace is not None:
+            trace.tool_metrics.append(metrics)
             trace.metrics.tool_used = state.tool_used
 
             if (
@@ -146,7 +161,30 @@ def tool_executor_node(state: AgentState) -> AgentState:
             },
         )
 
+
+
     except Exception as e:
+
+        finished = datetime.now(UTC)
+
+        trace = state.execution_trace
+
+        if trace is not None:
+
+            trace.tool_metrics.append(
+
+                ToolMetrics(
+                    tool_name=tool_name,
+                    started_at=started,
+                    finished_at=finished,
+                    duration_ms=(
+                        finished - started
+                    ).total_seconds() * 1000,
+                    success=False,
+                    error=str(e),
+                )
+            )
+
         logger.error(
             "tool_executor_node: tool '%s' raised %s: %s",
             tool_name, type(e).__name__, e,

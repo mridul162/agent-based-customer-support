@@ -14,6 +14,7 @@ Responsibilities:
 - Store request timing.
 - Aggregate node execution traces.
 - Compute total execution duration.
+- Aggregate tool execution metrics.
 
 This schema DOES NOT:
 ---------------------
@@ -28,11 +29,13 @@ HTTP Request
       │
       ▼
 ExecutionTrace
-      │
-      ├── NodeTrace
-      ├── NodeTrace
-      ├── NodeTrace
-      └── NodeTrace
+    ├── NodeTrace (...)
+    ├── NodeTrace (...)
+    ├── ExecutionMetrics
+    └── ToolMetrics[]
+            ├── create_ticket_tool
+            ├── get_ticket_tool
+            └── ...
 
 Later Milestones:
 -----------------
@@ -49,6 +52,7 @@ from pydantic import BaseModel, Field
 
 from app.schemas.execution_metrics import ExecutionMetrics
 from app.schemas.node_trace import NodeTrace
+from app.schemas.tool_metrics import ToolMetrics
 
 
 class ExecutionTrace(BaseModel):
@@ -90,4 +94,9 @@ class ExecutionTrace(BaseModel):
     metrics: ExecutionMetrics = Field(
         default_factory=ExecutionMetrics,
         description="Business-level execution summary for the request.",
+    )
+
+    tool_metrics: list[ToolMetrics] = Field(
+        default_factory=list,
+        description="Execution metrics for each tool invoked during the request.",
     )
