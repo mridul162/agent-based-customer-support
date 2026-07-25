@@ -42,6 +42,7 @@ import logging
 
 from app.schemas.agent_state import AgentState
 from app.tools.tool_registry import TOOL_REGISTRY
+from app.schemas.ticket import TicketResponse
 
 logger = logging.getLogger(__name__)
 
@@ -123,6 +124,17 @@ def tool_executor_node(state: AgentState) -> AgentState:
 
         state.tool_used   = tool_name
         state.tool_result = result
+
+        trace = state.execution_trace
+
+        if trace is not None:
+            trace.metrics.tool_used = state.tool_used
+
+            if (
+                    state.tool_result is not None
+                    and hasattr(state.tool_result, "ticket_id")
+                ):
+                    trace.metrics.ticket_created = True
 
         logger.info(
             "tool_executor_node completed",

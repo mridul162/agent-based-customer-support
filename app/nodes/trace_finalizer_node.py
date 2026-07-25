@@ -31,8 +31,12 @@ def trace_finalizer_node(state: AgentState) -> AgentState:
     finished = datetime.now(UTC)
 
     trace.finished_at = finished
+
     trace.total_duration_ms = (
         finished - trace.started_at
     ).total_seconds() * 1000
+
+    # Mirror the total request latency into the business metrics summary.
+    trace.metrics.total_latency_ms = trace.total_duration_ms
 
     return state

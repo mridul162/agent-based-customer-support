@@ -120,6 +120,11 @@ def router_node(state: AgentState) -> AgentState:
 
     state.routing_decision = routing_decision
 
+    trace = state.execution_trace
+
+    if trace is not None and state.routing_decision is not None:
+        trace.metrics.agent_name = state.routing_decision.agent_name
+
     logger.info(
         "router_node completed",
         extra={

@@ -130,6 +130,11 @@ def escalation_detection_node(state: AgentState) -> AgentState:
 
     if escalate:
         state.needs_human       = True
+
+        trace = state.execution_trace
+
+        if trace is not None:
+            trace.metrics.escalated = state.needs_human
         state.escalation_reason = reason
         state.escalation_queue  = queue.value
 

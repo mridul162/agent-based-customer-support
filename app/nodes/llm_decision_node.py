@@ -159,6 +159,13 @@ def llm_decision_node(state: AgentState) -> AgentState:
 
     state.tool_decision = tool_decision
 
+    trace = state.execution_trace
+
+    if trace is not None:
+        trace.metrics.clarification_requested = (
+            state.needs_clarification
+        )
+
     logger.info(
         "llm_decision_node completed",
         extra={

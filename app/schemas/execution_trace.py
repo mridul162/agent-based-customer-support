@@ -47,6 +47,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from app.schemas.execution_metrics import ExecutionMetrics
 from app.schemas.node_trace import NodeTrace
 
 
@@ -84,4 +85,9 @@ class ExecutionTrace(BaseModel):
     nodes: list[NodeTrace] = Field(
         default_factory=list,
         description="Ordered list of executed graph nodes.",
+    )
+
+    metrics: ExecutionMetrics = Field(
+        default_factory=ExecutionMetrics,
+        description="Business-level execution summary for the request.",
     )
