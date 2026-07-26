@@ -1,0 +1,61 @@
+[
+  {
+    "heading": "Privacy Policy",
+    "level": 1,
+    "section_id": null,
+    "heading_path": [
+      "Privacy Policy"
+    ],
+    "content": ""
+  },
+  {
+    "heading": "Information We Collect",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Privacy Policy",
+      "Information We Collect"
+    ],
+    "content": "- Contact details: name, phone number, email, delivery address\n- Order history and payment confirmation status (Silico does not store full card numbers)\n- Device/browser information for site security and performance"
+  },
+  {
+    "heading": "How We Use Your Information",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Privacy Policy",
+      "How We Use Your Information"
+    ],
+    "content": "- To process and deliver orders\n- To provide customer support\n- To send order updates, promotional offers (opt-out available), and service notices"
+  },
+  {
+    "heading": "Data Sharing",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Privacy Policy",
+      "Data Sharing"
+    ],
+    "content": "- Shared with delivery partners solely for the purpose of fulfilling shipments\n- Shared with payment gateways solely for processing transactions\n- Never sold to third parties for marketing purposes"
+  },
+  {
+    "heading": "Data Security",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Privacy Policy",
+      "Data Security"
+    ],
+    "content": "- All online transactions use SSL encryption\n- Payment processing is handled by PCI-DSS compliant gateways; Silico does not store full card details"
+  },
+  {
+    "heading": "Customer Rights",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Privacy Policy",
+      "Customer Rights"
+    ],
+    "content": "- Customers may request access to, correction of, or deletion of their personal data by contacting support@silicomobile.com\n- Account deletion requests are processed within 30 days, subject to legal record-keeping requirements"
+  }
+]

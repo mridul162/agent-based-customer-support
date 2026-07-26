@@ -16,6 +16,16 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str
     openai_model: str
+    embedding_model: str = "text-embedding-3-small"
+    embedding_dimension: int = 1536
+
+    # RAG
+    knowledge_base_path: str = "knowledge_base"
+    rag_artifacts_path: str = "artifacts"
+    chunk_artifacts_path: str = "artifacts/chunked"
+    faiss_index_path: str = "artifacts/embeddings/index.faiss"
+    faiss_metadata_path: str = "artifacts/embeddings/metadata.json"
+    manifest_path: str = "artifacts/embeddings/manifest.json"
 
     # PostgreSQL
     postgres_host: str

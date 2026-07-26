@@ -1,0 +1,446 @@
+[
+  {
+    "chunk_id": "faq_faq__faq.md__1__0",
+    "text": "Frequently Asked Questions > Orders\n\n**Q: How do I place an order?**\nBrowse products on the Silico website or app, add items to your cart, and complete checkout using any of our supported payment methods.\n\n**Q: Can I change or cancel my order after placing it?**\nOrders can be changed or cancelled within 1 hour of placement, as long as the order has not yet been packed for shipping. Contact support immediately with your order number.\n\n**Q: How do I track my order?**\nOnce your order ships, you will receive a tracking link by email and SMS. You can also check order status under \"My Orders\" in your account.",
+    "metadata": {
+      "document_id": "faq_faq",
+      "category": "faq",
+      "source_file": "faq.md",
+      "source_path": "knowledge_base\\faq\\faq.md",
+      "heading": "Orders",
+      "heading_path": [
+        "Frequently Asked Questions",
+        "Orders"
+      ],
+      "section_id": null,
+      "section_level": 2,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 109,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "faq_faq__faq.md__2__0",
+    "text": "Frequently Asked Questions\n\nProducts\n\n**Q: Are your phones brand new and original?**\nYes. All phones sold by Silico are 100% brand new, sealed, and sourced directly from authorized distributors or manufacturers.\n\n**Q: Do you sell refurbished phones?**\nSelect refurbished/certified pre-owned phones are available and are clearly labeled as \"Refurbished\" on the product page, with grading details (A/B/C condition).\n\n**Q: Do accessories come with a warranty?**\nMost accessories carry a 6-month warranty against manufacturing defects. Phones carry the manufacturer's standard warranty (see Warranty Policy).\n\nShipping\n\n**Q: How long does delivery take?**\nStandard delivery takes 2–5 business days depending on your location. Express delivery (1–2 business days) is available in select cities.\n\n**Q: Do you ship nationwide?**\nYes, we ship to all districts. Remote areas may experience 1–2 additional business days.",
+    "metadata": {
+      "document_id": "faq_faq",
+      "category": "faq",
+      "source_file": "faq.md",
+      "source_path": "knowledge_base\\faq\\faq.md",
+      "heading": "Frequently Asked Questions",
+      "heading_path": [
+        "Frequently Asked Questions"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 129,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "faq_faq__faq.md__3__0",
+    "text": "Frequently Asked Questions\n\nReturns & Refunds\n\n**Q: Can I return a phone if I change my mind?**\nYes, unused and unopened items can be returned within 7 days of delivery. See our Returns Policy for full details.\n\n**Q: How long do refunds take?**\nRefunds are processed within 5–7 business days after the returned item passes inspection.\n\nPayments\n\n**Q: What payment methods do you accept?**\nWe accept credit/debit cards, mobile wallets (bKash, Nagad, Rocket), bank transfers, and cash on delivery (COD) in eligible areas.\n\n**Q: Is it safe to pay online on your site?**\nYes. All online payments are processed through PCI-DSS compliant payment gateways with SSL encryption.",
+    "metadata": {
+      "document_id": "faq_faq",
+      "category": "faq",
+      "source_file": "faq.md",
+      "source_path": "knowledge_base\\faq\\faq.md",
+      "heading": "Frequently Asked Questions",
+      "heading_path": [
+        "Frequently Asked Questions"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 3,
+      "word_count": 107,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "faq_faq__faq.md__4__0",
+    "text": "Frequently Asked Questions > Account & Support\n\n**Q: I forgot my password. What do I do?**\nClick \"Forgot Password\" on the login page and follow the instructions sent to your registered email or phone number.\n\n**Q: How can I contact customer support?**\nYou can reach us via live chat, email at support@silicomobile.com, or phone at our support hotline, available 9 AM–9 PM, 7 days a week.",
+    "metadata": {
+      "document_id": "faq_faq",
+      "category": "faq",
+      "source_file": "faq.md",
+      "source_path": "knowledge_base\\faq\\faq.md",
+      "heading": "Account & Support",
+      "heading_path": [
+        "Frequently Asked Questions",
+        "Account & Support"
+      ],
+      "section_id": null,
+      "section_level": 2,
+      "chunk_index": 0,
+      "section_index": 4,
+      "word_count": 66,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "payments_payment__payment.md__1__0",
+    "text": "Payment Policy\n\nAccepted Payment Methods\n\n- **Credit/Debit Cards** — Visa, Mastercard, and other major cards\n- **Mobile Wallets** — bKash, Nagad, Rocket\n- **Bank Transfer** — direct transfer to Silico's business account\n- **Cash on Delivery (COD)** — available in eligible areas, up to a maximum order value\n\nPayment Security\n\n- All online payments are processed via PCI-DSS compliant, SSL-encrypted payment gateways.\n- Silico does not store full card numbers or CVV codes.\n\nOrder Confirmation\n\n- Orders paid online are confirmed automatically once payment is verified.\n- Bank transfer orders are confirmed manually within 1 business day of payment verification; please share the transaction reference with support to speed this up.\n- COD orders are confirmed upon successful phone verification.",
+    "metadata": {
+      "document_id": "payments_payment",
+      "category": "payments",
+      "source_file": "payment.md",
+      "source_path": "knowledge_base\\payments\\payment.md",
+      "heading": "Payment Policy",
+      "heading_path": [
+        "Payment Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 120,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "payments_payment__payment.md__2__0",
+    "text": "Payment Policy\n\nFailed or Pending Payments\n\n- If a payment fails but funds are deducted, the amount is automatically reversed by the payment gateway within 5–10 business days.\n- If an order shows \"Payment Pending\" for more than 24 hours, contact support with your transaction ID.\n\nInstallment Plans\n\n- EMI/installment plans are available on select phones through partner banks and cards. Eligibility and terms are shown at checkout for qualifying products.\n\nInvoices\n\n- A digital invoice/receipt is emailed automatically after each successful order and is also available under \"My Orders.\"",
+    "metadata": {
+      "document_id": "payments_payment",
+      "category": "payments",
+      "source_file": "payment.md",
+      "source_path": "knowledge_base\\payments\\payment.md",
+      "heading": "Payment Policy",
+      "heading_path": [
+        "Payment Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 90,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_policies__policies.md__1__0",
+    "text": "General Store Policies\n\nAbout Silico\n\nSilico Mobile Phone and Accessories Shop sells new and certified refurbished smartphones, along with a wide range of mobile accessories including cases, chargers, earphones, power banks, and screen protectors.\n\nOrder Acceptance\n\n- All orders are subject to acceptance and availability.\n- Silico reserves the right to cancel any order due to pricing errors, suspected fraud, or stock unavailability. Customers will be notified and fully refunded in such cases.\n\nPricing\n\n- Prices are listed in local currency and are inclusive of applicable taxes unless stated otherwise.\n- Prices may change without prior notice, but confirmed orders will honor the price at the time of purchase.",
+    "metadata": {
+      "document_id": "policies_policies",
+      "category": "policies",
+      "source_file": "policies.md",
+      "source_path": "knowledge_base\\policies\\policies.md",
+      "heading": "General Store Policies",
+      "heading_path": [
+        "General Store Policies"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 109,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_policies__policies.md__2__0",
+    "text": "General Store Policies\n\nProduct Authenticity\n\n- All new phones are sourced from authorized distributors and manufacturers.\n- Refurbished products are inspected, graded, and clearly labeled as such.\n- Silico does not sell counterfeit or \"master copy\" devices.\n\nCustomer Conduct\n\n- Abusive or threatening behavior toward support staff will not be tolerated and may result in account suspension.\n- Fraudulent return or refund claims may result in permanent account suspension and legal action.\n\nPrivacy\n\n- Customer data is collected only for order processing, delivery, and support purposes.\n- Silico does not sell customer data to third parties. See our full Privacy Policy for details.",
+    "metadata": {
+      "document_id": "policies_policies",
+      "category": "policies",
+      "source_file": "policies.md",
+      "source_path": "knowledge_base\\policies\\policies.md",
+      "heading": "General Store Policies",
+      "heading_path": [
+        "General Store Policies"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 103,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_policies__policies.md__3__0",
+    "text": "General Store Policies > Changes to Policies\n\nSilico reserves the right to update these policies at any time. Updates will be posted on this page with a revised effective date.\n\n*Related documents: warranty.md, privacy.md*",
+    "metadata": {
+      "document_id": "policies_policies",
+      "category": "policies",
+      "source_file": "policies.md",
+      "source_path": "knowledge_base\\policies\\policies.md",
+      "heading": "Changes to Policies",
+      "heading_path": [
+        "General Store Policies",
+        "Changes to Policies"
+      ],
+      "section_id": null,
+      "section_level": 2,
+      "chunk_index": 0,
+      "section_index": 3,
+      "word_count": 34,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_privacy__privacy.md__1__0",
+    "text": "Privacy Policy\n\nInformation We Collect\n\n- Contact details: name, phone number, email, delivery address\n- Order history and payment confirmation status (Silico does not store full card numbers)\n- Device/browser information for site security and performance\n\nHow We Use Your Information\n\n- To process and deliver orders\n- To provide customer support\n- To send order updates, promotional offers (opt-out available), and service notices\n\nData Sharing\n\n- Shared with delivery partners solely for the purpose of fulfilling shipments\n- Shared with payment gateways solely for processing transactions\n- Never sold to third parties for marketing purposes",
+    "metadata": {
+      "document_id": "policies_privacy",
+      "category": "policies",
+      "source_file": "privacy.md",
+      "source_path": "knowledge_base\\policies\\privacy.md",
+      "heading": "Privacy Policy",
+      "heading_path": [
+        "Privacy Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 96,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_privacy__privacy.md__2__0",
+    "text": "Privacy Policy\n\nData Security\n\n- All online transactions use SSL encryption\n- Payment processing is handled by PCI-DSS compliant gateways; Silico does not store full card details\n\nCustomer Rights\n\n- Customers may request access to, correction of, or deletion of their personal data by contacting support@silicomobile.com\n- Account deletion requests are processed within 30 days, subject to legal record-keeping requirements",
+    "metadata": {
+      "document_id": "policies_privacy",
+      "category": "policies",
+      "source_file": "privacy.md",
+      "source_path": "knowledge_base\\policies\\privacy.md",
+      "heading": "Privacy Policy",
+      "heading_path": [
+        "Privacy Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 60,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_warranty__warranty.md__1__0",
+    "text": "Warranty Policy\n\nPhones\n\n- New phones come with the manufacturer's official warranty, typically 12 months, covering manufacturing defects.\n- Warranty is void if the device shows signs of physical damage, liquid damage, unauthorized repair, or tampering.\n- Battery health issues are covered only if battery capacity drops below manufacturer-specified thresholds within the warranty period.\n\nRefurbished Phones\n\n- Refurbished phones carry a 3-month Silico warranty covering functional defects (not covered by the manufacturer).\n- Cosmetic wear consistent with the listed condition grade is not covered.\n\nAccessories\n\n- Chargers, cables, power banks, and earphones carry a 6-month warranty against manufacturing defects.\n- Cases, screen protectors, and other consumables (non-electronic) are not covered under warranty.",
+    "metadata": {
+      "document_id": "policies_warranty",
+      "category": "policies",
+      "source_file": "warranty.md",
+      "source_path": "knowledge_base\\policies\\warranty.md",
+      "heading": "Warranty Policy",
+      "heading_path": [
+        "Warranty Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 112,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_warranty__warranty.md__2__0",
+    "text": "Warranty Policy\n\nWhat Voids the Warranty\n\n- Physical or liquid damage\n- Unauthorized repair or opening of the device\n- Use of incompatible chargers or accessories causing damage\n- Missing or altered serial number/IMEI\n\nHow to Claim Warranty\n\n1. Contact Silico support with your order number and a description of the issue.\n2. Support will advise whether the item should be sent in for inspection or taken to an authorized service center.\n3. Approved warranty claims result in repair, replacement, or store credit, at Silico's discretion.",
+    "metadata": {
+      "document_id": "policies_warranty",
+      "category": "policies",
+      "source_file": "warranty.md",
+      "source_path": "knowledge_base\\policies\\warranty.md",
+      "heading": "Warranty Policy",
+      "heading_path": [
+        "Warranty Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 86,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "products_products__products.md__2__0",
+    "text": "Product Catalog Overview > Categories\n\nSmartphones\n\n- Latest flagship and mid-range models from major brands (Samsung, Apple, Xiaomi, Realme, Vivo, Oppo, and others)\n- Both brand-new and certified refurbished options available\n- Filter by brand, price range, RAM/storage, and 5G support on the website\n\nAccessories\n\n- **Cases & Covers** — silicone, leather, rugged, and transparent options for most popular models\n- **Chargers & Cables** — fast chargers, wireless chargers, USB-C/Lightning cables\n- **Earphones & Headphones** — wired, true wireless (TWS), and Bluetooth neckbands\n- **Power Banks** — 10,000mAh to 30,000mAh, with fast-charging support\n- **Screen Protectors** — tempered glass and hydrogel film, model-specific fitting",
+    "metadata": {
+      "document_id": "products_products",
+      "category": "products",
+      "source_file": "products.md",
+      "source_path": "knowledge_base\\products\\products.md",
+      "heading": "Categories",
+      "heading_path": [
+        "Product Catalog Overview",
+        "Categories"
+      ],
+      "section_id": null,
+      "section_level": 2,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 104,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "products_products__products.md__3__0",
+    "text": "Product Catalog Overview\n\nProduct Information\n\n- Each product page lists full specifications, in-box contents, warranty duration, and available color/storage variants.\n- Stock availability is shown in real time; out-of-stock items can be \"notified\" via email when restocked.\n- Genuine product images are used; actual color may vary slightly due to display settings.\n\nCompatibility\n\n- Accessory pages list compatible phone models. Please verify your exact model number before ordering cases or screen protectors.\n- Chargers indicate wattage and fast-charging protocol compatibility (e.g., PD, QC).\n\nBundles & Offers\n\n- Phone + accessory bundles are available at a discount on select listings.\n- Ongoing promotions are listed on the Offers page and applied automatically at checkout, or via promo code where specified.",
+    "metadata": {
+      "document_id": "products_products",
+      "category": "products",
+      "source_file": "products.md",
+      "source_path": "knowledge_base\\products\\products.md",
+      "heading": "Product Catalog Overview",
+      "heading_path": [
+        "Product Catalog Overview"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 3,
+      "word_count": 119,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_refund__refund.md__0__0",
+    "text": "Refund Policy\n\nCustomers may request a refund within 7 days of delivery.\nRefunds are processed after product inspection.\nRefunds are issued to the original payment method.",
+    "metadata": {
+      "document_id": "returns_refund",
+      "category": "returns",
+      "source_file": "refund.md",
+      "source_path": "knowledge_base\\returns\\refund.md",
+      "heading": "Refund Policy",
+      "heading_path": [
+        "Refund Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 0,
+      "word_count": 26,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_refund__refund.md__1__0",
+    "text": "Refund Policy\n\nRefund Timeline\n\n| Payment Method | Refund Time After Approval |\n|---|---|\n| Credit/Debit Card | 5–7 business days |\n| Mobile Wallet (bKash/Nagad/Rocket) | 2–3 business days |\n| Bank Transfer | 3–5 business days |\n| Cash on Delivery (COD) | Refunded via bank transfer or mobile wallet, 5–7 business days |\n\nPartial Refunds\n\n- Partial refunds may be issued if only part of an order is returned, or if a promotional discount applied to a bundle is affected by a partial return.",
+    "metadata": {
+      "document_id": "returns_refund",
+      "category": "returns",
+      "source_file": "refund.md",
+      "source_path": "knowledge_base\\returns\\refund.md",
+      "heading": "Refund Policy",
+      "heading_path": [
+        "Refund Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 87,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_refund__refund.md__2__0",
+    "text": "Refund Policy\n\nShipping Fees\n\n- Original shipping fees are non-refundable unless the return is due to a Silico error (wrong item shipped, defective product, etc.).\n- Return shipping is free for defective or incorrect items; otherwise, return shipping cost may be deducted from the refund.\n\nFailed or Delayed Refunds\n\n- If a refund has not been received within the stated timeline, customers should contact support with their order number and refund reference (if available) for investigation.",
+    "metadata": {
+      "document_id": "returns_refund",
+      "category": "returns",
+      "source_file": "refund.md",
+      "source_path": "knowledge_base\\returns\\refund.md",
+      "heading": "Refund Policy",
+      "heading_path": [
+        "Refund Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 76,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_returns__returns.md__1__0",
+    "text": "Returns Policy\n\nEligibility\n\n- Items may be returned within **7 days of delivery**.\n- Phones must be unused, with original packaging, box contents, and all accessories included.\n- IMEI/serial number must match the original invoice.\n- Accessories must be unused and in original, unopened packaging.\n\nNon-Returnable Items\n\n- Screen protectors and other consumables once opened\n- SIM cards or activated eSIM products\n- Items marked \"Final Sale\" on the product page\n- Products with damaged, missing, or altered original packaging\n\nHow to Request a Return\n\n1. Go to \"My Orders\" and select \"Request Return,\" or contact support with your order number.\n2. Choose a reason for return and, if applicable, upload photos of the issue.\n3. Once approved, a courier will be scheduled to pick up the item, or you may drop it off at a Silico service point.",
+    "metadata": {
+      "document_id": "returns_returns",
+      "category": "returns",
+      "source_file": "returns.md",
+      "source_path": "knowledge_base\\returns\\returns.md",
+      "heading": "Returns Policy",
+      "heading_path": [
+        "Returns Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 139,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_returns__returns.md__2__0",
+    "text": "Returns Policy\n\nInspection\n\n- Returned items are inspected upon receipt to confirm condition and completeness.\n- Items that fail inspection (e.g., signs of use, missing parts) will be sent back to the customer and are not eligible for refund/exchange.\n\nExchanges\n\n- Exchanges for a different color/variant of the same product are allowed within the 7-day return window, subject to stock availability.\n\n*Related document: refund.md*",
+    "metadata": {
+      "document_id": "returns_returns",
+      "category": "returns",
+      "source_file": "returns.md",
+      "source_path": "knowledge_base\\returns\\returns.md",
+      "heading": "Returns Policy",
+      "heading_path": [
+        "Returns Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 64,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "shipping_shipping__shipping.md__1__0",
+    "text": "Shipping Policy\n\nDelivery Options\n\n| Option | Delivery Time | Availability |\n|---|---|---|\n| Standard Delivery | 2–5 business days | Nationwide |\n| Express Delivery | 1–2 business days | Select major cities |\n| Same-Day Delivery | Same day (order before 12 PM) | Dhaka only |\n\nShipping Charges\n\n- Free standard shipping on orders above a set minimum threshold (shown at checkout).\n- Express and same-day delivery incur an additional fee, calculated at checkout based on location.\n\nOrder Processing\n\n- Orders are processed and packed within 24 hours of confirmation (excluding public holidays).\n- You will receive a confirmation SMS/email once your order ships, including a tracking number.",
+    "metadata": {
+      "document_id": "shipping_shipping",
+      "category": "shipping",
+      "source_file": "shipping.md",
+      "source_path": "knowledge_base\\shipping\\shipping.md",
+      "heading": "Shipping Policy",
+      "heading_path": [
+        "Shipping Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 111,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "shipping_shipping__shipping.md__2__0",
+    "text": "Shipping Policy\n\nDelivery Attempts\n\n- Our courier partner will attempt delivery up to 2 times.\n- If delivery fails both times, the order is returned to Silico and the customer is contacted to arrange redelivery or cancellation.\n\nDelays\n\n- Delivery times may be affected by weather, courier disruptions, or remote locations. Customers will be notified of any significant delay.\n\nOrder Inspection on Delivery\n\n- Customers are encouraged to inspect the package at the time of delivery. Report any visible damage to the delivery agent and to Silico support within 24 hours.",
+    "metadata": {
+      "document_id": "shipping_shipping",
+      "category": "shipping",
+      "source_file": "shipping.md",
+      "source_path": "knowledge_base\\shipping\\shipping.md",
+      "heading": "Shipping Policy",
+      "heading_path": [
+        "Shipping Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 91,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

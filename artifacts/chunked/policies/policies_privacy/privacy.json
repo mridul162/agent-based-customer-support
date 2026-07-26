@@ -1,0 +1,42 @@
+[
+  {
+    "chunk_id": "policies_privacy__privacy.md__1__0",
+    "text": "Privacy Policy\n\nInformation We Collect\n\n- Contact details: name, phone number, email, delivery address\n- Order history and payment confirmation status (Silico does not store full card numbers)\n- Device/browser information for site security and performance\n\nHow We Use Your Information\n\n- To process and deliver orders\n- To provide customer support\n- To send order updates, promotional offers (opt-out available), and service notices\n\nData Sharing\n\n- Shared with delivery partners solely for the purpose of fulfilling shipments\n- Shared with payment gateways solely for processing transactions\n- Never sold to third parties for marketing purposes",
+    "metadata": {
+      "document_id": "policies_privacy",
+      "category": "policies",
+      "source_file": "privacy.md",
+      "source_path": "knowledge_base\\policies\\privacy.md",
+      "heading": "Privacy Policy",
+      "heading_path": [
+        "Privacy Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 96,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_privacy__privacy.md__2__0",
+    "text": "Privacy Policy\n\nData Security\n\n- All online transactions use SSL encryption\n- Payment processing is handled by PCI-DSS compliant gateways; Silico does not store full card details\n\nCustomer Rights\n\n- Customers may request access to, correction of, or deletion of their personal data by contacting support@silicomobile.com\n- Account deletion requests are processed within 30 days, subject to legal record-keeping requirements",
+    "metadata": {
+      "document_id": "policies_privacy",
+      "category": "policies",
+      "source_file": "privacy.md",
+      "source_path": "knowledge_base\\policies\\privacy.md",
+      "heading": "Privacy Policy",
+      "heading_path": [
+        "Privacy Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 60,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

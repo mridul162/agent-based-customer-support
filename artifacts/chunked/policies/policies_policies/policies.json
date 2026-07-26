@@ -1,0 +1,63 @@
+[
+  {
+    "chunk_id": "policies_policies__policies.md__1__0",
+    "text": "General Store Policies\n\nAbout Silico\n\nSilico Mobile Phone and Accessories Shop sells new and certified refurbished smartphones, along with a wide range of mobile accessories including cases, chargers, earphones, power banks, and screen protectors.\n\nOrder Acceptance\n\n- All orders are subject to acceptance and availability.\n- Silico reserves the right to cancel any order due to pricing errors, suspected fraud, or stock unavailability. Customers will be notified and fully refunded in such cases.\n\nPricing\n\n- Prices are listed in local currency and are inclusive of applicable taxes unless stated otherwise.\n- Prices may change without prior notice, but confirmed orders will honor the price at the time of purchase.",
+    "metadata": {
+      "document_id": "policies_policies",
+      "category": "policies",
+      "source_file": "policies.md",
+      "source_path": "knowledge_base\\policies\\policies.md",
+      "heading": "General Store Policies",
+      "heading_path": [
+        "General Store Policies"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 109,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_policies__policies.md__2__0",
+    "text": "General Store Policies\n\nProduct Authenticity\n\n- All new phones are sourced from authorized distributors and manufacturers.\n- Refurbished products are inspected, graded, and clearly labeled as such.\n- Silico does not sell counterfeit or \"master copy\" devices.\n\nCustomer Conduct\n\n- Abusive or threatening behavior toward support staff will not be tolerated and may result in account suspension.\n- Fraudulent return or refund claims may result in permanent account suspension and legal action.\n\nPrivacy\n\n- Customer data is collected only for order processing, delivery, and support purposes.\n- Silico does not sell customer data to third parties. See our full Privacy Policy for details.",
+    "metadata": {
+      "document_id": "policies_policies",
+      "category": "policies",
+      "source_file": "policies.md",
+      "source_path": "knowledge_base\\policies\\policies.md",
+      "heading": "General Store Policies",
+      "heading_path": [
+        "General Store Policies"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 103,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_policies__policies.md__3__0",
+    "text": "General Store Policies > Changes to Policies\n\nSilico reserves the right to update these policies at any time. Updates will be posted on this page with a revised effective date.\n\n*Related documents: warranty.md, privacy.md*",
+    "metadata": {
+      "document_id": "policies_policies",
+      "category": "policies",
+      "source_file": "policies.md",
+      "source_path": "knowledge_base\\policies\\policies.md",
+      "heading": "Changes to Policies",
+      "heading_path": [
+        "General Store Policies",
+        "Changes to Policies"
+      ],
+      "section_id": null,
+      "section_level": 2,
+      "chunk_index": 0,
+      "section_index": 3,
+      "word_count": 34,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "chunk_id": "returns_refund__refund.md__0__0",
+    "text": "Refund Policy\n\nCustomers may request a refund within 7 days of delivery.\nRefunds are processed after product inspection.\nRefunds are issued to the original payment method.",
+    "metadata": {
+      "document_id": "returns_refund",
+      "category": "returns",
+      "source_file": "refund.md",
+      "source_path": "knowledge_base\\returns\\refund.md",
+      "heading": "Refund Policy",
+      "heading_path": [
+        "Refund Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 0,
+      "word_count": 26,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_refund__refund.md__1__0",
+    "text": "Refund Policy\n\nRefund Timeline\n\n| Payment Method | Refund Time After Approval |\n|---|---|\n| Credit/Debit Card | 5–7 business days |\n| Mobile Wallet (bKash/Nagad/Rocket) | 2–3 business days |\n| Bank Transfer | 3–5 business days |\n| Cash on Delivery (COD) | Refunded via bank transfer or mobile wallet, 5–7 business days |\n\nPartial Refunds\n\n- Partial refunds may be issued if only part of an order is returned, or if a promotional discount applied to a bundle is affected by a partial return.",
+    "metadata": {
+      "document_id": "returns_refund",
+      "category": "returns",
+      "source_file": "refund.md",
+      "source_path": "knowledge_base\\returns\\refund.md",
+      "heading": "Refund Policy",
+      "heading_path": [
+        "Refund Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 87,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_refund__refund.md__2__0",
+    "text": "Refund Policy\n\nShipping Fees\n\n- Original shipping fees are non-refundable unless the return is due to a Silico error (wrong item shipped, defective product, etc.).\n- Return shipping is free for defective or incorrect items; otherwise, return shipping cost may be deducted from the refund.\n\nFailed or Delayed Refunds\n\n- If a refund has not been received within the stated timeline, customers should contact support with their order number and refund reference (if available) for investigation.",
+    "metadata": {
+      "document_id": "returns_refund",
+      "category": "returns",
+      "source_file": "refund.md",
+      "source_path": "knowledge_base\\returns\\refund.md",
+      "heading": "Refund Policy",
+      "heading_path": [
+        "Refund Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 76,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

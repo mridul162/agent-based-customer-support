@@ -1,0 +1,61 @@
+[
+  {
+    "heading": "Returns Policy",
+    "level": 1,
+    "section_id": null,
+    "heading_path": [
+      "Returns Policy"
+    ],
+    "content": ""
+  },
+  {
+    "heading": "Eligibility",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Returns Policy",
+      "Eligibility"
+    ],
+    "content": "- Items may be returned within **7 days of delivery**.\n- Phones must be unused, with original packaging, box contents, and all accessories included.\n- IMEI/serial number must match the original invoice.\n- Accessories must be unused and in original, unopened packaging."
+  },
+  {
+    "heading": "Non-Returnable Items",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Returns Policy",
+      "Non-Returnable Items"
+    ],
+    "content": "- Screen protectors and other consumables once opened\n- SIM cards or activated eSIM products\n- Items marked \"Final Sale\" on the product page\n- Products with damaged, missing, or altered original packaging"
+  },
+  {
+    "heading": "How to Request a Return",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Returns Policy",
+      "How to Request a Return"
+    ],
+    "content": "1. Go to \"My Orders\" and select \"Request Return,\" or contact support with your order number.\n2. Choose a reason for return and, if applicable, upload photos of the issue.\n3. Once approved, a courier will be scheduled to pick up the item, or you may drop it off at a Silico service point."
+  },
+  {
+    "heading": "Inspection",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Returns Policy",
+      "Inspection"
+    ],
+    "content": "- Returned items are inspected upon receipt to confirm condition and completeness.\n- Items that fail inspection (e.g., signs of use, missing parts) will be sent back to the customer and are not eligible for refund/exchange."
+  },
+  {
+    "heading": "Exchanges",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Returns Policy",
+      "Exchanges"
+    ],
+    "content": "- Exchanges for a different color/variant of the same product are allowed within the 7-day return window, subject to stock availability.\n\n*Related document: refund.md*"
+  }
+]

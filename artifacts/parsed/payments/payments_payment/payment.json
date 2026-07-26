@@ -1,0 +1,71 @@
+[
+  {
+    "heading": "Payment Policy",
+    "level": 1,
+    "section_id": null,
+    "heading_path": [
+      "Payment Policy"
+    ],
+    "content": ""
+  },
+  {
+    "heading": "Accepted Payment Methods",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Payment Policy",
+      "Accepted Payment Methods"
+    ],
+    "content": "- **Credit/Debit Cards** — Visa, Mastercard, and other major cards\n- **Mobile Wallets** — bKash, Nagad, Rocket\n- **Bank Transfer** — direct transfer to Silico's business account\n- **Cash on Delivery (COD)** — available in eligible areas, up to a maximum order value"
+  },
+  {
+    "heading": "Payment Security",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Payment Policy",
+      "Payment Security"
+    ],
+    "content": "- All online payments are processed via PCI-DSS compliant, SSL-encrypted payment gateways.\n- Silico does not store full card numbers or CVV codes."
+  },
+  {
+    "heading": "Order Confirmation",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Payment Policy",
+      "Order Confirmation"
+    ],
+    "content": "- Orders paid online are confirmed automatically once payment is verified.\n- Bank transfer orders are confirmed manually within 1 business day of payment verification; please share the transaction reference with support to speed this up.\n- COD orders are confirmed upon successful phone verification."
+  },
+  {
+    "heading": "Failed or Pending Payments",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Payment Policy",
+      "Failed or Pending Payments"
+    ],
+    "content": "- If a payment fails but funds are deducted, the amount is automatically reversed by the payment gateway within 5–10 business days.\n- If an order shows \"Payment Pending\" for more than 24 hours, contact support with your transaction ID."
+  },
+  {
+    "heading": "Installment Plans",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Payment Policy",
+      "Installment Plans"
+    ],
+    "content": "- EMI/installment plans are available on select phones through partner banks and cards. Eligibility and terms are shown at checkout for qualifying products."
+  },
+  {
+    "heading": "Invoices",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Payment Policy",
+      "Invoices"
+    ],
+    "content": "- A digital invoice/receipt is emailed automatically after each successful order and is also available under \"My Orders.\""
+  }
+]

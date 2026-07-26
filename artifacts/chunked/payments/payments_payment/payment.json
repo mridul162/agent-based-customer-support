@@ -1,0 +1,42 @@
+[
+  {
+    "chunk_id": "payments_payment__payment.md__1__0",
+    "text": "Payment Policy\n\nAccepted Payment Methods\n\n- **Credit/Debit Cards** — Visa, Mastercard, and other major cards\n- **Mobile Wallets** — bKash, Nagad, Rocket\n- **Bank Transfer** — direct transfer to Silico's business account\n- **Cash on Delivery (COD)** — available in eligible areas, up to a maximum order value\n\nPayment Security\n\n- All online payments are processed via PCI-DSS compliant, SSL-encrypted payment gateways.\n- Silico does not store full card numbers or CVV codes.\n\nOrder Confirmation\n\n- Orders paid online are confirmed automatically once payment is verified.\n- Bank transfer orders are confirmed manually within 1 business day of payment verification; please share the transaction reference with support to speed this up.\n- COD orders are confirmed upon successful phone verification.",
+    "metadata": {
+      "document_id": "payments_payment",
+      "category": "payments",
+      "source_file": "payment.md",
+      "source_path": "knowledge_base\\payments\\payment.md",
+      "heading": "Payment Policy",
+      "heading_path": [
+        "Payment Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 120,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "payments_payment__payment.md__2__0",
+    "text": "Payment Policy\n\nFailed or Pending Payments\n\n- If a payment fails but funds are deducted, the amount is automatically reversed by the payment gateway within 5–10 business days.\n- If an order shows \"Payment Pending\" for more than 24 hours, contact support with your transaction ID.\n\nInstallment Plans\n\n- EMI/installment plans are available on select phones through partner banks and cards. Eligibility and terms are shown at checkout for qualifying products.\n\nInvoices\n\n- A digital invoice/receipt is emailed automatically after each successful order and is also available under \"My Orders.\"",
+    "metadata": {
+      "document_id": "payments_payment",
+      "category": "payments",
+      "source_file": "payment.md",
+      "source_path": "knowledge_base\\payments\\payment.md",
+      "heading": "Payment Policy",
+      "heading_path": [
+        "Payment Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 90,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

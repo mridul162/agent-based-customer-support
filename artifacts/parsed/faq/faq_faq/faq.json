@@ -1,0 +1,71 @@
+[
+  {
+    "heading": "Frequently Asked Questions",
+    "level": 1,
+    "section_id": null,
+    "heading_path": [
+      "Frequently Asked Questions"
+    ],
+    "content": ""
+  },
+  {
+    "heading": "Orders",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Frequently Asked Questions",
+      "Orders"
+    ],
+    "content": "**Q: How do I place an order?**\nBrowse products on the Silico website or app, add items to your cart, and complete checkout using any of our supported payment methods.\n\n**Q: Can I change or cancel my order after placing it?**\nOrders can be changed or cancelled within 1 hour of placement, as long as the order has not yet been packed for shipping. Contact support immediately with your order number.\n\n**Q: How do I track my order?**\nOnce your order ships, you will receive a tracking link by email and SMS. You can also check order status under \"My Orders\" in your account."
+  },
+  {
+    "heading": "Products",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Frequently Asked Questions",
+      "Products"
+    ],
+    "content": "**Q: Are your phones brand new and original?**\nYes. All phones sold by Silico are 100% brand new, sealed, and sourced directly from authorized distributors or manufacturers.\n\n**Q: Do you sell refurbished phones?**\nSelect refurbished/certified pre-owned phones are available and are clearly labeled as \"Refurbished\" on the product page, with grading details (A/B/C condition).\n\n**Q: Do accessories come with a warranty?**\nMost accessories carry a 6-month warranty against manufacturing defects. Phones carry the manufacturer's standard warranty (see Warranty Policy)."
+  },
+  {
+    "heading": "Shipping",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Frequently Asked Questions",
+      "Shipping"
+    ],
+    "content": "**Q: How long does delivery take?**\nStandard delivery takes 2–5 business days depending on your location. Express delivery (1–2 business days) is available in select cities.\n\n**Q: Do you ship nationwide?**\nYes, we ship to all districts. Remote areas may experience 1–2 additional business days."
+  },
+  {
+    "heading": "Returns & Refunds",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Frequently Asked Questions",
+      "Returns & Refunds"
+    ],
+    "content": "**Q: Can I return a phone if I change my mind?**\nYes, unused and unopened items can be returned within 7 days of delivery. See our Returns Policy for full details.\n\n**Q: How long do refunds take?**\nRefunds are processed within 5–7 business days after the returned item passes inspection."
+  },
+  {
+    "heading": "Payments",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Frequently Asked Questions",
+      "Payments"
+    ],
+    "content": "**Q: What payment methods do you accept?**\nWe accept credit/debit cards, mobile wallets (bKash, Nagad, Rocket), bank transfers, and cash on delivery (COD) in eligible areas.\n\n**Q: Is it safe to pay online on your site?**\nYes. All online payments are processed through PCI-DSS compliant payment gateways with SSL encryption."
+  },
+  {
+    "heading": "Account & Support",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Frequently Asked Questions",
+      "Account & Support"
+    ],
+    "content": "**Q: I forgot my password. What do I do?**\nClick \"Forgot Password\" on the login page and follow the instructions sent to your registered email or phone number.\n\n**Q: How can I contact customer support?**\nYou can reach us via live chat, email at support@silicomobile.com, or phone at our support hotline, available 9 AM–9 PM, 7 days a week."
+  }
+]

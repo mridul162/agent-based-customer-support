@@ -1,0 +1,43 @@
+[
+  {
+    "chunk_id": "products_products__products.md__2__0",
+    "text": "Product Catalog Overview > Categories\n\nSmartphones\n\n- Latest flagship and mid-range models from major brands (Samsung, Apple, Xiaomi, Realme, Vivo, Oppo, and others)\n- Both brand-new and certified refurbished options available\n- Filter by brand, price range, RAM/storage, and 5G support on the website\n\nAccessories\n\n- **Cases & Covers** — silicone, leather, rugged, and transparent options for most popular models\n- **Chargers & Cables** — fast chargers, wireless chargers, USB-C/Lightning cables\n- **Earphones & Headphones** — wired, true wireless (TWS), and Bluetooth neckbands\n- **Power Banks** — 10,000mAh to 30,000mAh, with fast-charging support\n- **Screen Protectors** — tempered glass and hydrogel film, model-specific fitting",
+    "metadata": {
+      "document_id": "products_products",
+      "category": "products",
+      "source_file": "products.md",
+      "source_path": "knowledge_base\\products\\products.md",
+      "heading": "Categories",
+      "heading_path": [
+        "Product Catalog Overview",
+        "Categories"
+      ],
+      "section_id": null,
+      "section_level": 2,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 104,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "products_products__products.md__3__0",
+    "text": "Product Catalog Overview\n\nProduct Information\n\n- Each product page lists full specifications, in-box contents, warranty duration, and available color/storage variants.\n- Stock availability is shown in real time; out-of-stock items can be \"notified\" via email when restocked.\n- Genuine product images are used; actual color may vary slightly due to display settings.\n\nCompatibility\n\n- Accessory pages list compatible phone models. Please verify your exact model number before ordering cases or screen protectors.\n- Chargers indicate wattage and fast-charging protocol compatibility (e.g., PD, QC).\n\nBundles & Offers\n\n- Phone + accessory bundles are available at a discount on select listings.\n- Ongoing promotions are listed on the Offers page and applied automatically at checkout, or via promo code where specified.",
+    "metadata": {
+      "document_id": "products_products",
+      "category": "products",
+      "source_file": "products.md",
+      "source_path": "knowledge_base\\products\\products.md",
+      "heading": "Product Catalog Overview",
+      "heading_path": [
+        "Product Catalog Overview"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 3,
+      "word_count": 119,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

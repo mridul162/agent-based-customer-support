@@ -1,0 +1,42 @@
+[
+  {
+    "chunk_id": "policies_warranty__warranty.md__1__0",
+    "text": "Warranty Policy\n\nPhones\n\n- New phones come with the manufacturer's official warranty, typically 12 months, covering manufacturing defects.\n- Warranty is void if the device shows signs of physical damage, liquid damage, unauthorized repair, or tampering.\n- Battery health issues are covered only if battery capacity drops below manufacturer-specified thresholds within the warranty period.\n\nRefurbished Phones\n\n- Refurbished phones carry a 3-month Silico warranty covering functional defects (not covered by the manufacturer).\n- Cosmetic wear consistent with the listed condition grade is not covered.\n\nAccessories\n\n- Chargers, cables, power banks, and earphones carry a 6-month warranty against manufacturing defects.\n- Cases, screen protectors, and other consumables (non-electronic) are not covered under warranty.",
+    "metadata": {
+      "document_id": "policies_warranty",
+      "category": "policies",
+      "source_file": "warranty.md",
+      "source_path": "knowledge_base\\policies\\warranty.md",
+      "heading": "Warranty Policy",
+      "heading_path": [
+        "Warranty Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 112,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "policies_warranty__warranty.md__2__0",
+    "text": "Warranty Policy\n\nWhat Voids the Warranty\n\n- Physical or liquid damage\n- Unauthorized repair or opening of the device\n- Use of incompatible chargers or accessories causing damage\n- Missing or altered serial number/IMEI\n\nHow to Claim Warranty\n\n1. Contact Silico support with your order number and a description of the issue.\n2. Support will advise whether the item should be sent in for inspection or taken to an authorized service center.\n3. Approved warranty claims result in repair, replacement, or store credit, at Silico's discretion.",
+    "metadata": {
+      "document_id": "policies_warranty",
+      "category": "policies",
+      "source_file": "warranty.md",
+      "source_path": "knowledge_base\\policies\\warranty.md",
+      "heading": "Warranty Policy",
+      "heading_path": [
+        "Warranty Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 86,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

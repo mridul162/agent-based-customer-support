@@ -1,0 +1,42 @@
+[
+  {
+    "chunk_id": "returns_returns__returns.md__1__0",
+    "text": "Returns Policy\n\nEligibility\n\n- Items may be returned within **7 days of delivery**.\n- Phones must be unused, with original packaging, box contents, and all accessories included.\n- IMEI/serial number must match the original invoice.\n- Accessories must be unused and in original, unopened packaging.\n\nNon-Returnable Items\n\n- Screen protectors and other consumables once opened\n- SIM cards or activated eSIM products\n- Items marked \"Final Sale\" on the product page\n- Products with damaged, missing, or altered original packaging\n\nHow to Request a Return\n\n1. Go to \"My Orders\" and select \"Request Return,\" or contact support with your order number.\n2. Choose a reason for return and, if applicable, upload photos of the issue.\n3. Once approved, a courier will be scheduled to pick up the item, or you may drop it off at a Silico service point.",
+    "metadata": {
+      "document_id": "returns_returns",
+      "category": "returns",
+      "source_file": "returns.md",
+      "source_path": "knowledge_base\\returns\\returns.md",
+      "heading": "Returns Policy",
+      "heading_path": [
+        "Returns Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 139,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "returns_returns__returns.md__2__0",
+    "text": "Returns Policy\n\nInspection\n\n- Returned items are inspected upon receipt to confirm condition and completeness.\n- Items that fail inspection (e.g., signs of use, missing parts) will be sent back to the customer and are not eligible for refund/exchange.\n\nExchanges\n\n- Exchanges for a different color/variant of the same product are allowed within the 7-day return window, subject to stock availability.\n\n*Related document: refund.md*",
+    "metadata": {
+      "document_id": "returns_returns",
+      "category": "returns",
+      "source_file": "returns.md",
+      "source_path": "knowledge_base\\returns\\returns.md",
+      "heading": "Returns Policy",
+      "heading_path": [
+        "Returns Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 64,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

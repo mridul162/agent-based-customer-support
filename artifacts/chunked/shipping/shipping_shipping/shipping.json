@@ -1,0 +1,42 @@
+[
+  {
+    "chunk_id": "shipping_shipping__shipping.md__1__0",
+    "text": "Shipping Policy\n\nDelivery Options\n\n| Option | Delivery Time | Availability |\n|---|---|---|\n| Standard Delivery | 2–5 business days | Nationwide |\n| Express Delivery | 1–2 business days | Select major cities |\n| Same-Day Delivery | Same day (order before 12 PM) | Dhaka only |\n\nShipping Charges\n\n- Free standard shipping on orders above a set minimum threshold (shown at checkout).\n- Express and same-day delivery incur an additional fee, calculated at checkout based on location.\n\nOrder Processing\n\n- Orders are processed and packed within 24 hours of confirmation (excluding public holidays).\n- You will receive a confirmation SMS/email once your order ships, including a tracking number.",
+    "metadata": {
+      "document_id": "shipping_shipping",
+      "category": "shipping",
+      "source_file": "shipping.md",
+      "source_path": "knowledge_base\\shipping\\shipping.md",
+      "heading": "Shipping Policy",
+      "heading_path": [
+        "Shipping Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 1,
+      "word_count": 111,
+      "chunking_strategy": "hybrid"
+    }
+  },
+  {
+    "chunk_id": "shipping_shipping__shipping.md__2__0",
+    "text": "Shipping Policy\n\nDelivery Attempts\n\n- Our courier partner will attempt delivery up to 2 times.\n- If delivery fails both times, the order is returned to Silico and the customer is contacted to arrange redelivery or cancellation.\n\nDelays\n\n- Delivery times may be affected by weather, courier disruptions, or remote locations. Customers will be notified of any significant delay.\n\nOrder Inspection on Delivery\n\n- Customers are encouraged to inspect the package at the time of delivery. Report any visible damage to the delivery agent and to Silico support within 24 hours.",
+    "metadata": {
+      "document_id": "shipping_shipping",
+      "category": "shipping",
+      "source_file": "shipping.md",
+      "source_path": "knowledge_base\\shipping\\shipping.md",
+      "heading": "Shipping Policy",
+      "heading_path": [
+        "Shipping Policy"
+      ],
+      "section_id": null,
+      "section_level": 1,
+      "chunk_index": 0,
+      "section_index": 2,
+      "word_count": 91,
+      "chunking_strategy": "hybrid"
+    }
+  }
+]

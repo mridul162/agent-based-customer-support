@@ -44,6 +44,7 @@ from typing import Any
 
 from app.schemas.agent_state import AgentState
 from app.schemas.tool_spec import ToolSpec
+from app.tools.retrieve_knowledge_tool import retrieve_knowledge_tool
 from app.tools.ticket_tools import create_ticket_tool, get_ticket_tool
 
 
@@ -80,6 +81,16 @@ def _build_get_ticket_arguments(state: AgentState) -> dict[str, Any]:
             if state.extracted_arguments is not None
             else None
         ),
+    }
+
+
+def _build_retrieve_knowledge_arguments(state: AgentState) -> dict[str, Any]:
+    """
+    Arguments for retrieve_knowledge_tool.
+    The customer's current message is the retrieval query.
+    """
+    return {
+        "question": state.message,
     }
 
 
@@ -124,6 +135,15 @@ def _build_get_ticket_response(tool_result: Any) -> str:
     )
 
 
+def _build_retrieve_knowledge_response(tool_result: Any) -> str:
+    """
+    RAG returns a customer-facing answer string.
+    """
+    if tool_result is None:
+        return ""
+    return str(tool_result).strip()
+
+
 # ---------------------------------------------------------------------------
 # Tool Registry
 #
@@ -148,5 +168,13 @@ TOOL_REGISTRY: dict[str, ToolSpec] = {
         required_arguments = ("ticket_id",), # must be extracted from language
         argument_builder   = _build_get_ticket_arguments,
         response_builder   = _build_get_ticket_response,
+    ),
+
+    "retrieve_knowledge_tool": ToolSpec(
+        name               = "retrieve_knowledge_tool",
+        tool_fn            = retrieve_knowledge_tool,
+        required_arguments = (),
+        argument_builder   = _build_retrieve_knowledge_arguments,
+        response_builder   = _build_retrieve_knowledge_response,
     ),
 }

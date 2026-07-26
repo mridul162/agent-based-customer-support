@@ -1,0 +1,71 @@
+[
+  {
+    "heading": "Shipping Policy",
+    "level": 1,
+    "section_id": null,
+    "heading_path": [
+      "Shipping Policy"
+    ],
+    "content": ""
+  },
+  {
+    "heading": "Delivery Options",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Shipping Policy",
+      "Delivery Options"
+    ],
+    "content": "| Option | Delivery Time | Availability |\n|---|---|---|\n| Standard Delivery | 2–5 business days | Nationwide |\n| Express Delivery | 1–2 business days | Select major cities |\n| Same-Day Delivery | Same day (order before 12 PM) | Dhaka only |"
+  },
+  {
+    "heading": "Shipping Charges",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Shipping Policy",
+      "Shipping Charges"
+    ],
+    "content": "- Free standard shipping on orders above a set minimum threshold (shown at checkout).\n- Express and same-day delivery incur an additional fee, calculated at checkout based on location."
+  },
+  {
+    "heading": "Order Processing",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Shipping Policy",
+      "Order Processing"
+    ],
+    "content": "- Orders are processed and packed within 24 hours of confirmation (excluding public holidays).\n- You will receive a confirmation SMS/email once your order ships, including a tracking number."
+  },
+  {
+    "heading": "Delivery Attempts",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Shipping Policy",
+      "Delivery Attempts"
+    ],
+    "content": "- Our courier partner will attempt delivery up to 2 times.\n- If delivery fails both times, the order is returned to Silico and the customer is contacted to arrange redelivery or cancellation."
+  },
+  {
+    "heading": "Delays",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Shipping Policy",
+      "Delays"
+    ],
+    "content": "- Delivery times may be affected by weather, courier disruptions, or remote locations. Customers will be notified of any significant delay."
+  },
+  {
+    "heading": "Order Inspection on Delivery",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Shipping Policy",
+      "Order Inspection on Delivery"
+    ],
+    "content": "- Customers are encouraged to inspect the package at the time of delivery. Report any visible damage to the delivery agent and to Silico support within 24 hours."
+  }
+]

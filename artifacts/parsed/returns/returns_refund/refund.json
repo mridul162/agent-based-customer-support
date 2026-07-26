@@ -1,0 +1,51 @@
+[
+  {
+    "heading": "Refund Policy",
+    "level": 1,
+    "section_id": null,
+    "heading_path": [
+      "Refund Policy"
+    ],
+    "content": "Customers may request a refund within 7 days of delivery.\nRefunds are processed after product inspection.\nRefunds are issued to the original payment method."
+  },
+  {
+    "heading": "Refund Timeline",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Refund Policy",
+      "Refund Timeline"
+    ],
+    "content": "| Payment Method | Refund Time After Approval |\n|---|---|\n| Credit/Debit Card | 5–7 business days |\n| Mobile Wallet (bKash/Nagad/Rocket) | 2–3 business days |\n| Bank Transfer | 3–5 business days |\n| Cash on Delivery (COD) | Refunded via bank transfer or mobile wallet, 5–7 business days |"
+  },
+  {
+    "heading": "Partial Refunds",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Refund Policy",
+      "Partial Refunds"
+    ],
+    "content": "- Partial refunds may be issued if only part of an order is returned, or if a promotional discount applied to a bundle is affected by a partial return."
+  },
+  {
+    "heading": "Shipping Fees",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Refund Policy",
+      "Shipping Fees"
+    ],
+    "content": "- Original shipping fees are non-refundable unless the return is due to a Silico error (wrong item shipped, defective product, etc.).\n- Return shipping is free for defective or incorrect items; otherwise, return shipping cost may be deducted from the refund."
+  },
+  {
+    "heading": "Failed or Delayed Refunds",
+    "level": 2,
+    "section_id": null,
+    "heading_path": [
+      "Refund Policy",
+      "Failed or Delayed Refunds"
+    ],
+    "content": "- If a refund has not been received within the stated timeline, customers should contact support with their order number and refund reference (if available) for investigation."
+  }
+]

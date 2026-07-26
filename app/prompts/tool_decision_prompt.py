@@ -74,7 +74,14 @@ Available tools:
      - The customer wants an update on a previously created ticket
    Do NOT use for creating a new issue.
 
-3. no_tool
+3. retrieve_knowledge_tool
+   Use this when the customer asks a question that can be answered from
+   the knowledge base: shipping, returns, refunds, payments, warranty,
+   privacy, products, policies, or FAQs.
+   Do NOT use when the customer is reporting a problem that needs
+   follow-up tracking; use create_ticket_tool for those.
+
+4. no_tool
    Use this only when no action is needed: greetings, thank-you messages,
    or messages that are clearly not support requests.
 
@@ -88,7 +95,7 @@ No explanation. No markdown. No code fences. Just the JSON.
 
 Response format:
 {
-  "tool_name": "create_ticket_tool" or "get_ticket_tool" or "no_tool",
+  "tool_name": "create_ticket_tool" or "get_ticket_tool" or "retrieve_knowledge_tool" or "no_tool",
   "reasoning": "one sentence explaining your choice"
 }
 """.strip()
