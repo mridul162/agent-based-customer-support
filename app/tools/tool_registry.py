@@ -44,6 +44,7 @@ from typing import Any
 
 from app.schemas.agent_state import AgentState
 from app.schemas.tool_spec import ToolSpec
+from app.tools.order_tools import cancel_order_tool, estimate_delivery_time_tool, get_order_status_tool, update_delivery_address_tool
 from app.tools.retrieve_knowledge_tool import retrieve_knowledge_tool
 from app.tools.ticket_tools import create_ticket_tool, get_ticket_tool
 
@@ -91,6 +92,67 @@ def _build_retrieve_knowledge_arguments(state: AgentState) -> dict[str, Any]:
     """
     return {
         "question": state.message,
+    }
+
+def _build_get_order_status_arguments(state: AgentState) -> dict[str, Any]:
+    """
+    Arguments for get_order_status_tool.
+    order_id is extracted from natural language by argument_extraction_node.
+    Validation guarantees it is present before execution reaches here.
+    """
+    return {
+        "order_id": (
+            state.extracted_arguments.get("order_id")
+            if state.extracted_arguments is not None
+            else None
+        ),
+    }
+
+def _build_cancel_order_arguments(state: AgentState) -> dict[str, Any]:
+    """
+    Arguments for cancel_order_tool.
+    order_id is extracted from natural language by argument_extraction_node.
+    Validation guarantees it is present before execution reaches here.
+    """
+    return {
+        "order_id": (
+            state.extracted_arguments.get("order_id")
+            if state.extracted_arguments is not None
+            else None
+        ),
+    }
+
+def _build_update_delivery_address_arguments(state: AgentState) -> dict[str, Any]:
+    """
+    Arguments for update_delivery_address_tool.
+    order_id and new_address are extracted from natural language by argument_extraction_node.
+    Validation guarantees they are present before execution reaches here.
+    """
+    return {
+        "order_id": (
+            state.extracted_arguments.get("order_id")
+            if state.extracted_arguments is not None
+            else None
+        ),
+        "new_address": (
+            state.extracted_arguments.get("new_address")
+            if state.extracted_arguments is not None
+            else None
+        ),
+    }
+
+def _build_estimate_delivery_time_arguments(state: AgentState) -> dict[str, Any]:
+    """
+    Arguments for estimate_delivery_time_tool.
+    order_id is extracted from natural language by argument_extraction_node.
+    Validation guarantees it is present before execution reaches here.
+    """
+    return {
+        "order_id": (
+            state.extracted_arguments.get("order_id")
+            if state.extracted_arguments is not None
+            else None
+        ),
     }
 
 
@@ -143,6 +205,61 @@ def _build_retrieve_knowledge_response(tool_result: Any) -> str:
         return ""
     return str(tool_result).strip()
 
+def _order_not_found_response() -> str:
+    return (
+        "We could not find an order with that ID. "
+        "Please verify the order number and try again."
+    )
+
+def _build_get_order_status_response(tool_result: Any) -> str:
+    """
+    Returns a customer-facing order status string.
+    """
+    if tool_result is None:
+        return _order_not_found_response()
+    return (
+        f"Here is the status of your order:\n\n"
+        f"Order ID: {tool_result.order_id}\n"
+        f"Status:   {tool_result.status.value}\n"
+        f"Total:    ৳{tool_result.total_amount:.2f}\n"
+        f"Address:  {tool_result.delivery_address}\n"
+        f"Last Updated: {tool_result.updated_at:%Y-%m-%d %H:%M UTC}"
+    )
+
+def _build_cancel_order_response(tool_result: Any) -> str:
+    """
+    Returns a customer-facing order cancellation confirmation string.
+    """
+    if tool_result is None:
+        return _order_not_found_response()
+    return (
+        f"Your order has been successfully cancelled.\n\n"
+        f"Order ID: {tool_result.order_id}\n"
+        f"Status:   {tool_result.status.value}"
+    )
+
+def _build_update_delivery_address_response(tool_result: Any) -> str:
+    """
+    Returns a customer-facing delivery address update confirmation string.
+    """
+    if tool_result is None:
+        return _order_not_found_response()
+    return (
+        f"Your delivery address has been successfully updated.\n\n"
+        f"Order ID: {tool_result.order_id}\n"
+        f"New Address: {tool_result.delivery_address}"
+    )
+
+def _build_estimate_delivery_time_response(tool_result: Any) -> str:
+    """
+    Returns a customer-facing estimated delivery time string.
+    """
+    if tool_result is None:
+        return _order_not_found_response()
+    return (
+        f"Your order is estimated to be delivered by {tool_result.estimated_delivery_time}."
+    )
+
 
 # ---------------------------------------------------------------------------
 # Tool Registry
@@ -176,5 +293,37 @@ TOOL_REGISTRY: dict[str, ToolSpec] = {
         required_arguments = (),
         argument_builder   = _build_retrieve_knowledge_arguments,
         response_builder   = _build_retrieve_knowledge_response,
+    ),
+
+    "get_order_status_tool": ToolSpec(
+        name               = "get_order_status_tool",
+        tool_fn            = get_order_status_tool,
+        required_arguments = ("order_id",), # must be extracted from language
+        argument_builder   = _build_get_order_status_arguments,
+        response_builder   = _build_get_order_status_response,
+    ),
+
+    "cancel_order_tool": ToolSpec(
+        name               = "cancel_order_tool",
+        tool_fn            = cancel_order_tool,
+        required_arguments = ("order_id",), # must be extracted from language
+        argument_builder   = _build_cancel_order_arguments,
+        response_builder   = _build_cancel_order_response,
+    ),
+
+    "update_delivery_address_tool": ToolSpec(
+        name               = "update_delivery_address_tool",
+        tool_fn            = update_delivery_address_tool,
+        required_arguments = ("order_id", "new_address"), # must be extracted from language
+        argument_builder   = _build_update_delivery_address_arguments,
+        response_builder   = _build_update_delivery_address_response,
+    ),
+
+    "estimate_delivery_time_tool": ToolSpec(
+        name               = "estimate_delivery_time_tool",
+        tool_fn            = estimate_delivery_time_tool,
+        required_arguments = ("order_id",), # must be extracted from language
+        argument_builder   = _build_estimate_delivery_time_arguments,
+        response_builder   = _build_estimate_delivery_time_response,
     ),
 }
