@@ -35,9 +35,10 @@ observable, and easy to extend.
 """
 
 from app.config.settings import settings
-from app.llm.openai_client import get_openai_client
+from app.llm.llm_service import LLMService
 from app.rag.generators.prompt_builder import PromptBuilder
 from app.rag.pipelines.retrieval_pipeline import RetrievalPipeline
+from app.schemas.execution_trace import ExecutionTrace
 
 
 class AnswerGenerator:
@@ -53,7 +54,6 @@ class AnswerGenerator:
         self.retrieval_pipeline = retrieval_pipeline
         self.prompt_builder = PromptBuilder()
 
-        self.client = get_openai_client()
         self.model_name = model_name or settings.openai_model
 
     def generate(
@@ -61,6 +61,7 @@ class AnswerGenerator:
         query: str,
         history:None,
         top_k: int = 5,
+        execution_trace: ExecutionTrace | None = None,
     ) -> str:
         """
         Generate an answer for a user query.
@@ -90,10 +91,12 @@ class AnswerGenerator:
             history=history,
         )
 
-        response = self.client.chat.completions.create(
+        response = LLMService.create_chat_completion(
             model=self.model_name,
             messages=messages,
             temperature=0.1,
+            execution_trace=execution_trace,
+            node_name="answer_generator",
         )
 
         answer = response.choices[0].message.content

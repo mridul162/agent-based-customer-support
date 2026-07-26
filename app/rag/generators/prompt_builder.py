@@ -35,6 +35,7 @@ Keep formatting logic centralized,
 deterministic, and easy to debug.
 """
 
+import logging
 from typing import List
 
 from app.rag.models.retrieval_models import RetrievedChunk
@@ -43,6 +44,8 @@ from .answer_prompt import (
     SYSTEM_PROMPT,
     USER_PROMPT_TEMPLATE,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class PromptBuilder:
@@ -55,23 +58,28 @@ class PromptBuilder:
         history,
     ) -> str:
 
-        if (
-            history is None
-            or not history.messages
-        ):
+        if history is None:
             return (
                 "No previous conversation."
             )
 
+        messages = getattr(history, "messages", history)
+
+        if not messages:
+            return "No previous conversation."
+
         lines = []
 
-        for message in history.messages:
+        for message in messages:
+
+            role = getattr(message, "role", None)
+            content = getattr(message, "content", None)
 
             lines.append(
 
-                f"{message.role.title()}: "
+                f"{str(role).title()}: "
 
-                f"{message.content}"
+                f"{content}"
             )
 
         return "\n".join(lines)
@@ -137,12 +145,14 @@ class PromptBuilder:
                 history
             )
         )
-        print("\n")
-        print("=" * 80)
-        print("FINAL PROMPT")
-        print("=" * 80)
-        print(conversation_history)
-        print("=" * 80)
+        logger.debug(
+            "Built grounded answer prompt.",
+            extra={
+                "query": query,
+                "context_documents": len(chunks),
+                "has_history": history is not None,
+            },
+        )
 
         return USER_PROMPT_TEMPLATE.format(
             history=conversation_history,

@@ -165,6 +165,65 @@ class LLMService:
             raise
 
     @classmethod
+    def create_chat_completion(
+        cls,
+        *,
+        model: str,
+        messages: list[dict[str, str]],
+        execution_trace: ExecutionTrace | None = None,
+        node_name: str | None = None,
+        **kwargs,
+    ) -> Any:
+        """
+        Execute a chat completion request and record metrics.
+
+        This is used by prompt-driven generation flows that already build
+        chat-style message payloads.
+        """
+
+        client = get_openai_client()
+
+        started_at = datetime.now(UTC)
+
+        try:
+
+            completion = client.chat.completions.create(
+                model=model,
+                messages=messages, # type: ignore
+                **kwargs,
+            )
+
+            finished_at = datetime.now(UTC)
+
+            cls._record_metrics(
+                execution_trace=execution_trace,
+                model=model,
+                started_at=started_at,
+                finished_at=finished_at,
+                response=completion,
+                success=True,
+                node_name=node_name,
+            )
+
+            return completion
+
+        except Exception as exc:
+
+            finished_at = datetime.now(UTC)
+
+            cls._record_metrics(
+                execution_trace=execution_trace,
+                model=model,
+                started_at=started_at,
+                finished_at=finished_at,
+                success=False,
+                error=str(exc),
+                node_name=node_name,
+            )
+
+            raise
+
+    @classmethod
     def parse_chat_completion(
         cls,
         *,

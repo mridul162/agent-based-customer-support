@@ -7,6 +7,7 @@ from functools import lru_cache
 
 from app.rag.generators.answer_generator import AnswerGenerator
 from app.rag.pipelines.retrieval_pipeline import RetrievalPipeline
+from app.schemas.execution_trace import ExecutionTrace
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ class RetrievalService:
     def answer_question(
         question: str,
         top_k: int = 5,
+        execution_trace: ExecutionTrace | None = None,
     ) -> str:
         if not question.strip():
             raise ValueError("Question cannot be empty.")
@@ -39,6 +41,7 @@ class RetrievalService:
                 query=question,
                 history=None,
                 top_k=top_k,
+                execution_trace=execution_trace,
             )
         except FileNotFoundError:
             logger.exception("RAG vector artifacts are missing.")
