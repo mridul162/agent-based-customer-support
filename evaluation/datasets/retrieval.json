@@ -1,0 +1,490 @@
+[
+  {
+    "id": "RET-001",
+    "description": "Happy path: customer asks a clear policy question with a single matching knowledge document.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats your return policy if the item doesnt fit" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_return_policy",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "policy_question", "happy_path"]
+  },
+  {
+    "id": "RET-002",
+    "description": "Happy path: customer asks about warranty coverage for a general product category.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "does my blender come with a warranty" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_warranty_policy",
+      "expected_product": "blender",
+      "fallback": false
+    },
+    "tags": ["retrieval", "policy_question", "product_specific"]
+  },
+  {
+    "id": "RET-003",
+    "description": "Happy path: customer asks which payment methods are accepted at checkout.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "do u guys take paypal or just cards" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_payment_methods",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "payment_question", "typo_heavy"]
+  },
+  {
+    "id": "RET-004",
+    "description": "Happy path: customer asks about international shipping availability to a specific country.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "do you ship to canada" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_international_shipping",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "shipping_question", "happy_path"]
+  },
+  {
+    "id": "RET-005",
+    "description": "Happy path: customer asks about technical specifications of a named product.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the battery life on the SoundWave X200 headphones" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_product_specs_soundwave_x200",
+      "expected_product": "SoundWave X200",
+      "fallback": false
+    },
+    "tags": ["retrieval", "product_specs", "happy_path"]
+  },
+  {
+    "id": "RET-006",
+    "description": "Fallback case: customer asks about a policy topic that has no matching document in the knowledge base.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can i pay in installments with klarna" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": true
+    },
+    "tags": ["retrieval", "fallback", "unsupported_document"]
+  },
+  {
+    "id": "RET-007",
+    "description": "Fallback case: customer asks about specs of a product that does not exist in the catalog.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "does the QuantumBlend 9000 have a self cleaning mode" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": true
+    },
+    "tags": ["retrieval", "fallback", "unknown_product"]
+  },
+  {
+    "id": "RET-008",
+    "description": "Ambiguous request: customer mentions a product category without specifying which product, requiring clarification before retrieval.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "does it come with a charger" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "ambiguous_request", "clarification"]
+  },
+  {
+    "id": "RET-009",
+    "description": "Out-of-domain question unrelated to any support topic should not trigger retrieval.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the capital of france lol" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "out_of_domain", "no_tool"]
+  },
+  {
+    "id": "RET-010",
+    "description": "Greeting message should not trigger retrieval.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "hey there, good morning" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "greeting", "no_tool"]
+  },
+  {
+    "id": "RET-011",
+    "description": "Gratitude message following a prior retrieval answer should not trigger another retrieval.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats your return policy" },
+        { "role": "agent", "content": "Items can be returned within 30 days of delivery for a full refund." },
+        { "role": "customer", "content": "perfect, thank you!" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "gratitude", "no_tool"]
+  },
+  {
+    "id": "RET-012",
+    "description": "Conversation memory: customer asks a follow-up policy question referring back to a previously discussed product without repeating its name.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "tell me about the SoundWave X200 headphones" },
+        { "role": "agent", "content": "The SoundWave X200 has a 30-hour battery life and active noise cancellation." },
+        { "role": "customer", "content": "does it also have a warranty" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_warranty_policy",
+      "expected_product": "SoundWave X200",
+      "fallback": false
+    },
+    "tags": ["retrieval", "conversation_memory", "follow_up"]
+  },
+  {
+    "id": "RET-013",
+    "description": "Typo-heavy input asking about the exchange policy for a defective item.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "wat is ur exchang policy if item is defectiv" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_exchange_policy",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "policy_question", "typo_heavy"]
+  },
+  {
+    "id": "RET-014",
+    "description": "Contradictory request: customer asks about two conflicting policy topics in a way that suggests confusion, requiring clarification rather than a single retrieval.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "is your return window 30 days or 14 days, i saw both on your site and im confused which is right" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_return_policy",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "contradictory_request", "policy_question"]
+  },
+  {
+    "id": "RET-015",
+    "description": "Happy path: customer asks about account deletion process.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "how do i delete my account permanently" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_account_deletion",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "account_question", "happy_path"]
+  },
+  {
+    "id": "RET-016",
+    "description": "Happy path: customer asks about gift card redemption process.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "how do i redeem a gift card at checkout" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_gift_card_redemption",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "payment_question", "happy_path"]
+  },
+  {
+    "id": "RET-017",
+    "description": "Vague request mentioning 'the policy' with no topic specified, requiring clarification before retrieval.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can you explain the policy to me" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "vague_request", "clarification"]
+  },
+  {
+    "id": "RET-018",
+    "description": "Mixed intent guard: customer includes an order ID within a general policy question, testing that retrieval is selected instead of an order tool since the question is about policy, not order-specific data.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "for order ORD-40218, whats the general return window for electronics" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_return_policy",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "policy_question", "mixed_context"]
+  },
+  {
+    "id": "RET-019",
+    "description": "Happy path: customer asks about the material composition of a specific product.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "is the ComfySit office chair made of real leather" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_product_specs_comfysit_chair",
+      "expected_product": "ComfySit office chair",
+      "fallback": false
+    },
+    "tags": ["retrieval", "product_specs", "happy_path"]
+  },
+  {
+    "id": "RET-020",
+    "description": "Fallback case: customer asks about a loyalty or rewards program that does not exist in the knowledge base.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "how many points do i have in your rewards program" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": true
+    },
+    "tags": ["retrieval", "fallback", "unsupported_document"]
+  },
+  {
+    "id": "RET-021",
+    "description": "Happy path: customer asks about the price-match guarantee policy.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "if i find it cheaper elsewhere will you match the price" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_price_match_policy",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "policy_question", "happy_path"]
+  },
+  {
+    "id": "RET-022",
+    "description": "Out-of-domain follow-up after a legitimate retrieval question, testing that the agent does not force retrieval on an unrelated topic mid-conversation.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats your warranty policy" },
+        { "role": "agent", "content": "Most products come with a 1-year manufacturer warranty." },
+        { "role": "customer", "content": "anyway, do you know a good recipe for pasta" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "out_of_domain", "conversation_memory"]
+  },
+  {
+    "id": "RET-023",
+    "description": "Happy path: customer asks about the size chart for a clothing product line.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "wheres the size chart for your hoodies" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_size_chart_hoodies",
+      "expected_product": "hoodies",
+      "fallback": false
+    },
+    "tags": ["retrieval", "product_specs", "happy_path"]
+  },
+  {
+    "id": "RET-024",
+    "description": "Malformed/garbled query that still contains enough signal to identify the intended policy topic.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "retrun policy?? how long i got" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_return_policy",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "policy_question", "typo_heavy"]
+  },
+  {
+    "id": "RET-025",
+    "description": "Fully garbled/nonsensical query with no recognizable topic should fall back rather than guess a document.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "asdkj policy thing return maybe idk help" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": true
+    },
+    "tags": ["retrieval", "fallback", "malformed_query"]
+  },
+  {
+    "id": "RET-026",
+    "description": "Happy path: customer asks whether a product is covered under an extended protection plan.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can i buy extended protection for the SoundWave X200" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_extended_protection_plan",
+      "expected_product": "SoundWave X200",
+      "fallback": false
+    },
+    "tags": ["retrieval", "product_specific", "policy_question"]
+  },
+  {
+    "id": "RET-027",
+    "description": "Ambiguous product reference: customer says 'the one I bought last week' without naming the product, requiring clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "does the one i bought last week have a warranty" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "ambiguous_request", "clarification"]
+  },
+  {
+    "id": "RET-028",
+    "description": "Happy path: customer asks about store hours and physical location availability.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "do you have any physical stores i can visit" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_store_locations",
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "general_question", "happy_path"]
+  },
+  {
+    "id": "RET-029",
+    "description": "Conversation memory: customer asks a vague follow-up ('and what about shipping') after a product-specific question, testing that context carries the product reference into a new document lookup.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "tell me about the ComfySit office chair" },
+        { "role": "agent", "content": "The ComfySit office chair features adjustable lumbar support and a mesh back." },
+        { "role": "customer", "content": "and what about shipping for that" }
+      ]
+    },
+    "expected": {
+      "tool": "retrieve_knowledge_tool",
+      "expected_document": "doc_shipping_policy",
+      "expected_product": "ComfySit office chair",
+      "fallback": false
+    },
+    "tags": ["retrieval", "conversation_memory", "follow_up"]
+  },
+  {
+    "id": "RET-030",
+    "description": "Unsupported request disguised as a knowledge question: customer asks the agent to override the stated return policy for their specific case, which is an escalation, not a retrieval task.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "i know its past 30 days but can you just make an exception for my return" }
+      ]
+    },
+    "expected": {
+      "tool": "create_ticket_tool",
+      "expected_document": null,
+      "expected_product": null,
+      "fallback": false
+    },
+    "tags": ["retrieval", "unsupported_request", "escalation"]
+  }
+]

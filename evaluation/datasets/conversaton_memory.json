@@ -1,0 +1,572 @@
+[
+  {
+    "id": "MEM-001",
+    "description": "Canonical memory case: a ticket is created, then the customer asks for its status without repeating the ID, requiring recovery of the ticket ID from the prior turn.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "My package arrived completely crushed, the item inside is damaged." },
+        { "role": "agent", "content": "I'm sorry to hear that. I've created ticket TCK-90210 for this issue and our team will follow up." },
+        { "role": "customer", "content": "ok, whats the status on that now" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-90210" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "ticket_id", "context_recovery"]
+  },
+  {
+    "id": "MEM-002",
+    "description": "Order ID given in turn one is recovered for a cancellation request in turn three, without the customer repeating it.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Can you check the status of ORD-60312?" },
+        { "role": "agent", "content": "Order ORD-60312 is currently in transit and expected to arrive in 2 days." },
+        { "role": "customer", "content": "Okay actually just cancel it then." }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60312" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "context_recovery", "cancel_order"]
+  },
+  {
+    "id": "MEM-003",
+    "description": "Order ID persists across an unrelated intervening turn about policy before being needed again for a cancellation.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Check order ORD-30215 please" },
+        { "role": "agent", "content": "ORD-30215 is currently being packed." },
+        { "role": "customer", "content": "also whats your return policy" },
+        { "role": "agent", "content": "Items can be returned within 30 days of delivery." },
+        { "role": "customer", "content": "ok and can you cancel that order now" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-30215" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "context_recovery", "multi_turn", "topic_interleaving"]
+  },
+  {
+    "id": "MEM-004",
+    "description": "Two-turn address update: order ID given first, agent asks for the new address, customer supplies only the address in the next turn, requiring both pieces to be merged.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I need to update the address for ORD-60110" },
+        { "role": "agent", "content": "Sure, what would you like the new delivery address to be?" },
+        { "role": "customer", "content": "9 River Rd, Austin, TX 78701" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60110", "new_address": "9 River Rd, Austin, TX 78701" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "delivery_address", "context_recovery", "multi_turn"]
+  },
+  {
+    "id": "MEM-005",
+    "description": "Negative test: after a topic change away from orders entirely, a vague new request should NOT silently reuse an order ID from several turns earlier.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check ORD-15500 please" },
+        { "role": "agent", "content": "ORD-15500 was delivered yesterday." },
+        { "role": "customer", "content": "thanks, unrelated question, can you cancel my order" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["conversation_memory", "negative_test", "ambiguous_reference", "clarification"]
+  },
+  {
+    "id": "MEM-006",
+    "description": "Pronoun resolution: customer uses 'it' to refer to the order discussed one turn earlier, requiring the pronoun to resolve to that order's ID.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Can you check order ORD-88820 for me?" },
+        { "role": "agent", "content": "Order ORD-88820 is being processed and hasn't shipped yet." },
+        { "role": "customer", "content": "great, cancel it then please" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-88820" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "pronoun_resolution", "order_id", "cancel_order"]
+  },
+  {
+    "id": "MEM-007",
+    "description": "Ticket created, then customer later returns to the same ticket using 'that ticket' phrasing after a two-turn detour discussing an unrelated product question.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "my headphones arrived with a broken earpiece" },
+        { "role": "agent", "content": "I'm sorry about that. I've created ticket TCK-51290 to look into it." },
+        { "role": "customer", "content": "by the way does the SoundWave X200 have noise cancellation" },
+        { "role": "agent", "content": "Yes, the SoundWave X200 includes active noise cancellation." },
+        { "role": "customer", "content": "ok, any movement on that ticket yet" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-51290" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "ticket_id", "context_recovery", "topic_interleaving"]
+  },
+  {
+    "id": "MEM-008",
+    "description": "Multiple entities in memory: two different order IDs were discussed earlier; the customer's follow-up must resolve to the correct one based on explicit reference.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the status of ORD-10001" },
+        { "role": "agent", "content": "ORD-10001 has been delivered." },
+        { "role": "customer", "content": "and whats the status of ORD-10002" },
+        { "role": "agent", "content": "ORD-10002 is still in transit." },
+        { "role": "customer", "content": "cancel the second one" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-10002" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "multiple_entities", "reference_resolution", "cancel_order"]
+  },
+  {
+    "id": "MEM-009",
+    "description": "Multiple entities in memory with an ambiguous follow-up that does not clearly specify which of two previously mentioned orders is meant, requiring clarification rather than a guess.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the status of ORD-10001" },
+        { "role": "agent", "content": "ORD-10001 has been delivered." },
+        { "role": "customer", "content": "and whats the status of ORD-10002" },
+        { "role": "agent", "content": "ORD-10002 is still in transit." },
+        { "role": "customer", "content": "ok cancel it" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["conversation_memory", "multiple_entities", "ambiguous_reference", "clarification"]
+  },
+  {
+    "id": "MEM-010",
+    "description": "Address update recovers a previously provided but never-used order ID from two turns back after the customer changes their mind about what action to take.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I have a question about ORD-73310" },
+        { "role": "agent", "content": "Sure, what would you like to know about ORD-73310?" },
+        { "role": "customer", "content": "actually can you just update the delivery address to 22 Baker Street, London" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-73310", "new_address": "22 Baker Street, London" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "delivery_address", "context_recovery"]
+  },
+  {
+    "id": "MEM-011",
+    "description": "Context correction: customer provides one order ID, then immediately corrects it in the next turn; the corrected ID must be the one used, not the original.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check ORD-40221 for me" },
+        { "role": "agent", "content": "Sure, one moment. Can you confirm the order ID?" },
+        { "role": "customer", "content": "sorry typo, I meant ORD-40222" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-40222" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "context_correction", "order_id"]
+  },
+  {
+    "id": "MEM-012",
+    "description": "Ticket ID recovered after a long, multi-turn conversation with several unrelated exchanges in between, testing memory retention over distance.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "the blender I got is cracked" },
+        { "role": "agent", "content": "I'm sorry to hear that. I've created ticket TCK-40501 for this." },
+        { "role": "customer", "content": "whats your return policy in general" },
+        { "role": "agent", "content": "Items can be returned within 30 days of delivery." },
+        { "role": "customer", "content": "do you ship to canada" },
+        { "role": "agent", "content": "Yes, we ship to Canada with standard international rates." },
+        { "role": "customer", "content": "ok, hows that ticket looking" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-40501" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "ticket_id", "long_distance_recovery", "multi_turn"]
+  },
+  {
+    "id": "MEM-013",
+    "description": "Memory recovery combined with argument extraction: delivery estimate is requested for 'that order' referring back to an order ID mentioned only once, several turns earlier.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Is ORD-20456 going to make it before Friday?" },
+        { "role": "agent", "content": "ORD-20456 is currently scheduled to arrive on Thursday." },
+        { "role": "customer", "content": "ok and whats the estimated delivery time for that same order again exactly?" }
+      ]
+    },
+    "expected": {
+      "tool": "estimate_delivery_time_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-20456" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "estimate_delivery", "context_recovery"]
+  },
+  {
+    "id": "MEM-014",
+    "description": "Negative test: customer asks a completely new question about a different order type (ticket) after only ever discussing an order ID, so the order ID must not be wrongly reused as a ticket ID.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check ORD-40221 for me" },
+        { "role": "agent", "content": "ORD-40221 is currently in transit." },
+        { "role": "customer", "content": "ok can you check my ticket status too" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["ticket_id"]
+    },
+    "tags": ["conversation_memory", "negative_test", "entity_type_mismatch", "clarification"]
+  },
+  {
+    "id": "MEM-015",
+    "description": "Address recovered from an earlier turn is reused for a second, different order in the same conversation only when explicitly requested, testing that memory is not over-applied to a new identifier.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "update ORD-60110 to 9 River Rd, Austin, TX 78701" },
+        { "role": "agent", "content": "Done, the delivery address for ORD-60110 has been updated to 9 River Rd, Austin, TX 78701." },
+        { "role": "customer", "content": "can you use that same address for ORD-60111 too" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60111", "new_address": "9 River Rd, Austin, TX 78701" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "delivery_address", "cross_entity_reuse", "explicit_reference"]
+  },
+  {
+    "id": "MEM-016",
+    "description": "Contradiction recovery: customer reverses an earlier cancellation decision from two turns prior; the system must act on the final stated intent, not the original one.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "cancel ORD-77410 please" },
+        { "role": "agent", "content": "Just to confirm, you'd like to cancel ORD-77410?" },
+        { "role": "customer", "content": "actually no, keep it, don't cancel it" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": false,
+      "arguments": {},
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "context_correction", "cancel_order", "reversed_intent"]
+  },
+  {
+    "id": "MEM-017",
+    "description": "Ticket ID recovery fails gracefully: customer references 'my ticket' but no ticket was ever created or mentioned earlier in the conversation, so clarification is required rather than fabricating an ID.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats your return policy" },
+        { "role": "agent", "content": "Items can be returned within 30 days of delivery." },
+        { "role": "customer", "content": "ok whats the status on my ticket" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["ticket_id"]
+    },
+    "tags": ["conversation_memory", "negative_test", "no_prior_entity", "clarification"]
+  },
+  {
+    "id": "MEM-018",
+    "description": "Order ID recovered from a customer's own earlier message even though the agent's intervening reply did not repeat the ID, testing recovery from the customer's turn rather than only the agent's.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "hey I placed order ORD-90144 yesterday" },
+        { "role": "agent", "content": "Thanks for letting me know, how can I help with it?" },
+        { "role": "customer", "content": "can you tell me when it'll arrive" }
+      ]
+    },
+    "expected": {
+      "tool": "estimate_delivery_time_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-90144" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "context_recovery", "customer_turn_source"]
+  },
+  {
+    "id": "MEM-019",
+    "description": "Follow-up ticket status check after the agent explicitly restates the ticket ID mid-conversation, confirming recovery works even when the anchor is in a later agent turn rather than the very first message.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "my order arrived damaged" },
+        { "role": "agent", "content": "I'm sorry to hear that, could you tell me more about the damage?" },
+        { "role": "customer", "content": "the box was crushed and the item inside is broken" },
+        { "role": "agent", "content": "Understood, I've created ticket TCK-63820 for this issue." },
+        { "role": "customer", "content": "cool, keep me posted, hows it looking now" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-63820" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "ticket_id", "context_recovery", "multi_turn"]
+  },
+  {
+    "id": "MEM-020",
+    "description": "Negative test: customer asks a vague follow-up ('what about the other one') when only a single order has ever been mentioned, so there is no valid second entity to resolve to.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check ORD-40221 for me" },
+        { "role": "agent", "content": "ORD-40221 is currently in transit." },
+        { "role": "customer", "content": "and what about the other one" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["conversation_memory", "negative_test", "ambiguous_reference", "clarification"]
+  },
+  {
+    "id": "MEM-021",
+    "description": "Memory persists through a customer-side topic detour into gratitude before returning to the original order for a new action.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the status of ORD-58213" },
+        { "role": "agent", "content": "ORD-58213 is out for delivery today." },
+        { "role": "customer", "content": "awesome, thank you!" },
+        { "role": "customer", "content": "actually wait, can you cancel it instead" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-58213" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "context_recovery", "topic_interleaving"]
+  },
+  {
+    "id": "MEM-022",
+    "description": "Recovering a delivery address from earlier in the conversation to complete a second, unrelated update request that only supplies a new order ID.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "update ORD-11290 to 500 Pine St, Seattle, WA 98101" },
+        { "role": "agent", "content": "Done, ORD-11290 has been updated to 500 Pine St, Seattle, WA 98101." },
+        { "role": "customer", "content": "great, also please set ORD-11291 to the same address" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-11291", "new_address": "500 Pine St, Seattle, WA 98101" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "delivery_address", "cross_entity_reuse", "explicit_reference"]
+  },
+  {
+    "id": "MEM-023",
+    "description": "Recovering an order ID for an estimate request when the original mention occurred inside a compound sentence about a different topic.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I have a complaint about ORD-33982 being late, its really frustrating" },
+        { "role": "agent", "content": "I understand the frustration, let me help. Would you like an updated delivery estimate?" },
+        { "role": "customer", "content": "yes please" }
+      ]
+    },
+    "expected": {
+      "tool": "estimate_delivery_time_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-33982" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "context_recovery", "compound_context"]
+  },
+  {
+    "id": "MEM-024",
+    "description": "Negative test: session restarts with a generic greeting after a long prior conversation about a specific order, and the new request should not silently reuse the old order ID since the customer gave no referring language.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the status of ORD-58213" },
+        { "role": "agent", "content": "ORD-58213 is out for delivery today." },
+        { "role": "customer", "content": "thanks, thats all for now, bye!" },
+        { "role": "customer", "content": "hi, can you check my order status" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["conversation_memory", "negative_test", "session_boundary", "clarification"]
+  },
+  {
+    "id": "MEM-025",
+    "description": "Ticket ID recovered when the customer refers to it using an ordinal reference ('the first ticket') after two tickets were created earlier in the conversation.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "my blender arrived cracked" },
+        { "role": "agent", "content": "I've created ticket TCK-70011 for the cracked blender." },
+        { "role": "customer", "content": "also my headphones are missing an earpiece" },
+        { "role": "agent", "content": "I've created ticket TCK-70012 for the missing earpiece." },
+        { "role": "customer", "content": "whats the update on the first ticket" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-70011" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "multiple_entities", "ordinal_reference", "ticket_id"]
+  },
+  {
+    "id": "MEM-026",
+    "description": "Ambiguous ordinal reference where the customer says 'the second one' but three tickets exist in memory, and it is unclear whether they mean order of creation or most recently discussed, requiring clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "my blender arrived cracked" },
+        { "role": "agent", "content": "I've created ticket TCK-70011 for the cracked blender." },
+        { "role": "customer", "content": "also my headphones are missing an earpiece" },
+        { "role": "agent", "content": "I've created ticket TCK-70012 for the missing earpiece." },
+        { "role": "customer", "content": "and my toaster wont turn on" },
+        { "role": "agent", "content": "I've created ticket TCK-70013 for the toaster issue." },
+        { "role": "customer", "content": "can you check on the second one" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["ticket_id"]
+    },
+    "tags": ["conversation_memory", "multiple_entities", "ambiguous_reference", "clarification"]
+  },
+  {
+    "id": "MEM-027",
+    "description": "Recovering an order ID across a turn where the agent asked a clarifying question and the customer's reply only confirms without restating the ID.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "cancel ORD-40890" },
+        { "role": "agent", "content": "Just to confirm, you want to cancel order ORD-40890?" },
+        { "role": "customer", "content": "yes, correct" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-40890" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "confirmation_turn", "cancel_order"]
+  },
+  {
+    "id": "MEM-028",
+    "description": "Recovering both order_id and a previously stated new address from two separate earlier turns to complete an update after an unrelated clarifying question from the agent in between.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I need to change the address on ORD-84400" },
+        { "role": "agent", "content": "Sure, what would you like the new address to be?" },
+        { "role": "customer", "content": "501 N Michigan Ave, Chicago, IL 60611" },
+        { "role": "agent", "content": "Got it. Just to confirm, is this for a gift order or your own?" },
+        { "role": "customer", "content": "my own, go ahead and update it" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-84400", "new_address": "501 N Michigan Ave, Chicago, IL 60611" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "delivery_address", "context_recovery", "multi_turn"]
+  },
+  {
+    "id": "MEM-029",
+    "description": "Memory should not incorrectly merge two customers' worth of context; a follow-up 'cancel it' after a policy-only exchange (no order ever mentioned) must trigger clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats your cancellation policy in general" },
+        { "role": "agent", "content": "Orders can be cancelled anytime before they ship." },
+        { "role": "customer", "content": "ok cancel it" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["conversation_memory", "negative_test", "no_prior_entity", "clarification"]
+  },
+  {
+    "id": "MEM-030",
+    "description": "Long conversation with a topic loop: customer returns to an order discussed at the very start after cycling through two other unrelated topics and a ticket creation, testing robust long-range memory recovery.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the status of ORD-20456" },
+        { "role": "agent", "content": "ORD-20456 is scheduled to arrive Thursday." },
+        { "role": "customer", "content": "do you ship to canada" },
+        { "role": "agent", "content": "Yes, we ship to Canada with standard international rates." },
+        { "role": "customer", "content": "also my toaster is broken" },
+        { "role": "agent", "content": "I've created ticket TCK-88213 for the broken toaster." },
+        { "role": "customer", "content": "whats your warranty policy" },
+        { "role": "agent", "content": "Most products come with a 1-year manufacturer warranty." },
+        { "role": "customer", "content": "ok going back to that order from earlier, can you cancel it" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-20456" },
+      "missing_arguments": []
+    },
+    "tags": ["conversation_memory", "order_id", "long_distance_recovery", "multi_turn", "topic_interleaving"]
+  }
+]

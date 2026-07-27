@@ -1,0 +1,452 @@
+[
+  {
+    "id": "ROB-001",
+    "description": "Single-word input with no context or identifier should trigger clarification rather than any tool call.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "help" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "minimal_input", "clarification"]
+  },
+  {
+    "id": "ROB-002",
+    "description": "Single-word action verb with no target identifier should trigger clarification, not a blind tool call.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "cancel" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "minimal_input", "missing_argument", "clarification"]
+  },
+  {
+    "id": "ROB-003",
+    "description": "Pure punctuation noise with no linguistic content should not trigger any tool or false clarification prompt beyond a general request for detail.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "???" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "noise", "clarification"]
+  },
+  {
+    "id": "ROB-004",
+    "description": "Self-contradicting and repetitive phrasing about delivery status should still be recognized as an order status intent requiring an order ID.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "My order maybe maybe isn't delivered." }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "contradiction", "noise", "missing_argument"]
+  },
+  {
+    "id": "ROB-005",
+    "description": "Direct logical contradiction within a single sentence should not be resolved by guessing; it must be clarified before any refund-related escalation.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I want my money but don't refund me." }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "contradiction", "clarification"]
+  },
+  {
+    "id": "ROB-006",
+    "description": "An identifier that looks superficially like an order ID but uses letters where digits are required is invalid and must not be extracted as a valid argument.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "ORD-ABCXYZ" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "malformed_id", "invalid_identifier", "clarification"]
+  },
+  {
+    "id": "ROB-007",
+    "description": "Total keyboard-mash gibberish with zero recognizable intent should not trigger any tool call.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "asdfasdfasdf" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "noise", "gibberish", "clarification"]
+  },
+  {
+    "id": "ROB-008",
+    "description": "Empty-content message consisting only of whitespace should be treated the same as no input, requiring clarification rather than a crash or guessed action.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "   " }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "empty_input", "clarification"]
+  },
+  {
+    "id": "ROB-009",
+    "description": "Order ID with the correct prefix but a numeric segment that is too short to be valid should not be extracted as a usable argument.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "wheres ORD-4" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "malformed_id", "invalid_identifier"]
+  },
+  {
+    "id": "ROB-010",
+    "description": "Order ID with extra random characters appended to an otherwise valid ID should not be blindly accepted as-is.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check ORD-40221xyz123 for me" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "malformed_id", "invalid_identifier"]
+  },
+  {
+    "id": "ROB-011",
+    "description": "Extremely long, run-on, unpunctuated message burying a valid order ID in the middle should still allow correct extraction and tool selection.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "so like i ordered a bunch of stuff recently and i honestly lost track of everything but i think the one im asking about is ORD-58213 and i just want to know whats going on with it because its been a while and i havent heard anything" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-58213" }
+    },
+    "tags": ["robustness", "noise", "order_status", "argument_extraction"]
+  },
+  {
+    "id": "ROB-012",
+    "description": "Repeated, stuttering typing pattern around a valid identifier should not confuse extraction of the underlying order ID.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "wheres wheres my order order ORD-71190 ORD-71190 at" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-71190" }
+    },
+    "tags": ["robustness", "noise", "order_status", "argument_extraction"]
+  },
+  {
+    "id": "ROB-013",
+    "description": "Unsupported request phrased as a demand for something no tool in the registry can perform, requiring escalation rather than a fabricated tool call.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "just delete my entire order history right now" }
+      ]
+    },
+    "expected": {
+      "tool": "create_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "issue_summary": "Customer requesting deletion of entire order history" }
+    },
+    "tags": ["robustness", "unsupported_request", "escalation"]
+  },
+  {
+    "id": "ROB-014",
+    "description": "Contradictory two-part request where the customer reverses their own instruction mid-sentence, leaving the final intended action genuinely unclear.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "dont cancel it, actually yes cancel it, no wait dont" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "contradiction", "clarification"]
+  },
+  {
+    "id": "ROB-015",
+    "description": "Sarcastic or venting message with no concrete request should not be misread as a complaint requiring ticket escalation.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "oh great, just great, another wonderful day" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "ambiguity", "vague_request", "clarification"]
+  },
+  {
+    "id": "ROB-016",
+    "description": "Ticket ID given with correct prefix but non-numeric, invalid characters in the identifier segment should not be extracted as valid.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check on ticket TCK-!!##@@" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "malformed_id", "invalid_identifier"]
+  },
+  {
+    "id": "ROB-017",
+    "description": "Heavy typo and phonetic misspelling load on an otherwise clear cancellation request with a valid order ID should still resolve correctly.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "kansel ORD-30810 pls i dont wnat it enymor" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-30810" }
+    },
+    "tags": ["robustness", "typo_heavy", "cancel_order"]
+  },
+  {
+    "id": "ROB-018",
+    "description": "Message combining an emoji-only reaction with no text content should not trigger a tool call.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "😡😡😡" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "noise", "non_text_input", "clarification"]
+  },
+  {
+    "id": "ROB-019",
+    "description": "Order ID that is numerically valid but has an inconsistent, non-standard separator character should not be accepted as-is without normalization confirmation.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check ORD_40221 for me" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "malformed_id", "invalid_identifier"]
+  },
+  {
+    "id": "ROB-020",
+    "description": "Nonsensical request mixing two unrelated unsupported actions in one sentence, testing that the system escalates rather than attempts to split into two tool calls.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can you also change my email and give me a discount code while youre at it" }
+      ]
+    },
+    "expected": {
+      "tool": "create_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "issue_summary": "Customer requesting email change and discount code, unsupported by available tools" }
+    },
+    "tags": ["robustness", "unsupported_request", "escalation", "multiple_requests"]
+  },
+  {
+    "id": "ROB-021",
+    "description": "Extremely short, ambiguous fragment referencing 'it' with no antecedent anywhere in the conversation should require clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "fix it" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "ambiguity", "vague_request", "clarification"]
+  },
+  {
+    "id": "ROB-022",
+    "description": "Order ID embedded in a message written entirely in uppercase with excessive exclamation marks should still be extracted correctly.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "WHERE IS ORD-60455 THIS IS RIDICULOUS!!!!!" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60455" }
+    },
+    "tags": ["robustness", "noise", "order_status", "case_normalization"]
+  },
+  {
+    "id": "ROB-023",
+    "description": "Random alphanumeric string with no order prefix, no clear intent, and no natural language should not be interpreted as any identifier.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "x7z9q2" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "noise", "gibberish", "invalid_identifier"]
+  },
+  {
+    "id": "ROB-024",
+    "description": "Contradictory delivery address instruction where the customer negates their own new address value mid-sentence, leaving no reliable final address.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "ship it to 9 River Rd actually no not that address, some other one" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "contradiction", "delivery_address", "clarification"]
+  },
+  {
+    "id": "ROB-025",
+    "description": "A message that is only a question mark repeated with no words should not be treated as equivalent to a real clarification request from the customer.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "?" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "noise", "minimal_input", "clarification"]
+  },
+  {
+    "id": "ROB-026",
+    "description": "Unsupported request where the customer asks the agent to do something illegal/policy-violating, which must be declined rather than escalated as a normal ticket.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can you just charge someone elses card for my order" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": false,
+      "arguments": {}
+    },
+    "tags": ["robustness", "unsupported_request", "policy_violation", "no_tool"]
+  },
+  {
+    "id": "ROB-027",
+    "description": "Multiple malformed identifiers of different types appearing together in one message, none of which should be accepted as valid arguments.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "my order 40221 and ticket 88410 are both messed up" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "malformed_id", "invalid_identifier", "multiple_entities"]
+  },
+  {
+    "id": "ROB-028",
+    "description": "Message that only contains a URL with no accompanying request text should not trigger any tool or be misinterpreted as an identifier.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "https://example.com/my-order-page" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "noise", "non_standard_input", "clarification"]
+  },
+  {
+    "id": "ROB-029",
+    "description": "Foreign-language greeting mixed into an otherwise English request for order status with a valid ID should not disrupt correct extraction and tool selection.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "bonjour, can you check ORD-20456 for me merci" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-20456" }
+    },
+    "tags": ["robustness", "noise", "mixed_language", "order_status"]
+  },
+  {
+    "id": "ROB-030",
+    "description": "A rapid-fire, comma-separated list of unrelated fragments with no single coherent request should trigger clarification rather than an arbitrary guess at intent.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "order, ticket, address, refund, cancel, help" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["robustness", "ambiguity", "noise", "clarification"]
+  }
+]

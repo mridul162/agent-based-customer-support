@@ -1,0 +1,434 @@
+[
+  {
+    "id": "TS-001",
+    "description": "Happy path: customer requests order status with a valid, well-formed order ID.",
+    "input": {
+      "customer_id": "TEST-CUST-001",
+      "message": "Hi, can you tell me the status of order ORD-48213?"
+    },
+    "expected": {
+      "tool_name": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-48213" }
+    },
+    "tags": ["tool_selection", "order_status", "happy_path"]
+  },
+  {
+    "id": "TS-002",
+    "description": "Malformed order ID: customer provides an ID that does not match the expected order ID format.",
+    "input": {
+      "customer_id": "TEST-CUST-002",
+      "message": "wheres my order 48213??"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "order_status", "malformed_id"]
+  },
+  {
+    "id": "TS-003",
+    "description": "Missing required argument: customer asks about order status without providing any order ID.",
+    "input": {
+      "customer_id": "TEST-CUST-003",
+      "message": "Can you check on my order for me?"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "order_status", "missing_argument", "clarification"]
+  },
+  {
+    "id": "TS-004",
+    "description": "Happy path: customer requests order cancellation with a valid order ID.",
+    "input": {
+      "customer_id": "TEST-CUST-004",
+      "message": "Please cancel order ORD-99120, I don't need it anymore."
+    },
+    "expected": {
+      "tool_name": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-99120" }
+    },
+    "tags": ["tool_selection", "cancel_order", "happy_path"]
+  },
+  {
+    "id": "TS-005",
+    "description": "Vague cancellation request with no order ID and no prior conversation context to recover one from.",
+    "input": {
+      "customer_id": "TEST-CUST-005",
+      "message": "cancel my order pls"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "cancel_order", "missing_argument", "clarification"]
+  },
+  {
+    "id": "TS-006",
+    "description": "Happy path: customer requests a delivery address update with order ID and new address provided.",
+    "input": {
+      "customer_id": "TEST-CUST-006",
+      "message": "Can you update the delivery address for ORD-55210 to 42 Baker Street, London?"
+    },
+    "expected": {
+      "tool_name": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-55210", "new_address": "42 Baker Street, London" }
+    },
+    "tags": ["tool_selection", "update_address", "happy_path"]
+  },
+  {
+    "id": "TS-007",
+    "description": "Missing required argument: customer wants to update delivery address but does not provide the new address.",
+    "input": {
+      "customer_id": "TEST-CUST-007",
+      "message": "I need to change the delivery address on ORD-55210."
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": { "order_id": "ORD-55210" }
+    },
+    "tags": ["tool_selection", "update_address", "missing_argument", "clarification"]
+  },
+  {
+    "id": "TS-008",
+    "description": "Happy path: customer asks for estimated delivery time for a specific order.",
+    "input": {
+      "customer_id": "TEST-CUST-008",
+      "message": "When will ORD-30044 arrive?"
+    },
+    "expected": {
+      "tool_name": "estimate_delivery_time_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-30044" }
+    },
+    "tags": ["tool_selection", "estimate_delivery", "happy_path"]
+  },
+  {
+    "id": "TS-009",
+    "description": "General shipping question with no specific order reference should route to knowledge retrieval, not order tools.",
+    "input": {
+      "customer_id": "TEST-CUST-009",
+      "message": "how long does standard shipping usually take for you guys"
+    },
+    "expected": {
+      "tool_name": "retrieve_knowledge_tool",
+      "requires_clarification": false,
+      "arguments": { "query": "standard shipping duration" }
+    },
+    "tags": ["tool_selection", "retrieval", "general_shipping_question"]
+  },
+  {
+    "id": "TS-010",
+    "description": "Happy path: customer reports a broken product, which should be escalated via ticket creation.",
+    "input": {
+      "customer_id": "TEST-CUST-010",
+      "message": "The blender I ordered arrived with a cracked lid, this is unacceptable."
+    },
+    "expected": {
+      "tool_name": "create_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "issue_summary": "Blender arrived with a cracked lid" }
+    },
+    "tags": ["tool_selection", "create_ticket", "happy_path", "complaint"]
+  },
+  {
+    "id": "TS-011",
+    "description": "Happy path: customer checks status of an existing support ticket with a valid ticket ID.",
+    "input": {
+      "customer_id": "TEST-CUST-011",
+      "message": "Any update on ticket TCK-77521?"
+    },
+    "expected": {
+      "tool_name": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-77521" }
+    },
+    "tags": ["tool_selection", "get_ticket", "happy_path"]
+  },
+  {
+    "id": "TS-012",
+    "description": "Malformed ticket ID: customer references a ticket number in an invalid format.",
+    "input": {
+      "customer_id": "TEST-CUST-012",
+      "message": "whats going on with ticket 77521"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "get_ticket", "malformed_id"]
+  },
+  {
+    "id": "TS-013",
+    "description": "Greeting with no actionable request should not trigger any tool.",
+    "input": {
+      "customer_id": "TEST-CUST-013",
+      "message": "hii is anyone there"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": false,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "no_tool", "greeting"]
+  },
+  {
+    "id": "TS-014",
+    "description": "Gratitude expression at the end of a conversation should not trigger any tool.",
+    "input": {
+      "customer_id": "TEST-CUST-014",
+      "message": "thanks so much for your help, appreciate it!"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": false,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "no_tool", "gratitude"]
+  },
+  {
+    "id": "TS-015",
+    "description": "Unsupported request: customer asks for a direct refund, which is not covered by any available tool and should be escalated.",
+    "input": {
+      "customer_id": "TEST-CUST-015",
+      "message": "just refund my money straight to my card instead of dealing with all this"
+    },
+    "expected": {
+      "tool_name": "create_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "issue_summary": "Customer requesting a direct refund to card" }
+    },
+    "tags": ["tool_selection", "unsupported_request", "escalation"]
+  },
+  {
+    "id": "TS-016",
+    "description": "Vague request describing a problem with an order without specifying which order or what the issue is.",
+    "input": {
+      "customer_id": "TEST-CUST-016",
+      "message": "something's wrong with my order"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "vague_request", "clarification"]
+  },
+  {
+    "id": "TS-017",
+    "description": "Contradictory request: customer simultaneously asks to cancel and to update the same order in one message.",
+    "input": {
+      "customer_id": "TEST-CUST-017",
+      "message": "cancel order ORD-11190 actually no wait, just update the address instead, or maybe cancel it, im not sure"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": { "order_id": "ORD-11190" }
+    },
+    "tags": ["tool_selection", "contradictory_request", "clarification"]
+  },
+  {
+    "id": "TS-018",
+    "description": "Conversation memory: customer previously provided an order ID, then follows up asking to cancel it without repeating the ID.",
+    "input": {
+      "customer_id": "TEST-CUST-018",
+      "conversation_history": [
+        { "role": "customer", "content": "Can you check the status of ORD-60312?" },
+        { "role": "agent", "content": "Order ORD-60312 is currently in transit and expected to arrive in 2 days." }
+      ],
+      "message": "Okay actually just cancel it then."
+    },
+    "expected": {
+      "tool_name": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60312" }
+    },
+    "tags": ["tool_selection", "conversation_memory", "follow_up"]
+  },
+  {
+    "id": "TS-019",
+    "description": "Typo-heavy input for order status request that should still resolve correctly with a valid order ID present.",
+    "input": {
+      "customer_id": "TEST-CUST-019",
+      "message": "wheres my odrer ORD-43201 it hasnt showed up yett"
+    },
+    "expected": {
+      "tool_name": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-43201" }
+    },
+    "tags": ["tool_selection", "order_status", "typo_heavy"]
+  },
+  {
+    "id": "TS-020",
+    "description": "Out-of-domain question unrelated to customer support should not trigger any tool.",
+    "input": {
+      "customer_id": "TEST-CUST-020",
+      "message": "hey random question, whats the weather like today?"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": false,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "out_of_domain", "no_tool"]
+  },
+  {
+    "id": "TS-021",
+    "description": "Knowledge retrieval: customer asks a general policy question about returns.",
+    "input": {
+      "customer_id": "TEST-CUST-021",
+      "message": "whats your return policy if i dont like the item"
+    },
+    "expected": {
+      "tool_name": "retrieve_knowledge_tool",
+      "requires_clarification": false,
+      "arguments": { "query": "return policy" }
+    },
+    "tags": ["tool_selection", "retrieval", "policy_question"]
+  },
+  {
+    "id": "TS-022",
+    "description": "Knowledge retrieval: customer asks whether the company ships internationally.",
+    "input": {
+      "customer_id": "TEST-CUST-022",
+      "message": "do u guys ship to canada"
+    },
+    "expected": {
+      "tool_name": "retrieve_knowledge_tool",
+      "requires_clarification": false,
+      "arguments": { "query": "shipping to Canada" }
+    },
+    "tags": ["tool_selection", "retrieval", "shipping_question"]
+  },
+  {
+    "id": "TS-023",
+    "description": "Ambiguous request that could map to multiple order tools, requiring clarification on desired action.",
+    "input": {
+      "customer_id": "TEST-CUST-023",
+      "message": "I want to change something about order ORD-71005"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": { "order_id": "ORD-71005" }
+    },
+    "tags": ["tool_selection", "ambiguous_request", "clarification"]
+  },
+  {
+    "id": "TS-024",
+    "description": "Conversation memory: customer checks an order, then in a follow-up asks to cancel that same order using a pronoun reference.",
+    "input": {
+      "customer_id": "TEST-CUST-024",
+      "conversation_history": [
+        { "role": "customer", "content": "Can you check order ORD-88820 for me?" },
+        { "role": "agent", "content": "Order ORD-88820 is being processed and hasn't shipped yet." }
+      ],
+      "message": "great, cancel it then please"
+    },
+    "expected": {
+      "tool_name": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-88820" }
+    },
+    "tags": ["tool_selection", "conversation_memory", "follow_up", "cancel_order"]
+  },
+  {
+    "id": "TS-025",
+    "description": "Ticket creation with enough detail to extract a clear issue summary from natural, informal phrasing.",
+    "input": {
+      "customer_id": "TEST-CUST-025",
+      "message": "yo my package showed up but the box was totally crushed and the item inside is smashed"
+    },
+    "expected": {
+      "tool_name": "create_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "issue_summary": "Package arrived crushed and item inside is damaged" }
+    },
+    "tags": ["tool_selection", "create_ticket", "typo_heavy", "complaint"]
+  },
+  {
+    "id": "TS-026",
+    "description": "Malformed order ID during a delivery address update request.",
+    "input": {
+      "customer_id": "TEST-CUST-026",
+      "message": "change my delivery address for order 55210 to 10 Downing St"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": true,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "update_address", "malformed_id", "clarification"]
+  },
+  {
+    "id": "TS-027",
+    "description": "Conversation memory: customer references 'that same order' when asking for a delivery estimate.",
+    "input": {
+      "customer_id": "TEST-CUST-027",
+      "conversation_history": [
+        { "role": "customer", "content": "Is ORD-20456 going to make it before Friday?" },
+        { "role": "agent", "content": "ORD-20456 is currently scheduled to arrive on Thursday." }
+      ],
+      "message": "ok and whats the estimated delivery time for that same order again exactly?"
+    },
+    "expected": {
+      "tool_name": "estimate_delivery_time_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-20456" }
+    },
+    "tags": ["tool_selection", "conversation_memory", "estimate_delivery"]
+  },
+  {
+    "id": "TS-028",
+    "description": "Farewell/closing statement with no request should not trigger any tool.",
+    "input": {
+      "customer_id": "TEST-CUST-028",
+      "message": "alright thats all, have a good one, bye!"
+    },
+    "expected": {
+      "tool_name": "no_tool",
+      "requires_clarification": false,
+      "arguments": {}
+    },
+    "tags": ["tool_selection", "no_tool", "farewell"]
+  },
+  {
+    "id": "TS-029",
+    "description": "Two order IDs mentioned in one message but only one action requested, testing correct argument extraction over the other irrelevant ID.",
+    "input": {
+      "customer_id": "TEST-CUST-029",
+      "message": "I ordered both ORD-10001 and ORD-10002 last week, can you cancel ORD-10002 only?"
+    },
+    "expected": {
+      "tool_name": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-10002" }
+    },
+    "tags": ["tool_selection", "cancel_order", "argument_extraction", "multiple_entities"]
+  },
+  {
+    "id": "TS-030",
+    "description": "Unsupported request: customer asks the agent to modify the item contents of an order, which no tool in the registry supports.",
+    "input": {
+      "customer_id": "TEST-CUST-030",
+      "message": "can you swap the color of the shoes in my order ORD-33210 from red to blue"
+    },
+    "expected": {
+      "tool_name": "create_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-33210", "issue_summary": "Customer requesting item color swap on order" }
+    },
+    "tags": ["tool_selection", "unsupported_request", "escalation", "order_modification"]
+  }
+]

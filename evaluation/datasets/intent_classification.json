@@ -1,0 +1,398 @@
+[
+  {
+    "id": "IC-001",
+    "description": "Customer intent is a straightforward order status inquiry.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Can you tell me where my order ORD-40221 is right now?" }
+      ]
+    },
+    "expected": {
+      "intent": "order_status"
+    },
+    "tags": ["intent_classification", "order_status", "happy_path"]
+  },
+  {
+    "id": "IC-002",
+    "description": "Customer intent is to cancel an existing order.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I dont want it anymore, please cancel ORD-99120." }
+      ]
+    },
+    "expected": {
+      "intent": "cancel_order"
+    },
+    "tags": ["intent_classification", "cancel_order", "happy_path"]
+  },
+  {
+    "id": "IC-003",
+    "description": "Customer intent is to change the delivery address on an order.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I moved, can you update the shipping address for ORD-55210?" }
+      ]
+    },
+    "expected": {
+      "intent": "update_delivery_address"
+    },
+    "tags": ["intent_classification", "update_delivery_address", "happy_path"]
+  },
+  {
+    "id": "IC-004",
+    "description": "Customer intent is to find out an estimated delivery time rather than the current status of the order.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "How many more days until ORD-30044 gets here?" }
+      ]
+    },
+    "expected": {
+      "intent": "estimate_delivery"
+    },
+    "tags": ["intent_classification", "estimate_delivery", "happy_path"]
+  },
+  {
+    "id": "IC-005",
+    "description": "Customer intent is explicitly requesting a refund, distinct from an order status or cancellation request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I want my money back for this, its been broken since it arrived." }
+      ]
+    },
+    "expected": {
+      "intent": "refund_request"
+    },
+    "tags": ["intent_classification", "refund_request", "happy_path"]
+  },
+  {
+    "id": "IC-006",
+    "description": "Customer intent is a general product question about specifications, unrelated to any specific order.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Does the SoundWave X200 headphones have noise cancellation?" }
+      ]
+    },
+    "expected": {
+      "intent": "product_question"
+    },
+    "tags": ["intent_classification", "product_question", "happy_path"]
+  },
+  {
+    "id": "IC-007",
+    "description": "Customer intent is asking about a store-wide policy rather than about their own specific order.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats your return window for items in general" }
+      ]
+    },
+    "expected": {
+      "intent": "policy_question"
+    },
+    "tags": ["intent_classification", "policy_question", "happy_path"]
+  },
+  {
+    "id": "IC-008",
+    "description": "Customer intent is checking on the status of a previously filed support ticket.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Any news on ticket TCK-77521?" }
+      ]
+    },
+    "expected": {
+      "intent": "ticket_status"
+    },
+    "tags": ["intent_classification", "ticket_status", "happy_path"]
+  },
+  {
+    "id": "IC-009",
+    "description": "Customer intent is reporting a problem or complaint, which is distinct from simply asking for a refund.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "The blender I got arrived with a cracked lid, this is really disappointing." }
+      ]
+    },
+    "expected": {
+      "intent": "complaint"
+    },
+    "tags": ["intent_classification", "complaint", "happy_path"]
+  },
+  {
+    "id": "IC-010",
+    "description": "Customer intent is a simple opening greeting with no actionable request yet.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "hi there, is anyone available to help me today?" }
+      ]
+    },
+    "expected": {
+      "intent": "greeting"
+    },
+    "tags": ["intent_classification", "greeting", "happy_path"]
+  },
+  {
+    "id": "IC-011",
+    "description": "Customer intent is expressing gratitude after receiving help, with no further request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "thank you so much, that really helped!" }
+      ]
+    },
+    "expected": {
+      "intent": "gratitude"
+    },
+    "tags": ["intent_classification", "gratitude", "happy_path"]
+  },
+  {
+    "id": "IC-012",
+    "description": "Customer intent is closing the conversation with a farewell, distinct from a gratitude-only message.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "alright thats everything, take care, bye!" }
+      ]
+    },
+    "expected": {
+      "intent": "farewell"
+    },
+    "tags": ["intent_classification", "farewell", "happy_path"]
+  },
+  {
+    "id": "IC-013",
+    "description": "Customer intent falls entirely outside the customer support domain.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "random question but whats the weather like where you are" }
+      ]
+    },
+    "expected": {
+      "intent": "out_of_domain"
+    },
+    "tags": ["intent_classification", "out_of_domain", "happy_path"]
+  },
+  {
+    "id": "IC-014",
+    "description": "Typo-heavy message should still be classified correctly as an order status inquiry.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "wheres my odrer ORD-43201 it hasnt showd up yett" }
+      ]
+    },
+    "expected": {
+      "intent": "order_status"
+    },
+    "tags": ["intent_classification", "order_status", "typo_heavy"]
+  },
+  {
+    "id": "IC-015",
+    "description": "Ambiguous request that does not clearly map to any single defined intent and should be classified as unclear.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "something's just not right, can you look into it" }
+      ]
+    },
+    "expected": {
+      "intent": "unclear"
+    },
+    "tags": ["intent_classification", "unclear", "vague_request"]
+  },
+  {
+    "id": "IC-016",
+    "description": "Contradictory message mixing cancellation and address-change language should still resolve to a single dominant intent of wanting to modify the order.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "cancel ORD-11190 wait no, actually just change the address instead" }
+      ]
+    },
+    "expected": {
+      "intent": "update_delivery_address"
+    },
+    "tags": ["intent_classification", "contradictory_request", "update_delivery_address"]
+  },
+  {
+    "id": "IC-017",
+    "description": "Conversation memory: customer's follow-up message carries forward the cancellation intent from an earlier order status inquiry.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the status of ORD-60312" },
+        { "role": "agent", "content": "ORD-60312 is currently in transit and expected in 2 days." },
+        { "role": "customer", "content": "ok actually just cancel it" }
+      ]
+    },
+    "expected": {
+      "intent": "cancel_order"
+    },
+    "tags": ["intent_classification", "conversation_memory", "cancel_order"]
+  },
+  {
+    "id": "IC-018",
+    "description": "Customer intent is a refund request phrased indirectly without using the word 'refund'.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I just want my payment reversed for this order, I dont want the item." }
+      ]
+    },
+    "expected": {
+      "intent": "refund_request"
+    },
+    "tags": ["intent_classification", "refund_request", "indirect_phrasing"]
+  },
+  {
+    "id": "IC-019",
+    "description": "Customer intent is asking a policy question, but phrased in a way that could be mistaken for a product question; wording centers on the rule, not the item.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "if i dont like the color can i send it back" }
+      ]
+    },
+    "expected": {
+      "intent": "policy_question"
+    },
+    "tags": ["intent_classification", "policy_question", "ambiguous_phrasing"]
+  },
+  {
+    "id": "IC-020",
+    "description": "Customer intent is a product question phrased in a way that could be mistaken for a policy question; wording centers on a specific item's attribute.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "is the ComfySit office chair made of real leather" }
+      ]
+    },
+    "expected": {
+      "intent": "product_question"
+    },
+    "tags": ["intent_classification", "product_question", "ambiguous_phrasing"]
+  },
+  {
+    "id": "IC-021",
+    "description": "Gratitude message following a resolved ticket should not be reclassified as a new ticket status request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats the status of TCK-30012" },
+        { "role": "agent", "content": "TCK-30012 has been resolved and closed." },
+        { "role": "customer", "content": "awesome, thanks a bunch!" }
+      ]
+    },
+    "expected": {
+      "intent": "gratitude"
+    },
+    "tags": ["intent_classification", "gratitude", "conversation_memory"]
+  },
+  {
+    "id": "IC-022",
+    "description": "Customer intent is a complaint about product quality that does not explicitly request a refund, ticket, or cancellation.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "honestly the build quality on this thing is way worse than i expected" }
+      ]
+    },
+    "expected": {
+      "intent": "complaint"
+    },
+    "tags": ["intent_classification", "complaint", "product_quality"]
+  },
+  {
+    "id": "IC-023",
+    "description": "Out-of-domain small talk embedded mid-conversation should be classified independently of the prior support topic.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats your return policy" },
+        { "role": "agent", "content": "Items can be returned within 30 days of delivery." },
+        { "role": "customer", "content": "anyway do you know any good pizza places nearby" }
+      ]
+    },
+    "expected": {
+      "intent": "out_of_domain"
+    },
+    "tags": ["intent_classification", "out_of_domain", "conversation_memory"]
+  },
+  {
+    "id": "IC-024",
+    "description": "Estimate delivery intent phrased casually with an abbreviation, distinct from a direct order status check.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "when's ORD-30044 gonna get here approx" }
+      ]
+    },
+    "expected": {
+      "intent": "estimate_delivery"
+    },
+    "tags": ["intent_classification", "estimate_delivery", "typo_heavy"]
+  },
+  {
+    "id": "IC-025",
+    "description": "A single-word greeting with no punctuation should still be recognized as a greeting rather than unclear.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "hey" }
+      ]
+    },
+    "expected": {
+      "intent": "greeting"
+    },
+    "tags": ["intent_classification", "greeting", "minimal_input"]
+  },
+  {
+    "id": "IC-026",
+    "description": "Customer intent is checking ticket status, phrased with a malformed ticket reference, but the intent itself is still clearly ticket-related regardless of ID validity.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "did anyone check on ticket 77521 yet" }
+      ]
+    },
+    "expected": {
+      "intent": "ticket_status"
+    },
+    "tags": ["intent_classification", "ticket_status", "malformed_id"]
+  },
+  {
+    "id": "IC-027",
+    "description": "Vague single-sentence message with no topic, product, or order reference, correctly classified as unclear rather than forced into any specific category.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can you help me with something" }
+      ]
+    },
+    "expected": {
+      "intent": "unclear"
+    },
+    "tags": ["intent_classification", "unclear", "vague_request"]
+  },
+  {
+    "id": "IC-028",
+    "description": "Customer intent is asking about shipping availability to a country, a general policy question rather than an order-specific one.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "do u guys ship to canada" }
+      ]
+    },
+    "expected": {
+      "intent": "policy_question"
+    },
+    "tags": ["intent_classification", "policy_question", "typo_heavy"]
+  },
+  {
+    "id": "IC-029",
+    "description": "Customer intent combines a farewell with gratitude in the same message; the closing/ending nature of the message should take precedence as farewell.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "thanks for everything, gotta go now, bye!" }
+      ]
+    },
+    "expected": {
+      "intent": "farewell"
+    },
+    "tags": ["intent_classification", "farewell", "mixed_signals"]
+  },
+  {
+    "id": "IC-030",
+    "description": "Customer intent is a refund request that also mentions an order ID, testing that intent classification correctly centers on the refund action rather than being distracted into order_status.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "for order ORD-70021 I want a refund, the item never worked properly" }
+      ]
+    },
+    "expected": {
+      "intent": "refund_request"
+    },
+    "tags": ["intent_classification", "refund_request", "mixed_context"]
+  }
+]

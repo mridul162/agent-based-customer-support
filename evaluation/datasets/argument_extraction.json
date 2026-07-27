@@ -1,0 +1,492 @@
+[
+  {
+    "id": "AE-001",
+    "description": "Extract a well-formed order_id from a straightforward order status request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Can you check on ORD-40221 for me?" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-40221" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "happy_path"]
+  },
+  {
+    "id": "AE-002",
+    "description": "Order status request with no order_id present anywhere in the message; extraction has nothing to recover.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can you tell me where my stuff is" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["argument_extraction", "order_id", "missing_argument"]
+  },
+  {
+    "id": "AE-003",
+    "description": "Order_id present but in an invalid format (missing the required prefix), so it should not be extracted as a valid argument.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "wheres order 40221 at" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["argument_extraction", "order_id", "malformed_id"]
+  },
+  {
+    "id": "AE-004",
+    "description": "Order_id extracted correctly despite lowercase formatting and surrounding typo-heavy text.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "yo wheres ord-40221 i ordrd it last week" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-40221" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "typo_heavy", "case_normalization"]
+  },
+  {
+    "id": "AE-005",
+    "description": "Two order_ids mentioned in the same message; only the one tied to the requested action should be extracted.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I have ORD-10001 and ORD-10002, please check the status of ORD-10002" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-10002" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "multiple_entities"]
+  },
+  {
+    "id": "AE-006",
+    "description": "Two order_ids mentioned with no clear indication of which one the action applies to; extraction is ambiguous and requires clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I ordered ORD-10001 and ORD-10002, can you cancel it" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["argument_extraction", "order_id", "ambiguous_reference"]
+  },
+  {
+    "id": "AE-007",
+    "description": "Conversation memory: order_id given in an earlier turn should be recovered for a later action request that omits it.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Whats the status of ORD-77410?" },
+        { "role": "agent", "content": "ORD-77410 is out for delivery today." },
+        { "role": "customer", "content": "ok cancel it then" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-77410" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "conversation_memory"]
+  },
+  {
+    "id": "AE-008",
+    "description": "Conversation memory across three turns where the order_id from turn one must persist despite an unrelated intervening turn.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "Check order ORD-30215 please" },
+        { "role": "agent", "content": "ORD-30215 is currently being packed." },
+        { "role": "customer", "content": "also whats your return policy" },
+        { "role": "agent", "content": "Items can be returned within 30 days of delivery." },
+        { "role": "customer", "content": "ok and can you cancel that order now" }
+      ]
+    },
+    "expected": {
+      "tool": "cancel_order_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-30215" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "conversation_memory", "multi_turn"]
+  },
+  {
+    "id": "AE-009",
+    "description": "Extract a well-formed ticket_id from a straightforward ticket status request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "any update on TCK-88410?" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-88410" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "ticket_id", "happy_path"]
+  },
+  {
+    "id": "AE-010",
+    "description": "Ticket_id given without the required prefix, so it should not be treated as a valid extracted argument.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "whats happening with ticket 88410" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["ticket_id"]
+    },
+    "tags": ["argument_extraction", "ticket_id", "malformed_id"]
+  },
+  {
+    "id": "AE-011",
+    "description": "Ticket status request with no ticket_id present at all.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "did anyone look into my complaint yet" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["ticket_id"]
+    },
+    "tags": ["argument_extraction", "ticket_id", "missing_argument"]
+  },
+  {
+    "id": "AE-012",
+    "description": "Ticket_id extracted correctly despite lowercase input and casual phrasing.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can u check tck-88410 for me plz" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-88410" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "ticket_id", "case_normalization"]
+  },
+  {
+    "id": "AE-013",
+    "description": "Order_id and ticket_id both appear in the same message; only the ticket_id is relevant to the requested ticket lookup.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "for my order ORD-40221 i opened ticket TCK-88410, whats the ticket status" }
+      ]
+    },
+    "expected": {
+      "tool": "get_ticket_tool",
+      "requires_clarification": false,
+      "arguments": { "ticket_id": "TCK-88410" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "ticket_id", "multiple_entities"]
+  },
+  {
+    "id": "AE-014",
+    "description": "Extract both order_id and a complete delivery_address in a single well-formed update request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "please update the delivery address on ORD-51092 to 14 Maple Avenue, Springfield, IL 62704" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-51092", "new_address": "14 Maple Avenue, Springfield, IL 62704" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "delivery_address", "happy_path"]
+  },
+  {
+    "id": "AE-015",
+    "description": "Order_id present but new delivery_address is completely missing from the request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "i need to change the shipping address on ORD-51092" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": { "order_id": "ORD-51092" },
+      "missing_arguments": ["new_address"]
+    },
+    "tags": ["argument_extraction", "delivery_address", "missing_argument"]
+  },
+  {
+    "id": "AE-016",
+    "description": "Delivery address given but order_id missing entirely, so the target order cannot be identified.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can you change my delivery address to 88 Oak Street, Denver, CO" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": { "new_address": "88 Oak Street, Denver, CO" },
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["argument_extraction", "order_id", "missing_argument"]
+  },
+  {
+    "id": "AE-017",
+    "description": "Both order_id and delivery_address are missing from a vague address-change request.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "i need to change my address" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id", "new_address"]
+    },
+    "tags": ["argument_extraction", "order_id", "delivery_address", "missing_argument"]
+  },
+  {
+    "id": "AE-018",
+    "description": "Delivery address extracted despite being incomplete (missing city and postal code), which counts as a partial argument requiring clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "change the address on ORD-51092 to 14 Maple Avenue" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": { "order_id": "ORD-51092" },
+      "missing_arguments": ["new_address"]
+    },
+    "tags": ["argument_extraction", "delivery_address", "partial_argument"]
+  },
+  {
+    "id": "AE-019",
+    "description": "Delivery address extracted correctly from casual phrasing using an abbreviation for 'address'.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "pls update ORD-60110 addr to 9 River Rd, Austin, TX 78701" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60110", "new_address": "9 River Rd, Austin, TX 78701" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "delivery_address", "typo_heavy"]
+  },
+  {
+    "id": "AE-020",
+    "description": "Conversation memory: order_id given in an earlier turn is recovered when the customer later provides only the new address.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "I need to update the address for ORD-60110" },
+        { "role": "agent", "content": "Sure, what would you like the new delivery address to be?" },
+        { "role": "customer", "content": "9 River Rd, Austin, TX 78701" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60110", "new_address": "9 River Rd, Austin, TX 78701" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "delivery_address", "conversation_memory"]
+  },
+  {
+    "id": "AE-021",
+    "description": "P.O. Box style delivery address should be extracted as a valid, complete address.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "change delivery for ORD-60110 to PO Box 4421, Madison, WI 53703" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60110", "new_address": "PO Box 4421, Madison, WI 53703" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "delivery_address", "edge_case_format"]
+  },
+  {
+    "id": "AE-022",
+    "description": "Delivery address including an apartment/unit number should be extracted in full, not truncated.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "update ORD-60110 to 200 Elm St Apt 5B, Chicago, IL 60614" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-60110", "new_address": "200 Elm St Apt 5B, Chicago, IL 60614" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "delivery_address", "edge_case_format"]
+  },
+  {
+    "id": "AE-023",
+    "description": "A bare postal code with no street or city is not a sufficient delivery address and should trigger clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "just ship it to 60614 instead" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id", "new_address"]
+    },
+    "tags": ["argument_extraction", "delivery_address", "malformed_argument"]
+  },
+  {
+    "id": "AE-024",
+    "description": "Contradictory address update within a single message: two different addresses given, so neither should be extracted as final without clarification.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "update ORD-60110 to 9 River Rd, Austin, TX actually no, use 12 Lake Dr, Austin, TX instead" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": { "order_id": "ORD-60110" },
+      "missing_arguments": ["new_address"]
+    },
+    "tags": ["argument_extraction", "delivery_address", "contradictory_request"]
+  },
+  {
+    "id": "AE-025",
+    "description": "Order_id embedded inside a longer, noisy sentence should still be correctly isolated and extracted.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "so basically i placed like three orders this month and the one im asking about right now is ORD-91847 can u check it" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-91847" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "noisy_input"]
+  },
+  {
+    "id": "AE-026",
+    "description": "International-format delivery address (non-US) should still be extracted as a complete valid argument.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "please send ORD-73310 to 22 Baker Street, London, NW1 6XE, United Kingdom" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-73310", "new_address": "22 Baker Street, London, NW1 6XE, United Kingdom" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "delivery_address", "international_format"]
+  },
+  {
+    "id": "AE-027",
+    "description": "Ticket_id and order_id both missing, and the request is generic enough that neither argument can be inferred.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "can someone give me an update please" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["ticket_id"]
+    },
+    "tags": ["argument_extraction", "ticket_id", "vague_request"]
+  },
+  {
+    "id": "AE-028",
+    "description": "Conversation memory failure case: an order_id was mentioned three turns ago but the topic has since shifted, so it should not be silently reused for an unrelated new request lacking its own identifier.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check ORD-15500 please" },
+        { "role": "agent", "content": "ORD-15500 was delivered yesterday." },
+        { "role": "customer", "content": "thanks, unrelated question, can you cancel my order" }
+      ]
+    },
+    "expected": {
+      "tool": "no_tool",
+      "requires_clarification": true,
+      "arguments": {},
+      "missing_arguments": ["order_id"]
+    },
+    "tags": ["argument_extraction", "order_id", "conversation_memory", "ambiguous_reference"]
+  },
+  {
+    "id": "AE-029",
+    "description": "Delivery address with an unusual but valid abbreviation (St, Ave) mixed with full words should be extracted as-is without over-normalization errors.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "update ORD-84400 to 501 N Michigan Ave, Chicago, IL 60611" }
+      ]
+    },
+    "expected": {
+      "tool": "update_delivery_address_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-84400", "new_address": "501 N Michigan Ave, Chicago, IL 60611" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "delivery_address", "abbreviation_handling"]
+  },
+  {
+    "id": "AE-030",
+    "description": "Order_id with extra trailing punctuation and a stray space should still be normalized and extracted correctly.",
+    "input": {
+      "messages": [
+        { "role": "customer", "content": "check on ORD- 91847 . please" }
+      ]
+    },
+    "expected": {
+      "tool": "get_order_status_tool",
+      "requires_clarification": false,
+      "arguments": { "order_id": "ORD-91847" },
+      "missing_arguments": []
+    },
+    "tags": ["argument_extraction", "order_id", "malformed_id", "normalization"]
+  }
+]
