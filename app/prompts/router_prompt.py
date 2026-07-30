@@ -36,7 +36,6 @@ Available agents:
 3. order_agent
    Use for: order tracking, order cancellation, order modifications,
    or detailed order history inquiries.
-   Note: this agent is not yet fully implemented.
 
 Instructions:
 - Choose exactly ONE agent.

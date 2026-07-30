@@ -55,6 +55,9 @@ _CLARIFICATION_PROMPTS: dict[str, str] = {
     "order_id": (
         "Could you please provide your order ID so I can look that up for you?"
     ),
+    "new_address": (
+        "Could you please provide the new delivery address for your order?"
+    ),
 }
 
 _DEFAULT_CLARIFICATION = (

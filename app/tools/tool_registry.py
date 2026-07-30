@@ -92,6 +92,7 @@ def _build_retrieve_knowledge_arguments(state: AgentState) -> dict[str, Any]:
     """
     return {
         "question": state.message,
+        "execution_trace": state.execution_trace,
     }
 
 def _build_get_order_status_arguments(state: AgentState) -> dict[str, Any]:
@@ -256,6 +257,8 @@ def _build_estimate_delivery_time_response(tool_result: Any) -> str:
     """
     if tool_result is None:
         return _order_not_found_response()
+    if isinstance(tool_result, str):
+        return tool_result
     return (
         f"Your order is estimated to be delivered by {tool_result.estimated_delivery_time}."
     )

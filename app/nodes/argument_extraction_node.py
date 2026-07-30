@@ -98,6 +98,22 @@ _TICKET_ID_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+_ORDER_ID_PATTERN = re.compile(
+    r'\bORD-[A-Z0-9]+\b',
+    re.IGNORECASE,
+)
+
+_NEW_ADDRESS_PATTERNS = (
+    re.compile(
+        r'\b(?:new\s+address\s+is|address\s+to|deliver\s+to|ship\s+to)\s+(.+)$',
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r'\bto\s+(.+)$',
+        re.IGNORECASE,
+    ),
+)
+
 
 # ---------------------------------------------------------------------------
 # Extraction Functions
@@ -120,6 +136,33 @@ def _extract_ticket_id(message: str) -> str | None:
     match = _TICKET_ID_PATTERN.search(message)
     if match:
         return match.group(0).upper()
+    return None
+
+
+def _extract_order_id(message: str) -> str | None:
+    """
+    Extract the first order ID found in the message.
+    """
+    match = _ORDER_ID_PATTERN.search(message)
+    if match:
+        return match.group(0).upper()
+    return None
+
+
+def _extract_new_address(message: str) -> str | None:
+    """
+    Extract a simple free-text delivery address from update requests.
+
+    This intentionally handles common phrasing only. More ambiguous address
+    extraction can be upgraded to an LLM-backed extractor later.
+    """
+    for pattern in _NEW_ADDRESS_PATTERNS:
+        match = pattern.search(message)
+        if match:
+            address = match.group(1).strip(" .")
+            if _ORDER_ID_PATTERN.fullmatch(address):
+                continue
+            return address
     return None
 
 
@@ -150,6 +193,14 @@ def _extract_all(message: str) -> dict[str, str]:
     ticket_id = _extract_ticket_id(message)
     if ticket_id is not None:
         extracted["ticket_id"] = ticket_id
+
+    order_id = _extract_order_id(message)
+    if order_id is not None:
+        extracted["order_id"] = order_id
+
+    new_address = _extract_new_address(message)
+    if new_address is not None:
+        extracted["new_address"] = new_address
 
     return extracted
 
