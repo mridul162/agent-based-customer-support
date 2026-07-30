@@ -23,6 +23,8 @@ import sys
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +38,7 @@ from app.schemas.agent_state import AgentState
 from app.schemas.execution_trace import ExecutionTrace
 from app.schemas.routing_decision import RoutingDecision
 from app.schemas.tool_spec import ToolSpec
+from app.schemas.tool_decision import ToolDecision
 from app.tools import tool_registry
 
 
@@ -93,6 +96,53 @@ def fake_estimate_delivery_time_tool(order_id: str):
     return "Your order is being prepared for shipment."
 
 
+def fake_order_parse_chat_completion(**kwargs):
+    message = kwargs["messages"][-1]["content"].lower()
+
+    if any(word in message for word in ("cancel", "cancellation")):
+        tool_name = "cancel_order_tool"
+        reasoning = "Customer wants to cancel an order."
+
+    elif (
+        "address" in message
+        and any(word in message for word in ("update", "change", "deliver", "ship"))
+    ):
+        tool_name = "update_delivery_address_tool"
+        reasoning = "Customer wants to update a delivery address."
+
+    elif any(
+        phrase in message
+        for phrase in (
+            "delivery time",
+            "estimated delivery",
+            "eta",
+            "when will",
+            "when does",
+            "arrive",
+            "delivered",
+        )
+    ):
+        tool_name = "estimate_delivery_time_tool"
+        reasoning = "Customer wants a delivery estimate."
+
+    else:
+        tool_name = "get_order_status_tool"
+        reasoning = "Customer wants order status."
+
+    return SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                message=SimpleNamespace(
+                    parsed=ToolDecision(
+                        tool_name=tool_name,
+                        reasoning=reasoning,
+                    )
+                )
+            )
+        ]
+    )
+
+
 @contextmanager
 def patched_order_tools():
     original = tool_registry.TOOL_REGISTRY.copy()
@@ -128,11 +178,15 @@ def patched_order_tools():
         ),
     })
 
-    try:
-        yield
-    finally:
-        tool_registry.TOOL_REGISTRY.clear()
-        tool_registry.TOOL_REGISTRY.update(original)
+    with patch(
+        "app.nodes.order_tool_decision_node.LLMService.parse_chat_completion",
+        side_effect=fake_order_parse_chat_completion,
+    ):
+        try:
+            yield
+        finally:
+            tool_registry.TOOL_REGISTRY.clear()
+            tool_registry.TOOL_REGISTRY.update(original)
 
 
 def build_state(message: str) -> AgentState:
@@ -172,10 +226,10 @@ def validate_status_lookup() -> None:
         check(len(state.execution_trace.tool_metrics) == 1, "Tool metrics recorded")
         check(
             any(
-                node.node_name == "order_decision_node"
+                node.node_name == "order_tool_decision_node"
                 for node in state.execution_trace.nodes
             ),
-            "Order decision node traced",
+            "Order tool decision node traced",
         )
 
 

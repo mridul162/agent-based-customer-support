@@ -66,7 +66,7 @@ def tool_executor_node(state: AgentState) -> AgentState:
     if state.tool_decision is None:
         logger.error(
             "tool_executor_node called with no tool_decision. "
-            "Check graph wiring — llm_decision_node must run first.",
+            "Check graph wiring: a tool decision node must run first.",
             extra={
                 "request_id": state.request_id,
                 "customer_id": state.customer_id
