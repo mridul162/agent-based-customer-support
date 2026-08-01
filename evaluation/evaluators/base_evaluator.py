@@ -129,8 +129,13 @@ class BaseEvaluator(ABC):
 
         return EvaluationResult(
             case_id=execution_result.case_id,
+            description=execution_result.description,
+            tags=execution_result.tags,
+            input=execution_result.input,
             passed=True,
             latency_ms=execution_result.latency_ms,
+            expected=execution_result.expected,
+            observed=execution_result.observed,
             failures=[],
             execution_error=execution_result.error,
         )
@@ -147,8 +152,13 @@ class BaseEvaluator(ABC):
 
         return EvaluationResult(
             case_id=execution_result.case_id,
+            description=execution_result.description,
+            tags=execution_result.tags,
+            input=execution_result.input,
             passed=False,
             latency_ms=execution_result.latency_ms,
+            expected=execution_result.expected,
+            observed=execution_result.observed,
             failures=failures,
             execution_error=execution_result.error,
         )

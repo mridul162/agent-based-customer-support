@@ -62,6 +62,21 @@ class EvaluationExecutionResult(BaseModel):
         description="Unique identifier of the evaluation case."
     )
 
+    description: str | None = Field(
+        default=None,
+        description="Human-readable description of the evaluation case."
+    )
+
+    tags: list[str] = Field(
+        default_factory=list,
+        description="Dataset tags describing the evaluation case."
+    )
+
+    input: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Input used to execute the evaluation case."
+    )
+
     expected: dict[str, Any] = Field(
         ...,
         description="Expected values defined by the evaluation dataset."
@@ -128,9 +143,19 @@ class EvaluationResult(BaseModel):
 
     case_id: str
 
+    description: str | None = None
+
+    tags: list[str] = Field(default_factory=list)
+
+    input: dict[str, Any] = Field(default_factory=dict)
+
     passed: bool
 
     latency_ms: float
+
+    expected: dict[str, Any] = Field(default_factory=dict)
+
+    observed: dict[str, Any] | None = None
 
     failures: list[EvaluationFailure] = Field(
         default_factory=list

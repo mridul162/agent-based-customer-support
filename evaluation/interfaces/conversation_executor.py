@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
-from app.schemas.agent import AgentResponse
-
 
 class ConversationExecutor(Protocol):
     """
@@ -25,13 +23,13 @@ class ConversationExecutor(Protocol):
         *,
         customer_id: str,
         message: str,
-    ) -> AgentResponse:
+    ) -> Any:
         """
         Execute one customer message.
 
         Returns
         -------
-        AgentResponse
+        Any
             Raw execution result.
 
         Expected fields are implementation-defined, but should include

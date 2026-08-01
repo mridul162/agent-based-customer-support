@@ -1,0 +1,140 @@
+[
+  {
+    "id": "MA-001",
+    "description": "Ticket agent creates a support ticket for a damaged product complaint.",
+    "input": {
+      "customer_id": "EVAL-CUST-001",
+      "message": "My product arrived damaged and I want a refund."
+    },
+    "expected": {
+      "agent_name": "ticket_agent",
+      "tool_name": "create_ticket_tool",
+      "needs_clarification": false,
+      "needs_human": false,
+      "ticket_created": true,
+      "response_contains": ["Ticket ID"]
+    },
+    "tags": ["ticket_agent", "ticket_creation"]
+  },
+  {
+    "id": "MA-002",
+    "description": "Ticket agent looks up an existing ticket.",
+    "input": {
+      "customer_id": "EVAL-CUST-002",
+      "message": "What is the status of ticket TICKET-12345?"
+    },
+    "expected": {
+      "agent_name": "ticket_agent",
+      "tool_name": "get_ticket_tool",
+      "needs_clarification": false,
+      "needs_human": false,
+      "arguments": {"ticket_id": "TICKET-12345"},
+      "response_contains": ["TICKET-12345"]
+    },
+    "tags": ["ticket_agent", "ticket_lookup"]
+  },
+  {
+    "id": "MA-003",
+    "description": "FAQ agent answers a shipping policy question.",
+    "input": {
+      "customer_id": "EVAL-CUST-003",
+      "message": "How long does shipping take?"
+    },
+    "expected": {
+      "agent_name": "faq_agent",
+      "tool_name": "retrieve_knowledge_tool",
+      "needs_clarification": false,
+      "needs_human": false,
+      "response_contains": ["shipping", "business days"]
+    },
+    "tags": ["faq_agent", "retrieval"]
+  },
+  {
+    "id": "MA-004",
+    "description": "Order agent checks an order status.",
+    "input": {
+      "customer_id": "EVAL-CUST-004",
+      "message": "Can you check the status of order ORD-1001?"
+    },
+    "expected": {
+      "agent_name": "order_agent",
+      "tool_name": "get_order_status_tool",
+      "needs_clarification": false,
+      "needs_human": false,
+      "arguments": {"order_id": "ORD-1001"},
+      "response_contains": ["ORD-1001", "processing"]
+    },
+    "tags": ["order_agent", "order_status"]
+  },
+  {
+    "id": "MA-005",
+    "description": "Order agent cancels an order.",
+    "input": {
+      "customer_id": "EVAL-CUST-005",
+      "message": "Please cancel order ORD-2002."
+    },
+    "expected": {
+      "agent_name": "order_agent",
+      "tool_name": "cancel_order_tool",
+      "needs_clarification": false,
+      "needs_human": false,
+      "arguments": {"order_id": "ORD-2002"},
+      "response_contains": ["cancelled"]
+    },
+    "tags": ["order_agent", "cancel_order"]
+  },
+  {
+    "id": "MA-006",
+    "description": "Order agent asks for missing order ID.",
+    "input": {
+      "customer_id": "EVAL-CUST-006",
+      "message": "Track my order."
+    },
+    "expected": {
+      "agent_name": "order_agent",
+      "tool_name": null,
+      "needs_clarification": true,
+      "needs_human": false,
+      "missing_arguments": ["order_id"],
+      "response_contains": ["order ID"]
+    },
+    "tags": ["order_agent", "clarification"]
+  },
+  {
+    "id": "MA-007",
+    "description": "Order agent updates a delivery address.",
+    "input": {
+      "customer_id": "EVAL-CUST-007",
+      "message": "Change address for ORD-3003 to Khulna Sadar."
+    },
+    "expected": {
+      "agent_name": "order_agent",
+      "tool_name": "update_delivery_address_tool",
+      "needs_clarification": false,
+      "needs_human": false,
+      "arguments": {
+        "order_id": "ORD-3003",
+        "new_address": "Khulna Sadar"
+      },
+      "response_contains": ["Khulna Sadar"]
+    },
+    "tags": ["order_agent", "update_address"]
+  },
+  {
+    "id": "MA-008",
+    "description": "Escalation path bypasses router for legal threats.",
+    "input": {
+      "customer_id": "EVAL-CUST-008",
+      "message": "I will sue you and take legal action."
+    },
+    "expected": {
+      "agent_name": null,
+      "tool_name": null,
+      "needs_clarification": false,
+      "needs_human": true,
+      "escalated": true,
+      "response_contains": ["Escalation ID"]
+    },
+    "tags": ["escalation"]
+  }
+]
