@@ -60,6 +60,7 @@ repository layer.
 
 from datetime import datetime, timezone
 
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.models.ticket_model import Ticket
@@ -122,6 +123,21 @@ class TicketRepository:
         if ticket is None:
             return None
         return self._to_response(ticket)
+
+    def list_tickets(self, limit: int = 20) -> list[TicketResponse]:
+        """
+        Return recent tickets, newest first.
+
+        Args:
+            limit: Maximum number of tickets to return.
+        """
+        rows = (
+            self._session.query(Ticket)
+            .order_by(desc(Ticket.created_at))
+            .limit(limit)
+            .all()
+        )
+        return [self._to_response(ticket) for ticket in rows]
 
     def update_status(
         self,

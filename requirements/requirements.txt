@@ -7,3 +7,6 @@ psycopg[binary]
 fastapi
 uvicorn
 pyyaml
+
+streamlit
+requests
