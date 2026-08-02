@@ -25,10 +25,16 @@ Endpoints:
     GET  /health            → service health check
 """
 
+from pathlib import Path
+from typing import TypedDict, cast
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import text
 
 from app.api.dependencies import get_router_service, get_ticket_service
+from app.config.settings import settings
+from app.database.connection import engine
 from app.services.router_service import RouterService
 from app.services.ticket_service import TicketService
 
@@ -72,16 +78,103 @@ class TicketResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
+    checks: dict[str, dict[str, object]] | None = None
+
+
+class RootResponse(BaseModel):
+    name: str
+    status: str
+
+
+class HealthCheck(TypedDict):
+    status: str
+    detail: str
+
+
+class HealthReport(TypedDict):
+    status: str
+    checks: dict[str, HealthCheck]
+
+
+def build_health_report() -> HealthReport:
+    """Build a deployment-focused health snapshot."""
+    checks: dict[str, HealthCheck] = {}
+
+    database_ok = False
+    database_detail = "unavailable"
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        database_ok = True
+        database_detail = "ready"
+    except Exception as exc:  # pragma: no cover - exercised in runtime checks
+        database_detail = str(exc)
+
+    checks["database"] = {
+        "status": "ok" if database_ok else "error",
+        "detail": database_detail,
+    }
+
+    openai_ok = bool(settings.openai_api_key and settings.openai_api_key.strip())
+    checks["openai"] = {
+        "status": "ok" if openai_ok else "error",
+        "detail": "configured" if openai_ok else "missing API key",
+    }
+
+    vector_index_path = Path(settings.faiss_index_path)
+    vector_ok = vector_index_path.exists() and vector_index_path.is_file()
+    checks["vector_index"] = {
+        "status": "ok" if vector_ok else "error",
+        "detail": str(vector_index_path),
+    }
+
+    overall_status = "ok"
+    if not all(check["status"] == "ok" for check in checks.values()):
+        overall_status = "degraded"
+
+    return cast(HealthReport, {"status": overall_status, "checks": checks})
 
 
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
 
+@router.get("/version", response_model=RootResponse, tags=["System"])
+def version() -> RootResponse:
+    """Return the current application version."""
+    return RootResponse(name="Multi-Agent Customer Support Platform", status="ok")
+
+@router.get("/", response_model=RootResponse, tags=["System"])
+def root() -> RootResponse:
+    """Basic service entrypoint for deployment probes."""
+    return RootResponse(name="Multi-Agent Customer Support Platform", status="ok")
+
+
 @router.get("/health", response_model=HealthResponse, tags=["System"])
 def health_check() -> HealthResponse:
     """Service liveness check."""
-    return HealthResponse(status="ok")
+    report = build_health_report()
+    return HealthResponse(status=report["status"], checks=report["checks"]) # type: ignore
+
+
+@router.get("/health/database", response_model=HealthResponse, tags=["System"])
+def database_health_check() -> HealthResponse:
+    """Database readiness check."""
+    report = build_health_report()
+    return HealthResponse(
+        status="ok" if report["checks"]["database"]["status"] == "ok" else "degraded",
+        checks={"database": report["checks"]["database"]}, # type: ignore
+    )
+
+
+@router.get("/health/openai", response_model=HealthResponse, tags=["System"])
+def openai_health_check() -> HealthResponse:
+    """OpenAI configuration readiness check."""
+    report = build_health_report()
+    return HealthResponse(
+        status="ok" if report["checks"]["openai"]["status"] == "ok" else "degraded",
+        checks={"openai": report["checks"]["openai"]}, # type: ignore
+    )
 
 
 @router.post("/support/message", response_model=MessageResponse, tags=["Support"])

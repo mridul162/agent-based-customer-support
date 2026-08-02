@@ -3,7 +3,7 @@ sqlalchemy
 
 langgraph
 openai
-psycopg
+psycopg[binary]
 fastapi
 uvicorn
 pyyaml

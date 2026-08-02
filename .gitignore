@@ -8,6 +8,7 @@ __pycache__/
 
 scripts/
 docs/
+.env.docker
 
 # Distribution / packaging
 .Python

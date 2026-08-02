@@ -41,7 +41,8 @@ import sys
 
 from fastapi import FastAPI
 
-from app.api.routes.support import router as support_router
+from app.api.routes.support import build_health_report, router as support_router
+from app.config.settings import settings
 from app.database.init_db import init_db
 
 
@@ -120,6 +121,18 @@ def create_app() -> FastAPI:
 
     @application.on_event("startup")
     def on_startup() -> None:
+        health_report = build_health_report()
+        logger.info("Application startup: validating deployment dependencies.")
+        if settings.app_env == "production":
+            failed_checks = [
+                name for name, check in health_report["checks"].items() if check["status"] != "ok"
+            ]
+            if failed_checks:
+                raise RuntimeError(f"Startup validation failed: {', '.join(failed_checks)}")
+
+        if health_report["status"] != "ok":
+            logger.warning("Startup validation reported degraded health: %s", health_report)
+
         logger.info("Application startup: initialising database tables.")
         init_db()
         logger.info("Application startup: complete.")

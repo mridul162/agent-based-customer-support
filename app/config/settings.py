@@ -8,14 +8,14 @@ class Settings(BaseSettings):
     """
 
     # Environment
-    app_env: str
+    app_env: str = "development"
 
     # LLM Provider
     llm_provider: str = "OpenAI"
 
     # OpenAI
-    openai_api_key: str
-    openai_model: str
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-4o-mini"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimension: int = 1536
 
@@ -28,13 +28,13 @@ class Settings(BaseSettings):
     manifest_path: str = "artifacts/embeddings/manifest.json"
 
     # PostgreSQL
-    postgres_host: str
-    postgres_port: int
-    postgres_db: str
-    postgres_user: str
-    postgres_password: str
+    postgres_host: str = "localhost"
+    postgres_port: int = 5432
+    postgres_db: str = "customer_support"
+    postgres_user: str = "postgres"
+    postgres_password: str = "password"
 
-    DATABASE_URL: str
+    DATABASE_URL: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -46,8 +46,15 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def database_url(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL.replace(
+                "postgresql://",
+                "postgresql+psycopg://",
+                1,
+            )
+
         return (
-            f"postgresql://"
+            f"postgresql+psycopg://"
             f"{self.postgres_user}:"
             f"{self.postgres_password}@"
             f"{self.postgres_host}:"
@@ -56,4 +63,4 @@ class Settings(BaseSettings):
         )
 
 
-settings = Settings() # type: ignore
+settings = Settings()  # type: ignore[arg-type]
