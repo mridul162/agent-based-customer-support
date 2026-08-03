@@ -69,13 +69,13 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config.settings import settings
 
-
 # ---------------------------------------------------------------------------
 # SQLAlchemy Base
 #
 # All ORM models inherit from Base.
 # Base.metadata is used by init_db.py to create tables.
 # ---------------------------------------------------------------------------
+
 
 class Base(DeclarativeBase):
     pass
@@ -128,7 +128,9 @@ SessionLocal = sessionmaker(
 # ---------------------------------------------------------------------------
 
 from collections.abc import Generator
+
 from sqlalchemy.orm import Session
+
 
 @contextmanager
 def get_session() -> Generator[Session, None, None]:

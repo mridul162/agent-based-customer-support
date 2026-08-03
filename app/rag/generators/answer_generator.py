@@ -59,7 +59,7 @@ class AnswerGenerator:
     def generate(
         self,
         query: str,
-        history:None,
+        history: None,
         top_k: int = 5,
         execution_trace: ExecutionTrace | None = None,
     ) -> str:
@@ -102,24 +102,19 @@ class AnswerGenerator:
         answer = response.choices[0].message.content
 
         return answer.strip()
-    
+
 
 if __name__ == "__main__":
-
     from app.rag.embedders.openai_embedder import OpenAIEmbedder
     from app.rag.pipelines.retrieval_pipeline import RetrievalPipeline
     from app.rag.retrievers.retriever import Retriever
     from app.rag.vectorstores.faiss_store import FAISSStore
 
     # Load embedder
-    embedder = OpenAIEmbedder(
-        model_name="text-embedding-3-small"
-    )
+    embedder = OpenAIEmbedder(model_name="text-embedding-3-small")
 
     # Load vector store
-    vector_store = FAISSStore(
-        embedding_dimension=1536
-    )
+    vector_store = FAISSStore(embedding_dimension=1536)
 
     vector_store.load(
         index_path=settings.faiss_index_path,
@@ -136,17 +131,12 @@ if __name__ == "__main__":
     retrieval_pipeline = RetrievalPipeline()
 
     # Create answer generator
-    generator = AnswerGenerator(
-        retrieval_pipeline=retrieval_pipeline
-    )
+    generator = AnswerGenerator(retrieval_pipeline=retrieval_pipeline)
 
     # Test queries
-    test_queries = [
-        "500g lichu fuler modhur dam koto?"
-    ]
+    test_queries = ["500g lichu fuler modhur dam koto?"]
 
     for query in test_queries:
-
         print("\n" + "=" * 80)
         print(f"QUERY:\n{query}")
         print("=" * 80)

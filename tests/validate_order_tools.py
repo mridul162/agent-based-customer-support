@@ -24,7 +24,7 @@ python tests/validate_order_tools.py
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from app.models.order import Order, OrderStatus
 from app.tools.order_tools import (
@@ -33,12 +33,11 @@ from app.tools.order_tools import (
     get_order_status_tool,
     update_delivery_address_tool,
 )
-from datetime import UTC, datetime
-
 
 # ---------------------------------------------------------------------
 # Fake Service
 # ---------------------------------------------------------------------
+
 
 class FakeOrderService:
     """
@@ -93,7 +92,7 @@ class FakeOrderService:
 # Monkey Patch
 # ---------------------------------------------------------------------
 
-import app.tools.order_tools as order_tools
+from app.tools import order_tools
 
 _fake_service = FakeOrderService()
 
@@ -145,7 +144,9 @@ check(
 
 cancelled = cancel_order_tool("ORD-1001")
 
-check(cancelled is not None and cancelled.status == OrderStatus.CANCELLED, "Cancel order")
+check(
+    cancelled is not None and cancelled.status == OrderStatus.CANCELLED, "Cancel order"
+)
 
 
 updated = update_delivery_address_tool(

@@ -1,10 +1,8 @@
 import streamlit as st
-
 from components.metrics import render_health_check
 from components.sidebar import render_sidebar
 from components.styles import apply_styles
 from services.api_client import ApiClientError, get_api_client
-
 
 st.set_page_config(page_title="System Health", page_icon="HT", layout="wide")
 apply_styles()

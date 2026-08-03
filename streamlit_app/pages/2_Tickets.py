@@ -1,9 +1,7 @@
 import streamlit as st
-
 from components.sidebar import render_sidebar
 from components.styles import apply_styles
 from services.api_client import ApiClientError, get_api_client
-
 
 st.set_page_config(page_title="Tickets", page_icon="TK", layout="wide")
 apply_styles()

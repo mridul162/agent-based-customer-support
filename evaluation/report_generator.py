@@ -94,12 +94,8 @@ class ReportGenerator:
         lines.append(f"Passed            : {summary.passed_cases}")
         lines.append(f"Failed            : {summary.failed_cases}")
         lines.append(f"Accuracy          : {summary.accuracy:.2f}%")
-        lines.append(
-            f"Average Latency   : {summary.average_latency_ms:.2f} ms"
-        )
-        lines.append(
-            f"Execution Errors  : {summary.execution_errors}"
-        )
+        lines.append(f"Average Latency   : {summary.average_latency_ms:.2f} ms")
+        lines.append(f"Execution Errors  : {summary.execution_errors}")
 
         # ==============================================================
         # Individual Cases
@@ -126,47 +122,29 @@ class ReportGenerator:
         # Failed Cases
         # ==============================================================
 
-        failed_results = [
-            result
-            for result in summary.results
-            if not result.passed
-        ]
+        failed_results = [result for result in summary.results if not result.passed]
 
         if failed_results:
-
             lines.append("")
             lines.append("Failed Cases")
             lines.append(self._SUB_SEPARATOR)
 
             for result in failed_results:
-
                 lines.append(f"Case ID : {result.case_id}")
 
                 if result.execution_error is not None:
-                    lines.append(
-                        f"Execution Error : {result.execution_error}"
-                    )
+                    lines.append(f"Execution Error : {result.execution_error}")
 
                 for failure in result.failures:
-
-                    lines.append(
-                        f"  Field    : {failure.field}"
-                    )
-                    lines.append(
-                        f"  Expected : {failure.expected}"
-                    )
-                    lines.append(
-                        f"  Observed : {failure.observed}"
-                    )
-                    lines.append(
-                        f"  Reason   : {failure.message}"
-                    )
+                    lines.append(f"  Field    : {failure.field}")
+                    lines.append(f"  Expected : {failure.expected}")
+                    lines.append(f"  Observed : {failure.observed}")
+                    lines.append(f"  Reason   : {failure.message}")
                     lines.append("")
 
                 lines.append(self._SUB_SEPARATOR)
 
         else:
-
             lines.append("")
             lines.append("No failed evaluation cases.")
 
@@ -216,9 +194,7 @@ class ReportGenerator:
         if result.failures:
             lines.append("Failures")
             for failure in result.failures:
-                lines.append(
-                    f"  {failure.field}: {failure.message}"
-                )
+                lines.append(f"  {failure.field}: {failure.message}")
 
         observed_summary = self._observed_summary(result.observed)
         if observed_summary:
@@ -258,9 +234,7 @@ class ReportGenerator:
             tool_counts[str(tool_used)] += 1
             tag_counts.update(result.tags)
             check_counts.update(result.expected.keys())
-            failed_check_counts.update(
-                failure.field for failure in result.failures
-            )
+            failed_check_counts.update(failure.field for failure in result.failures)
 
             if observed.get("needs_clarification"):
                 clarification_count += 1
@@ -321,9 +295,7 @@ class ReportGenerator:
             lines.append(
                 f"  Slowest case        : {slowest.case_id} ({slowest.latency_ms:.2f} ms)"
             )
-            lines.append(
-                f"  Average latency     : {summary.average_latency_ms:.2f} ms"
-            )
+            lines.append(f"  Average latency     : {summary.average_latency_ms:.2f} ms")
         else:
             lines.append("  No cases executed.")
 
@@ -336,10 +308,7 @@ class ReportGenerator:
         if not counter:
             return ["  none: 0"]
 
-        return [
-            f"  {key}: {count}"
-            for key, count in sorted(counter.items())
-        ]
+        return [f"  {key}: {count}" for key, count in sorted(counter.items())]
 
     def _observed_value(
         self,
@@ -371,10 +340,7 @@ class ReportGenerator:
 
         if key == "response_contains":
             response = observed.get("response") or ""
-            return {
-                term: term.lower() in response.lower()
-                for term in expected_value
-            }
+            return {term: term.lower() in response.lower() for term in expected_value}
 
         return observed.get(key)
 
@@ -407,10 +373,7 @@ class ReportGenerator:
             "escalation_id": escalation.get("escalation_id"),
             "response": observed.get("response"),
             "trace_nodes": len(nodes),
-            "tool_metrics": [
-                metric.get("tool_name")
-                for metric in tool_metrics
-            ],
+            "tool_metrics": [metric.get("tool_name") for metric in tool_metrics],
             "llm_metrics_count": len(llm_metrics),
         }
 

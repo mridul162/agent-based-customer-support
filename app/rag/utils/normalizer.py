@@ -38,12 +38,11 @@ import unicodedata
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-from typing import List
-
 
 # ---------------------------------------------------------
 # NORMALIZER
 # ---------------------------------------------------------
+
 
 class TextNormalizer:
     """
@@ -52,10 +51,7 @@ class TextNormalizer:
 
     # -----------------------------------------------------
 
-    def normalize(
-        self,
-        text: str
-    ) -> str:
+    def normalize(self, text: str) -> str:
         """
         Main normalization pipeline.
         """
@@ -74,34 +70,20 @@ class TextNormalizer:
 
     # -----------------------------------------------------
 
-    def normalize_sections(
-        self,
-        sections
-    ):
+    def normalize_sections(self, sections):
 
         for section in sections:
+            section.content = self.normalize(section.content)
 
-            section.content = self.normalize(
-                section.content
-            )
+            section.heading = self.normalize(section.heading)
 
-            section.heading = self.normalize(
-                section.heading
-            )
-
-            section.heading_path = [
-                self.normalize(h)
-                for h in section.heading_path
-            ]
+            section.heading_path = [self.normalize(h) for h in section.heading_path]
 
         return sections
 
     # -----------------------------------------------------
 
-    def _normalize_unicode(
-        self,
-        text: str
-    ) -> str:
+    def _normalize_unicode(self, text: str) -> str:
         """
         Normalize Unicode characters.
 
@@ -111,17 +93,11 @@ class TextNormalizer:
         - embedding stability
         """
 
-        return unicodedata.normalize(
-            "NFKC",
-            text
-        )
+        return unicodedata.normalize("NFKC", text)
 
     # -----------------------------------------------------
 
-    def _normalize_line_endings(
-        self,
-        text: str
-    ) -> str:
+    def _normalize_line_endings(self, text: str) -> str:
         """
         Normalize Windows/Linux/macOS line endings.
         """
@@ -134,47 +110,31 @@ class TextNormalizer:
 
     # -----------------------------------------------------
 
-    def _remove_trailing_whitespace(
-        self,
-        text: str
-    ) -> str:
+    def _remove_trailing_whitespace(self, text: str) -> str:
         """
         Remove trailing spaces from lines.
         """
 
         lines = text.split("\n")
 
-        cleaned_lines = [
-            line.rstrip()
-            for line in lines
-        ]
+        cleaned_lines = [line.rstrip() for line in lines]
 
         return "\n".join(cleaned_lines)
 
     # -----------------------------------------------------
 
-    def _normalize_blank_lines(
-        self,
-        text: str
-    ) -> str:
+    def _normalize_blank_lines(self, text: str) -> str:
         """
         Collapse excessive blank lines.
 
         Preserve semantic spacing.
         """
 
-        return re.sub(
-            r"\n{3,}",
-            "\n\n",
-            text
-        )
+        return re.sub(r"\n{3,}", "\n\n", text)
 
     # -----------------------------------------------------
 
-    def _normalize_horizontal_spacing(
-        self,
-        text: str
-    ) -> str:
+    def _normalize_horizontal_spacing(self, text: str) -> str:
         """
         Normalize excessive horizontal spaces.
 
@@ -188,7 +148,6 @@ class TextNormalizer:
         lines = text.split("\n")
 
         for line in lines:
-
             stripped = line.strip()
 
             # -----------------------------------------
@@ -196,7 +155,6 @@ class TextNormalizer:
             # -----------------------------------------
 
             if stripped.startswith("|"):
-
                 normalized_lines.append(line)
 
                 continue
@@ -206,7 +164,6 @@ class TextNormalizer:
             # -----------------------------------------
 
             if stripped.startswith("<"):
-
                 normalized_lines.append(line)
 
                 continue
@@ -215,11 +172,7 @@ class TextNormalizer:
             # Normalize spaces
             # -----------------------------------------
 
-            line = re.sub(
-                r"[ \t]{2,}",
-                " ",
-                line
-            )
+            line = re.sub(r"[ \t]{2,}", " ", line)
 
             normalized_lines.append(line)
 
@@ -231,7 +184,6 @@ class TextNormalizer:
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
-
     sample_text = """
 # Nutrition\r\n\r\n\r\n
 
@@ -257,9 +209,7 @@ This     is     a      sample      paragraph.
 
     normalizer = TextNormalizer()
 
-    normalized = normalizer.normalize(
-        sample_text
-    )
+    normalized = normalizer.normalize(sample_text)
 
     print("\n" + "=" * 70)
     print("NORMALIZED OUTPUT")

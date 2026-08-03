@@ -19,16 +19,15 @@ from app.schemas.escalation import EscalationQueue, EscalationResponse, Escalati
 
 
 class EscalationRepository:
-
     def __init__(self, session: Session) -> None:
         self._session = session
 
     def create(
         self,
         escalation_id: str,
-        customer_id:   str,
-        reason:        str,
-        queue:         EscalationQueue,
+        customer_id: str,
+        reason: str,
+        queue: EscalationQueue,
     ) -> EscalationResponse:
         escalation = Escalation(
             escalation_id=escalation_id,

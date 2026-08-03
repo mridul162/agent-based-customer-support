@@ -28,16 +28,13 @@ Token optimization second.
 """
 
 import re
-import sys
-import uuid
-
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional
-
+from typing import Any
 
 # ---------------------------------------------------------
 # CHUNK MODEL
 # ---------------------------------------------------------
+
 
 @dataclass
 class Chunk:
@@ -47,7 +44,7 @@ class Chunk:
 
     chunk_id: str
     text: str
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 @dataclass
@@ -59,13 +56,14 @@ class MergedSection:
     heading: str
     level: int
     content: str
-    heading_path: List[str]
-    section_id: Optional[str] = None
+    heading_path: list[str]
+    section_id: str | None = None
 
 
 # ---------------------------------------------------------
 # SEMANTIC CHUNKER
 # ---------------------------------------------------------
+
 
 class SemanticChunker:
     """
@@ -88,20 +86,17 @@ class SemanticChunker:
     def chunk_sections(
         self,
         sections,
-        base_metadata: Optional[Dict[str, Any]] = None,
-    ) -> List[Chunk]:
+        base_metadata: dict[str, Any] | None = None,
+    ) -> list[Chunk]:
         """
         Convert parsed sections into semantic chunks.
         """
 
         all_chunks = []
 
-        merged_sections = self._merge_tiny_sibling_sections(
-            sections
-        )
+        merged_sections = self._merge_tiny_sibling_sections(sections)
 
         for section_index, section in enumerate(merged_sections):
-
             section_chunks = self._chunk_single_section(
                 section=section,
                 section_index=section_index,
@@ -118,8 +113,8 @@ class SemanticChunker:
         self,
         section,
         section_index: int,
-        base_metadata: Dict[str, Any],
-    ) -> List[Chunk]:
+        base_metadata: dict[str, Any],
+    ) -> list[Chunk]:
         """
         Chunk a single semantic section.
         """
@@ -129,20 +124,15 @@ class SemanticChunker:
         if not content:
             return []
 
-        section_text = self._build_section_text(
-            section
-        )
+        section_text = self._build_section_text(section)
 
-        word_count = self._estimate_word_count(
-            section_text
-        )
+        word_count = self._estimate_word_count(section_text)
 
         # ---------------------------------------------
         # Preserve small semantic sections
         # ---------------------------------------------
 
         if word_count <= self.target_size:
-
             return [
                 self._build_chunk(
                     text=section_text,
@@ -166,10 +156,7 @@ class SemanticChunker:
 
     # -----------------------------------------------------
 
-    def _build_section_text(
-        self,
-        section
-    ) -> str:
+    def _build_section_text(self, section) -> str:
         """
         Build retrieval-ready section text.
 
@@ -179,21 +166,16 @@ class SemanticChunker:
         - semantic context
         """
 
-        path = " > ".join(
-            section.heading_path
-        )
+        path = " > ".join(section.heading_path)
 
-        return (
-            f"{path}\n\n"
-            f"{section.content}"
-        ).strip()
+        return (f"{path}\n\n{section.content}").strip()
 
     # -----------------------------------------------------
 
     def _merge_tiny_sibling_sections(
         self,
         sections,
-    ) -> List:
+    ) -> list:
         """
         Merge adjacent tiny sibling sections before chunking.
         """
@@ -213,24 +195,15 @@ class SemanticChunker:
                 return
 
             if len(tiny_group) == 1:
-
-                merged_sections.append(
-                    tiny_group[0]
-                )
+                merged_sections.append(tiny_group[0])
 
             else:
-
-                merged_sections.append(
-                    self._build_merged_section(
-                        tiny_group
-                    )
-                )
+                merged_sections.append(self._build_merged_section(tiny_group))
 
             tiny_group = []
             tiny_group_size = 0
 
         for section in sections:
-
             content = section.content.strip()
 
             if not content:
@@ -238,22 +211,14 @@ class SemanticChunker:
                 merged_sections.append(section)
                 continue
 
-            word_count = self._estimate_word_count(
-                content
-            )
+            word_count = self._estimate_word_count(content)
 
             if word_count >= self.min_chunk_words:
                 flush_tiny_group()
                 merged_sections.append(section)
                 continue
 
-            if (
-                tiny_group and
-                not self._are_sibling_sections(
-                    tiny_group[-1],
-                    section
-                )
-            ):
+            if tiny_group and not self._are_sibling_sections(tiny_group[-1], section):
                 flush_tiny_group()
 
             tiny_group.append(section)
@@ -278,8 +243,8 @@ class SemanticChunker:
         """
 
         return (
-            left.level == right.level and
-            left.heading_path[:-1] == right.heading_path[:-1]
+            left.level == right.level
+            and left.heading_path[:-1] == right.heading_path[:-1]
         )
 
     # -----------------------------------------------------
@@ -294,33 +259,22 @@ class SemanticChunker:
 
         first_section = sections[0]
 
-        parent_path = (
-            first_section.heading_path[:-1]
-        )
+        parent_path = first_section.heading_path[:-1]
 
         if parent_path:
             heading_path = parent_path
             heading = parent_path[-1]
-            level = max(
-                first_section.level - 1,
-                1
-            )
+            level = max(first_section.level - 1, 1)
         else:
-            heading_path = [
-                first_section.heading
-            ]
+            heading_path = [first_section.heading]
             heading = first_section.heading
             level = first_section.level
 
         content_blocks = []
 
         for section in sections:
-
             content_blocks.append(
-                (
-                    f"{section.heading}\n\n"
-                    f"{section.content.strip()}"
-                ).strip()
+                (f"{section.heading}\n\n{section.content.strip()}").strip()
             )
 
         return MergedSection(
@@ -338,27 +292,19 @@ class SemanticChunker:
         section_text: str,
         section,
         section_index: int,
-        base_metadata: Dict[str, Any],
-    ) -> List[Chunk]:
+        base_metadata: dict[str, Any],
+    ) -> list[Chunk]:
         """
         Split oversized section using paragraph grouping.
         """
 
-        paragraphs = self._split_paragraphs(
-            section_text
-        )
+        paragraphs = self._split_paragraphs(section_text)
 
         context = ""
 
-        heading_path = " > ".join(
-            section.heading_path
-        )
+        heading_path = " > ".join(section.heading_path)
 
-        if (
-            paragraphs and
-            paragraphs[0] == heading_path
-        ):
-
+        if paragraphs and paragraphs[0] == heading_path:
             context = paragraphs.pop(0)
 
         chunks = []
@@ -370,22 +316,15 @@ class SemanticChunker:
         chunk_index = 0
 
         for paragraph in paragraphs:
-
-            paragraph_size = self._estimate_word_count(
-                paragraph
-            )
+            paragraph_size = self._estimate_word_count(paragraph)
 
             # -----------------------------------------
             # Preserve atomic tables
             # -----------------------------------------
 
             if self._is_table_block(paragraph):
-
                 if current_chunk:
-
-                    chunk_text = "\n\n".join(
-                        current_chunk
-                    )
+                    chunk_text = "\n\n".join(current_chunk)
 
                     chunk_text = self._prepend_context(
                         text=chunk_text,
@@ -393,7 +332,6 @@ class SemanticChunker:
                     )
 
                     chunks.append(
-
                         self._build_chunk(
                             text=chunk_text,
                             section=section,
@@ -410,7 +348,6 @@ class SemanticChunker:
                     current_size = 0
 
                 chunks.append(
-
                     self._build_chunk(
                         text=self._prepend_context(
                             text=paragraph,
@@ -431,14 +368,8 @@ class SemanticChunker:
             # Target size exceeded
             # -----------------------------------------
 
-            if (
-                current_size + paragraph_size >
-                self.target_size
-            ):
-
-                chunk_text = "\n\n".join(
-                    current_chunk
-                )
+            if current_size + paragraph_size > self.target_size:
+                chunk_text = "\n\n".join(current_chunk)
 
                 chunk_text = self._prepend_context(
                     text=chunk_text,
@@ -446,7 +377,6 @@ class SemanticChunker:
                 )
 
                 chunks.append(
-
                     self._build_chunk(
                         text=chunk_text,
                         section=section,
@@ -462,20 +392,13 @@ class SemanticChunker:
                 # Add light overlap
                 # -------------------------------------
 
-                overlap = self._build_overlap(
-                    current_chunk
-                )
+                overlap = self._build_overlap(current_chunk)
 
-                current_chunk = overlap + [
-                    paragraph
-                ]
+                current_chunk = overlap + [paragraph]
 
-                current_size = self._estimate_word_count(
-                    "\n\n".join(current_chunk)
-                )
+                current_size = self._estimate_word_count("\n\n".join(current_chunk))
 
             else:
-
                 current_chunk.append(paragraph)
 
                 current_size += paragraph_size
@@ -485,10 +408,7 @@ class SemanticChunker:
         # ---------------------------------------------
 
         if current_chunk:
-
-            chunk_text = "\n\n".join(
-                current_chunk
-            )
+            chunk_text = "\n\n".join(current_chunk)
 
             chunk_text = self._prepend_context(
                 text=chunk_text,
@@ -496,7 +416,6 @@ class SemanticChunker:
             )
 
             chunks.append(
-
                 self._build_chunk(
                     text=chunk_text,
                     section=section,
@@ -522,17 +441,11 @@ class SemanticChunker:
         if not context:
             return text
 
-        return (
-            f"{context}\n\n"
-            f"{text}"
-        ).strip()
+        return (f"{context}\n\n{text}").strip()
 
     # -----------------------------------------------------
 
-    def _split_paragraphs(
-        self,
-        text: str
-    ) -> List[str]:
+    def _split_paragraphs(self, text: str) -> list[str]:
         """
         Split text into semantic paragraph blocks
         while preserving HTML tables atomically.
@@ -542,36 +455,25 @@ class SemanticChunker:
         # STEP 1 — Extract HTML tables
         # -------------------------------------------------
 
-        table_pattern = re.compile(
-            r"<table.*?>.*?</table>",
-            re.DOTALL | re.IGNORECASE
-        )
+        table_pattern = re.compile(r"<table.*?>.*?</table>", re.DOTALL | re.IGNORECASE)
 
         tables = {}
 
         def replace_table(match):
 
-            placeholder = (
-                f"__TABLE_{len(tables)}__"
-            )
+            placeholder = f"__TABLE_{len(tables)}__"
 
             tables[placeholder] = match.group(0)
 
             return placeholder
 
-        text = table_pattern.sub(
-            replace_table,
-            text
-        )
+        text = table_pattern.sub(replace_table, text)
 
         # -------------------------------------------------
         # STEP 2 — Split paragraphs safely
         # -------------------------------------------------
 
-        paragraphs = re.split(
-            r"\n\s*\n",
-            text
-        )
+        paragraphs = re.split(r"\n\s*\n", text)
 
         cleaned_paragraphs = []
 
@@ -580,31 +482,21 @@ class SemanticChunker:
         # -------------------------------------------------
 
         for paragraph in paragraphs:
-
             paragraph = paragraph.strip()
 
             if not paragraph:
                 continue
 
             for placeholder, table in tables.items():
+                paragraph = paragraph.replace(placeholder, table)
 
-                paragraph = paragraph.replace(
-                    placeholder,
-                    table
-                )
-
-            cleaned_paragraphs.append(
-                paragraph
-            )
+            cleaned_paragraphs.append(paragraph)
 
         return cleaned_paragraphs
 
     # -----------------------------------------------------
 
-    def _is_table_block(
-        self,
-        text: str
-    ) -> bool:
+    def _is_table_block(self, text: str) -> bool:
         """
         Detect markdown or HTML tables.
         """
@@ -623,10 +515,7 @@ class SemanticChunker:
 
     # -----------------------------------------------------
 
-    def _build_overlap(
-        self,
-        paragraphs: List[str]
-    ) -> List[str]:
+    def _build_overlap(self, paragraphs: list[str]) -> list[str]:
         """
         Build light semantic overlap.
         """
@@ -639,15 +528,9 @@ class SemanticChunker:
         current_size = 0
 
         for paragraph in reversed(paragraphs):
+            size = self._estimate_word_count(paragraph)
 
-            size = self._estimate_word_count(
-                paragraph
-            )
-
-            if (
-                current_size + size >
-                self.overlap_size
-            ):
+            if current_size + size > self.overlap_size:
                 break
 
             overlap.insert(0, paragraph)
@@ -658,10 +541,7 @@ class SemanticChunker:
 
     # -----------------------------------------------------
 
-    def _estimate_word_count(
-        self,
-        text: str
-    ) -> int:
+    def _estimate_word_count(self, text: str) -> int:
         """
         Lightweight word-count approximation.
         """
@@ -676,7 +556,7 @@ class SemanticChunker:
         section,
         chunk_index: int,
         section_index: int,
-        base_metadata: Dict[str, Any],
+        base_metadata: dict[str, Any],
     ) -> Chunk:
         """
         Build final chunk object.
@@ -696,44 +576,23 @@ class SemanticChunker:
         )
 
         metadata = {
-
             # -----------------------------------------
             # Base metadata
             # -----------------------------------------
-
             **base_metadata,
-
             # -----------------------------------------
             # Section metadata
             # -----------------------------------------
-
             "heading": section.heading,
-
-            "heading_path": (
-                section.heading_path
-            ),
-
-            "section_id": (
-                section.section_id
-            ),
-
-            "section_level": (
-                section.level
-            ),
-
+            "heading_path": (section.heading_path),
+            "section_id": (section.section_id),
+            "section_level": (section.level),
             # -----------------------------------------
             # Chunk metadata
             # -----------------------------------------
-
             "chunk_index": chunk_index,
-
             "section_index": section_index,
-
-            "word_count": (
-                self._estimate_word_count(
-                    text
-                )
-            ),
+            "word_count": (self._estimate_word_count(text)),
             "chunking_strategy": "hybrid",
         }
 
@@ -752,26 +611,17 @@ if __name__ == "__main__":
 
     @dataclass
     class ParsedSection:
-
         heading: str
         level: int
         content: str
-        heading_path: List[str]
-        section_id: Optional[str] = None
+        heading_path: list[str]
+        section_id: str | None = None
 
     sample_section = ParsedSection(
-
         heading="Our Prices",
-
         level=2,
-
-        heading_path=[
-            "Pricing",
-            "Our Prices"
-        ],
-
+        heading_path=["Pricing", "Our Prices"],
         section_id="our-prices",
-
         content="""
             <table>
             <thead>
@@ -797,7 +647,8 @@ if __name__ == "__main__":
             Prices valid as of May 2026.
 
             The larger size offers better value for regular family usage.
-            """ * 8
+            """
+        * 8,
     )
 
     chunker = SemanticChunker(
@@ -807,12 +658,11 @@ if __name__ == "__main__":
 
     chunks = chunker.chunk_sections(
         sections=[sample_section],
-
         base_metadata={
             "document_id": "shipping_shipping",
             "category": "honey",
             "source_file": "pricing.md",
-        }
+        },
     )
 
     print("\n" + "=" * 70)
@@ -822,7 +672,6 @@ if __name__ == "__main__":
     print(f"\nGenerated Chunks: {len(chunks)}")
 
     for i, chunk in enumerate(chunks, start=1):
-
         print("\n" + "-" * 70)
 
         print(f"CHUNK #{i}")
@@ -834,7 +683,6 @@ if __name__ == "__main__":
         print("\nMetadata:")
 
         for k, v in chunk.metadata.items():
-
             print(f"{k}: {v}")
 
         print("\nText Preview:")

@@ -62,9 +62,7 @@ class FakeRouterClient:
     @property
     def beta(self):
         return SimpleNamespace(
-            chat=SimpleNamespace(
-                completions=SimpleNamespace(parse=self._parse)
-            )
+            chat=SimpleNamespace(completions=SimpleNamespace(parse=self._parse))
         )
 
     def _parse(self, **kwargs):
@@ -72,9 +70,7 @@ class FakeRouterClient:
         return SimpleNamespace(
             choices=[
                 SimpleNamespace(
-                    message=SimpleNamespace(
-                        parsed=_route_for_message(message)
-                    )
+                    message=SimpleNamespace(parsed=_route_for_message(message))
                 )
             ]
         )
@@ -86,7 +82,10 @@ def _route_for_message(message: str) -> RoutingDecision:
     if any(token in lowered for token in ("order", "ord-", "cancel", "address")):
         agent_name = "order_agent"
         reasoning = "Order management request."
-    elif any(token in lowered for token in ("policy", "shipping", "warranty", "faq", "return")):
+    elif any(
+        token in lowered
+        for token in ("policy", "shipping", "warranty", "faq", "return")
+    ):
         agent_name = "faq_agent"
         reasoning = "Knowledge-base question."
     else:
@@ -103,16 +102,30 @@ def _tool_decision_for_message(**kwargs):
     if "order management specialist" in system_prompt:
         if any(word in message for word in ("cancel", "cancellation")):
             tool_name = "cancel_order_tool"
-        elif "address" in message and any(word in message for word in ("change", "update", "deliver", "ship")):
+        elif "address" in message and any(
+            word in message for word in ("change", "update", "deliver", "ship")
+        ):
             tool_name = "update_delivery_address_tool"
-        elif any(word in message for word in ("arrive", "eta", "delivery time", "when will")):
+        elif any(
+            word in message for word in ("arrive", "eta", "delivery time", "when will")
+        ):
             tool_name = "estimate_delivery_time_tool"
         else:
             tool_name = "get_order_status_tool"
     else:
         if "ticket" in message and "status" in message:
             tool_name = "get_ticket_tool"
-        elif any(word in message for word in ("refund", "damaged", "charged", "billing", "complaint", "never arrived")):
+        elif any(
+            word in message
+            for word in (
+                "refund",
+                "damaged",
+                "charged",
+                "billing",
+                "complaint",
+                "never arrived",
+            )
+        ):
             tool_name = "create_ticket_tool"
         else:
             tool_name = "no_tool"
@@ -212,53 +225,57 @@ def _fake_create_escalation_tool(
 def offline_multiagent_dependencies():
     original_registry = tool_registry.TOOL_REGISTRY.copy()
 
-    tool_registry.TOOL_REGISTRY.update({
-        "create_ticket_tool": ToolSpec(
-            name="create_ticket_tool",
-            tool_fn=_fake_create_ticket_tool,
-            required_arguments=(),
-            argument_builder=tool_registry._build_create_ticket_arguments,
-            response_builder=tool_registry._build_create_ticket_response,
-        ),
-        "get_ticket_tool": ToolSpec(
-            name="get_ticket_tool",
-            tool_fn=_fake_get_ticket_tool,
-            required_arguments=("ticket_id",),
-            argument_builder=tool_registry._build_get_ticket_arguments,
-            response_builder=tool_registry._build_get_ticket_response,
-        ),
-        "get_order_status_tool": ToolSpec(
-            name="get_order_status_tool",
-            tool_fn=_fake_get_order_status_tool,
-            required_arguments=("order_id",),
-            argument_builder=tool_registry._build_get_order_status_arguments,
-            response_builder=tool_registry._build_get_order_status_response,
-        ),
-        "cancel_order_tool": ToolSpec(
-            name="cancel_order_tool",
-            tool_fn=_fake_cancel_order_tool,
-            required_arguments=("order_id",),
-            argument_builder=tool_registry._build_cancel_order_arguments,
-            response_builder=tool_registry._build_cancel_order_response,
-        ),
-        "update_delivery_address_tool": ToolSpec(
-            name="update_delivery_address_tool",
-            tool_fn=_fake_update_delivery_address_tool,
-            required_arguments=("order_id", "new_address"),
-            argument_builder=tool_registry._build_update_delivery_address_arguments,
-            response_builder=tool_registry._build_update_delivery_address_response,
-        ),
-        "estimate_delivery_time_tool": ToolSpec(
-            name="estimate_delivery_time_tool",
-            tool_fn=_fake_estimate_delivery_time_tool,
-            required_arguments=("order_id",),
-            argument_builder=tool_registry._build_estimate_delivery_time_arguments,
-            response_builder=tool_registry._build_estimate_delivery_time_response,
-        ),
-    })
+    tool_registry.TOOL_REGISTRY.update(
+        {
+            "create_ticket_tool": ToolSpec(
+                name="create_ticket_tool",
+                tool_fn=_fake_create_ticket_tool,
+                required_arguments=(),
+                argument_builder=tool_registry._build_create_ticket_arguments,
+                response_builder=tool_registry._build_create_ticket_response,
+            ),
+            "get_ticket_tool": ToolSpec(
+                name="get_ticket_tool",
+                tool_fn=_fake_get_ticket_tool,
+                required_arguments=("ticket_id",),
+                argument_builder=tool_registry._build_get_ticket_arguments,
+                response_builder=tool_registry._build_get_ticket_response,
+            ),
+            "get_order_status_tool": ToolSpec(
+                name="get_order_status_tool",
+                tool_fn=_fake_get_order_status_tool,
+                required_arguments=("order_id",),
+                argument_builder=tool_registry._build_get_order_status_arguments,
+                response_builder=tool_registry._build_get_order_status_response,
+            ),
+            "cancel_order_tool": ToolSpec(
+                name="cancel_order_tool",
+                tool_fn=_fake_cancel_order_tool,
+                required_arguments=("order_id",),
+                argument_builder=tool_registry._build_cancel_order_arguments,
+                response_builder=tool_registry._build_cancel_order_response,
+            ),
+            "update_delivery_address_tool": ToolSpec(
+                name="update_delivery_address_tool",
+                tool_fn=_fake_update_delivery_address_tool,
+                required_arguments=("order_id", "new_address"),
+                argument_builder=tool_registry._build_update_delivery_address_arguments,
+                response_builder=tool_registry._build_update_delivery_address_response,
+            ),
+            "estimate_delivery_time_tool": ToolSpec(
+                name="estimate_delivery_time_tool",
+                tool_fn=_fake_estimate_delivery_time_tool,
+                required_arguments=("order_id",),
+                argument_builder=tool_registry._build_estimate_delivery_time_arguments,
+                response_builder=tool_registry._build_estimate_delivery_time_response,
+            ),
+        }
+    )
 
     patches = [
-        patch("app.nodes.router_node.get_openai_client", return_value=FakeRouterClient()),
+        patch(
+            "app.nodes.router_node.get_openai_client", return_value=FakeRouterClient()
+        ),
         patch(
             "app.nodes.ticket_tool_decision_node.LLMService.parse_chat_completion",
             side_effect=_tool_decision_for_message,
@@ -267,11 +284,26 @@ def offline_multiagent_dependencies():
             "app.nodes.order_tool_decision_node.LLMService.parse_chat_completion",
             side_effect=_tool_decision_for_message,
         ),
-        patch("app.graphs.faq_agent.retrieve_knowledge_tool", side_effect=_fake_retrieve_knowledge_tool),
-        patch("app.graphs.escalation_agent.create_escalation_tool", side_effect=_fake_create_escalation_tool),
-        patch("app.nodes.memory_loader_node.conversation_service.get_history", return_value=[]),
-        patch("app.nodes.memory_writer_node.conversation_service.append_turn", return_value=None),
-        patch("app.nodes.memory_writer_node.conversation_service.get_history", return_value=[]),
+        patch(
+            "app.graphs.faq_agent.retrieve_knowledge_tool",
+            side_effect=_fake_retrieve_knowledge_tool,
+        ),
+        patch(
+            "app.graphs.escalation_agent.create_escalation_tool",
+            side_effect=_fake_create_escalation_tool,
+        ),
+        patch(
+            "app.nodes.memory_loader_node.conversation_service.get_history",
+            return_value=[],
+        ),
+        patch(
+            "app.nodes.memory_writer_node.conversation_service.append_turn",
+            return_value=None,
+        ),
+        patch(
+            "app.nodes.memory_writer_node.conversation_service.get_history",
+            return_value=[],
+        ),
     ]
 
     started = [p.start() for p in patches]

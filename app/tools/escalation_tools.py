@@ -10,7 +10,11 @@ Thin adapter: receives structured inputs, calls EscalationService,
 returns EscalationResponse. No business logic.
 """
 
-from app.schemas.escalation import CreateEscalationRequest, EscalationQueue, EscalationResponse
+from app.schemas.escalation import (
+    CreateEscalationRequest,
+    EscalationQueue,
+    EscalationResponse,
+)
 from app.services.escalation_service import EscalationService
 
 _escalation_service = EscalationService()
@@ -18,8 +22,8 @@ _escalation_service = EscalationService()
 
 def create_escalation_tool(
     customer_id: str,
-    reason:      str,
-    queue:       str = "general",
+    reason: str,
+    queue: str = "general",
 ) -> EscalationResponse:
     """
     Create a human escalation for a customer issue.

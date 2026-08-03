@@ -34,14 +34,14 @@ Optimize later.
 import re
 import sys
 
-sys.stdout.reconfigure(encoding="utf-8") #type: ignore
+sys.stdout.reconfigure(encoding="utf-8")  # type: ignore
 
 from dataclasses import dataclass
-from typing import List, Optional
 
 # ---------------------------------------------------------
 # DATA MODEL
 # ---------------------------------------------------------
+
 
 @dataclass
 class ParsedSection:
@@ -52,30 +52,25 @@ class ParsedSection:
     heading: str
     level: int
     content: str
-    heading_path: List[str]
-    section_id: Optional[str] = None
+    heading_path: list[str]
+    section_id: str | None = None
 
 
 # ---------------------------------------------------------
 # MARKDOWN PARSER
 # ---------------------------------------------------------
 
+
 class MarkdownParser:
     """
     Semantic markdown parser for Hasanah Mart KB.
     """
 
-    HEADING_PATTERN = re.compile(
-        r"^(#{1,6})\s+(.*)$",
-        re.MULTILINE
-    )
+    HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$", re.MULTILINE)
 
     # -----------------------------------------------------
 
-    def parse(
-        self,
-        markdown_text: str
-    ) -> List[ParsedSection]:
+    def parse(self, markdown_text: str) -> list[ParsedSection]:
         """
         Parse markdown document into semantic sections.
         """
@@ -84,20 +79,16 @@ class MarkdownParser:
         # First extract HTML sections if present
         # ---------------------------------------------
 
-        html_sections = self._extract_html_sections(
-            markdown_text
-        )
+        html_sections = self._extract_html_sections(markdown_text)
 
         # ---------------------------------------------
         # If HTML sections exist, parse them
         # ---------------------------------------------
 
         if html_sections:
-
             parsed_sections = []
 
             for section_id, section_content in html_sections:
-
                 sections = self._parse_markdown_sections(
                     section_content,
                     section_id=section_id,
@@ -111,16 +102,11 @@ class MarkdownParser:
         # Otherwise parse normally
         # ---------------------------------------------
 
-        return self._parse_markdown_sections(
-            markdown_text
-        )
+        return self._parse_markdown_sections(markdown_text)
 
     # -----------------------------------------------------
 
-    def _extract_html_sections(
-        self,
-        markdown_text: str
-    ):
+    def _extract_html_sections(self, markdown_text: str):
         """
         Extract semantic HTML <section> blocks.
 
@@ -145,16 +131,12 @@ class MarkdownParser:
 
         for match in section_pattern.finditer(markdown_text):
             opening_tag = markdown_text[
-                match.start():markdown_text.find(">", match.start()) + 1
+                match.start() : markdown_text.find(">", match.start()) + 1
             ]
 
             id_match = id_pattern.search(opening_tag)
 
-            section_id = (
-                id_match.group(1)
-                if id_match is not None
-                else None
-            )
+            section_id = id_match.group(1) if id_match is not None else None
 
             section_content = match.group(1)
 
@@ -172,20 +154,15 @@ class MarkdownParser:
     def _parse_markdown_sections(
         self,
         markdown_text: str,
-        section_id: Optional[str] = None,
-    ) -> List[ParsedSection]:
+        section_id: str | None = None,
+    ) -> list[ParsedSection]:
         """
         Parse markdown headings into semantic sections.
         """
 
-        matches = list(
-            self.HEADING_PATTERN.finditer(
-                markdown_text
-            )
-        )
+        matches = list(self.HEADING_PATTERN.finditer(markdown_text))
 
         if not matches:
-
             return [
                 ParsedSection(
                     heading="Document",
@@ -201,7 +178,6 @@ class MarkdownParser:
         heading_stack = []
 
         for i, match in enumerate(matches):
-
             # -----------------------------------------
             # Current heading
             # -----------------------------------------
@@ -218,24 +194,18 @@ class MarkdownParser:
             # -----------------------------------------
 
             if i + 1 < len(matches):
-
                 content_end = matches[i + 1].start()
 
             else:
                 content_end = len(markdown_text)
 
-            content = markdown_text[
-                content_start:content_end
-            ].strip()
+            content = markdown_text[content_start:content_end].strip()
 
             # -----------------------------------------
             # Maintain heading hierarchy
             # -----------------------------------------
 
-            while (
-                heading_stack and
-                heading_stack[-1][0] >= level
-            ):
+            while heading_stack and heading_stack[-1][0] >= level:
                 heading_stack.pop()
 
             heading_stack.append(
@@ -245,10 +215,7 @@ class MarkdownParser:
                 )
             )
 
-            heading_path = [
-                item[1]
-                for item in heading_stack
-            ]
+            heading_path = [item[1] for item in heading_stack]
 
             # -----------------------------------------
             # Create ParsedSection
@@ -262,9 +229,7 @@ class MarkdownParser:
                 section_id=section_id,
             )
 
-            parsed_sections.append(
-                parsed_section
-            )
+            parsed_sections.append(parsed_section)
 
         return parsed_sections
 
@@ -274,7 +239,6 @@ class MarkdownParser:
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
-
     sample_markdown = """
 # Nutrition
 
@@ -309,9 +273,7 @@ Rich in antioxidants.
 
     parser = MarkdownParser()
 
-    sections = parser.parse(
-        sample_markdown
-    )
+    sections = parser.parse(sample_markdown)
 
     print("\n" + "=" * 70)
     print("MARKDOWN PARSER OUTPUT")
@@ -320,7 +282,6 @@ Rich in antioxidants.
     print(f"\nParsed Sections: {len(sections)}")
 
     for i, section in enumerate(sections, start=1):
-
         print("\n" + "-" * 70)
 
         print(f"SECTION #{i}")

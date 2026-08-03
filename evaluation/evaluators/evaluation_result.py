@@ -43,10 +43,10 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 # ============================================================================
 # Raw execution result
 # ============================================================================
+
 
 class EvaluationExecutionResult(BaseModel):
     """
@@ -57,45 +57,34 @@ class EvaluationExecutionResult(BaseModel):
     No correctness is implied here.
     """
 
-    case_id: str = Field(
-        ...,
-        description="Unique identifier of the evaluation case."
-    )
+    case_id: str = Field(..., description="Unique identifier of the evaluation case.")
 
     description: str | None = Field(
-        default=None,
-        description="Human-readable description of the evaluation case."
+        default=None, description="Human-readable description of the evaluation case."
     )
 
     tags: list[str] = Field(
-        default_factory=list,
-        description="Dataset tags describing the evaluation case."
+        default_factory=list, description="Dataset tags describing the evaluation case."
     )
 
     input: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Input used to execute the evaluation case."
+        default_factory=dict, description="Input used to execute the evaluation case."
     )
 
     expected: dict[str, Any] = Field(
-        ...,
-        description="Expected values defined by the evaluation dataset."
+        ..., description="Expected values defined by the evaluation dataset."
     )
 
     observed: dict[str, Any] | None = Field(
-        default=None,
-        description="Actual output returned by the application."
+        default=None, description="Actual output returned by the application."
     )
 
     latency_ms: float = Field(
-        ...,
-        ge=0,
-        description="Execution latency in milliseconds."
+        ..., ge=0, description="Execution latency in milliseconds."
     )
 
     error: str | None = Field(
-        default=None,
-        description="Unhandled execution error, if any."
+        default=None, description="Unhandled execution error, if any."
     )
 
 
@@ -103,35 +92,25 @@ class EvaluationExecutionResult(BaseModel):
 # Individual evaluation failure
 # ============================================================================
 
+
 class EvaluationFailure(BaseModel):
     """
     Represents one failed evaluation assertion.
     """
 
-    field: str = Field(
-        ...,
-        description="Field that failed validation."
-    )
+    field: str = Field(..., description="Field that failed validation.")
 
-    expected: Any = Field(
-        ...,
-        description="Expected value."
-    )
+    expected: Any = Field(..., description="Expected value.")
 
-    observed: Any = Field(
-        ...,
-        description="Observed value."
-    )
+    observed: Any = Field(..., description="Observed value.")
 
-    message: str = Field(
-        ...,
-        description="Human-readable failure description."
-    )
+    message: str = Field(..., description="Human-readable failure description.")
 
 
 # ============================================================================
 # Final evaluation result
 # ============================================================================
+
 
 class EvaluationResult(BaseModel):
     """
@@ -157,9 +136,7 @@ class EvaluationResult(BaseModel):
 
     observed: dict[str, Any] | None = None
 
-    failures: list[EvaluationFailure] = Field(
-        default_factory=list
-    )
+    failures: list[EvaluationFailure] = Field(default_factory=list)
 
     execution_error: str | None = None
 
@@ -167,6 +144,7 @@ class EvaluationResult(BaseModel):
 # ============================================================================
 # Evaluation summary
 # ============================================================================
+
 
 class EvaluationSummary(BaseModel):
     """

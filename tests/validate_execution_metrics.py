@@ -57,11 +57,7 @@ def main() -> None:
 
     result = router_graph.invoke(state)
 
-    state = (
-        result
-        if isinstance(result, AgentState)
-        else AgentState(**result)
-    )
+    state = result if isinstance(result, AgentState) else AgentState(**result)
 
     trace = state.execution_trace
     metrics = trace.metrics if trace else None
@@ -77,8 +73,7 @@ def main() -> None:
     check(metrics.agent_name is not None, "Agent selected")
     check(metrics.tool_used is not None, "Tool recorded")
     check(
-        metrics.total_latency_ms is not None
-        and metrics.total_latency_ms >= 0,
+        metrics.total_latency_ms is not None and metrics.total_latency_ms >= 0,
         "Total latency recorded",
     )
 

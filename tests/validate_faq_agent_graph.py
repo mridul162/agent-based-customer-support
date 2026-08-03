@@ -35,7 +35,6 @@ from app.schemas.agent_state import AgentState
 from app.schemas.execution_trace import ExecutionTrace
 from app.schemas.routing_decision import RoutingDecision
 
-
 PASS = "PASS"
 FAIL = "FAIL"
 

@@ -41,4 +41,4 @@ class RoutingDecision(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     agent_name: str
-    reasoning:  str
+    reasoning: str

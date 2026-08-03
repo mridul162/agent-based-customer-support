@@ -33,7 +33,6 @@ responsibility regardless of the registry.
 """
 
 import logging
-from typing import Any
 
 from app.schemas.agent_state import AgentState
 from app.tools.tool_registry import TOOL_REGISTRY
@@ -90,10 +89,10 @@ def response_node(state: AgentState) -> AgentState:
         5.  success            → builder produces response
     """
 
-    logger.info("response_node started", extra={
-        "request_id": state.request_id,
-        "customer_id": state.customer_id
-    })
+    logger.info(
+        "response_node started",
+        extra={"request_id": state.request_id, "customer_id": state.customer_id},
+    )
 
     # Case 1: no_tool
     if state.tool_decision is None or state.tool_decision.is_no_tool():
@@ -103,15 +102,14 @@ def response_node(state: AgentState) -> AgentState:
 
     # Case 1b: clarification required
     if state.needs_clarification and state.missing_arguments:
-        first_missing  = state.missing_arguments[0]
-        state.response = _CLARIFICATION_PROMPTS.get(first_missing, _DEFAULT_CLARIFICATION)
+        first_missing = state.missing_arguments[0]
+        state.response = _CLARIFICATION_PROMPTS.get(
+            first_missing, _DEFAULT_CLARIFICATION
+        )
         logger.info(
             "response_node: needs_clarification=True. Missing: %s",
             state.missing_arguments,
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
@@ -120,13 +118,10 @@ def response_node(state: AgentState) -> AgentState:
     # Case 2: executor skipped but not due to no_tool or clarification
     if tool_name is None:
         state.needs_human = True
-        state.response    = _FALLBACK_RESPONSE
+        state.response = _FALLBACK_RESPONSE
         logger.warning(
             "response_node: tool_used is None — escalating.",
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
@@ -135,14 +130,11 @@ def response_node(state: AgentState) -> AgentState:
 
     if spec is None:
         state.needs_human = True
-        state.response    = _FALLBACK_RESPONSE
+        state.response = _FALLBACK_RESPONSE
         logger.error(
             "response_node: tool '%s' not found in TOOL_REGISTRY — escalating.",
             tool_name,
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
@@ -153,14 +145,11 @@ def response_node(state: AgentState) -> AgentState:
 
     if not state.response:
         state.needs_human = True
-        state.response    = _FALLBACK_RESPONSE
+        state.response = _FALLBACK_RESPONSE
         logger.error(
             "response_node: builder for '%s' returned empty — escalating.",
             tool_name,
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
@@ -174,7 +163,7 @@ def response_node(state: AgentState) -> AgentState:
             "request_id": state.request_id,
             "customer_id": state.customer_id,
             "tool_name": tool_name,
-            "ticket_id": state.ticket_id
+            "ticket_id": state.ticket_id,
         },
     )
 

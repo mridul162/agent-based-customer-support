@@ -69,10 +69,7 @@ def memory_loader_node(state: AgentState) -> AgentState:
         len(history),
         state.customer_id,
         state.request_id,
-        extra={
-            "request_id": state.request_id,
-            "customer_id": state.customer_id
-        },
+        extra={"request_id": state.request_id, "customer_id": state.customer_id},
     )
 
     return state

@@ -63,11 +63,7 @@ def main() -> None:
 
     result = router_graph.invoke(state)
 
-    state = (
-        result
-        if isinstance(result, AgentState)
-        else AgentState(**result)
-    )    
+    state = result if isinstance(result, AgentState) else AgentState(**result)
 
     trace = state.execution_trace
 
@@ -112,8 +108,7 @@ def main() -> None:
     )
 
     check(
-        llm.duration_ms is not None
-        and llm.duration_ms >= 0,
+        llm.duration_ms is not None and llm.duration_ms >= 0,
         "Execution duration recorded",
     )
 
@@ -122,16 +117,12 @@ def main() -> None:
         and llm.completion_tokens is not None
         and llm.total_tokens is not None
     ):
-
         check(
-            llm.total_tokens
-            == llm.prompt_tokens + llm.completion_tokens,
+            llm.total_tokens == llm.prompt_tokens + llm.completion_tokens,
             "Total token count correct",
         )
 
-
     else:
-
         print("  ⚠️  Token usage unavailable from provider response")
 
     check(
@@ -145,8 +136,8 @@ def main() -> None:
     )
 
     check(
-    llm.estimated_cost_usd is not None,
-    "Estimated cost calculated",
+        llm.estimated_cost_usd is not None,
+        "Estimated cost calculated",
     )
 
     print("\nLLM Metrics")

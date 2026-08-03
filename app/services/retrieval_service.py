@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def _get_answer_generator() -> AnswerGenerator:
-    return AnswerGenerator(
-        retrieval_pipeline=RetrievalPipeline()
-    )
+    return AnswerGenerator(retrieval_pipeline=RetrievalPipeline())
 
 
 class RetrievalService:

@@ -33,11 +33,13 @@ from app.database.connection import Base
 class ConversationMessageDB(Base):
     __tablename__ = "conversation_messages"
 
-    id:          Mapped[int]      = mapped_column(Integer,              primary_key=True, autoincrement=True)
-    customer_id: Mapped[str]      = mapped_column(String,              nullable=False,   index=True)
-    role:        Mapped[str]      = mapped_column(String(20),          nullable=False)   # "user" | "assistant"
-    content:     Mapped[str]      = mapped_column(Text,                nullable=False)
-    created_at:  Mapped[datetime] = mapped_column(
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    customer_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    role: Mapped[str] = mapped_column(
+        String(20), nullable=False
+    )  # "user" | "assistant"
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.now(timezone.utc),

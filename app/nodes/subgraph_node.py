@@ -1,5 +1,7 @@
 from collections.abc import Callable
+
 from langgraph.graph.state import CompiledStateGraph
+
 from app.schemas.agent_state import AgentState
 
 

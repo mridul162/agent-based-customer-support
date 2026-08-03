@@ -39,12 +39,11 @@ The executor never flattens or interprets the result.
 """
 
 import logging
+from datetime import UTC, datetime
 
 from app.schemas.agent_state import AgentState
-from app.tools.tool_registry import TOOL_REGISTRY
-from app.schemas.ticket import TicketResponse
-from datetime import UTC, datetime
 from app.schemas.tool_metrics import ToolMetrics
+from app.tools.tool_registry import TOOL_REGISTRY
 
 logger = logging.getLogger(__name__)
 
@@ -67,10 +66,7 @@ def tool_executor_node(state: AgentState) -> AgentState:
         logger.error(
             "tool_executor_node called with no tool_decision. "
             "Check graph wiring: a tool decision node must run first.",
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
@@ -79,10 +75,7 @@ def tool_executor_node(state: AgentState) -> AgentState:
     if state.tool_decision.is_no_tool():
         logger.info(
             "tool_executor_node: no_tool — skipping execution.",
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
@@ -90,24 +83,18 @@ def tool_executor_node(state: AgentState) -> AgentState:
         logger.info(
             "tool_executor_node: needs_clarification=True — skipping. Missing: %s",
             state.missing_arguments,
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
     tool_name = state.tool_decision.tool_name
-    spec      = TOOL_REGISTRY.get(tool_name)
+    spec = TOOL_REGISTRY.get(tool_name)
 
     if spec is None:
         logger.error(
             "tool_executor_node: tool '%s' not found in TOOL_REGISTRY.",
             tool_name,
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
         return state
 
@@ -116,26 +103,24 @@ def tool_executor_node(state: AgentState) -> AgentState:
         extra={
             "request_id": state.request_id,
             "customer_id": state.customer_id,
-            "tool_name": tool_name
+            "tool_name": tool_name,
         },
     )
 
     try:
         started = datetime.now(UTC)
         arguments = spec.argument_builder(state)
-        result    = spec.tool_fn(**arguments)
+        result = spec.tool_fn(**arguments)
         finished = datetime.now(UTC)
 
-        state.tool_used   = tool_name
+        state.tool_used = tool_name
         state.tool_result = result
 
         metrics = ToolMetrics(
             tool_name=tool_name,
             started_at=started,
             finished_at=finished,
-            duration_ms=(
-                finished - started
-            ).total_seconds() * 1000,
+            duration_ms=(finished - started).total_seconds() * 1000,
             success=True,
         )
 
@@ -145,11 +130,10 @@ def tool_executor_node(state: AgentState) -> AgentState:
             trace.tool_metrics.append(metrics)
             trace.metrics.tool_used = state.tool_used
 
-            if (
-                    state.tool_result is not None
-                    and hasattr(state.tool_result, "ticket_id")
-                ):
-                    trace.metrics.ticket_created = True
+            if state.tool_result is not None and hasattr(
+                state.tool_result, "ticket_id"
+            ):
+                trace.metrics.ticket_created = True
 
         logger.info(
             "tool_executor_node completed",
@@ -157,29 +141,22 @@ def tool_executor_node(state: AgentState) -> AgentState:
                 "request_id": state.request_id,
                 "customer_id": state.customer_id,
                 "tool_name": tool_name,
-                "tool_result": repr(result)
+                "tool_result": repr(result),
             },
         )
 
-
-
     except Exception as e:
-
         finished = datetime.now(UTC)
 
         trace = state.execution_trace
 
         if trace is not None:
-
             trace.tool_metrics.append(
-
                 ToolMetrics(
                     tool_name=tool_name,
                     started_at=started,
                     finished_at=finished,
-                    duration_ms=(
-                        finished - started
-                    ).total_seconds() * 1000,
+                    duration_ms=(finished - started).total_seconds() * 1000,
                     success=False,
                     error=str(e),
                 )
@@ -187,11 +164,10 @@ def tool_executor_node(state: AgentState) -> AgentState:
 
         logger.error(
             "tool_executor_node: tool '%s' raised %s: %s",
-            tool_name, type(e).__name__, e,
-            extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id
-            },
+            tool_name,
+            type(e).__name__,
+            e,
+            extra={"request_id": state.request_id, "customer_id": state.customer_id},
         )
 
     return state

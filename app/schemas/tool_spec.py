@@ -57,8 +57,9 @@ in one registry file. Every node reads from that single source:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 from app.schemas.agent_state import AgentState
 
@@ -85,6 +86,7 @@ ResponseBuilder = Callable[[Any], str]
 # ---------------------------------------------------------------------------
 # ToolSpec
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class ToolSpec:
@@ -114,8 +116,8 @@ class ToolSpec:
                             tool_result, including None.
     """
 
-    name:               str
-    tool_fn:            ToolFn
+    name: str
+    tool_fn: ToolFn
     required_arguments: tuple[str, ...]
-    argument_builder:   ArgumentBuilder
-    response_builder:   ResponseBuilder
+    argument_builder: ArgumentBuilder
+    response_builder: ResponseBuilder

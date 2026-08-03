@@ -57,11 +57,11 @@ from pydantic import BaseModel, Field
 
 from app.schemas.agent import Intent
 from app.schemas.conversation_message import ConversationMessage
+from app.schemas.escalation import EscalationResponse
 from app.schemas.execution_trace import ExecutionTrace
 from app.schemas.extracted_arguments import ExtractedArguments
 from app.schemas.routing_decision import RoutingDecision
 from app.schemas.tool_decision import ToolDecision
-from app.schemas.escalation import EscalationResponse
 
 
 class AgentState(BaseModel):
@@ -118,7 +118,7 @@ class AgentState(BaseModel):
     # -- Input --
     customer_id: str
     message: str
-    request_id: str | None = None   # set by RouterService; flows through all nodes
+    request_id: str | None = None  # set by RouterService; flows through all nodes
 
     # -- Routing --
     # Written by router_node. Identifies which specialist agent
@@ -173,8 +173,8 @@ class AgentState(BaseModel):
     response: str | None = None
 
     # -------------------------------------------------------------------------
-# Observability
-# -------------------------------------------------------------------------
+    # Observability
+    # -------------------------------------------------------------------------
 
     execution_trace: ExecutionTrace | None = Field(
         default=None,

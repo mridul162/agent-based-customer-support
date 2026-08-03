@@ -29,7 +29,6 @@ from app.prompts.ticket_tool_decision_prompt import (
 from app.schemas.agent_state import AgentState
 from app.schemas.tool_decision import ToolDecision
 
-
 PASS = "PASS"
 FAIL = "FAIL"
 

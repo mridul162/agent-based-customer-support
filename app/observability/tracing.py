@@ -39,11 +39,8 @@ ExecutionTrace
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable
-
-
-from langgraph import func
 
 from app.observability.tracer import ExecutionTracer
 from app.schemas.agent_state import AgentState
@@ -51,7 +48,7 @@ from app.schemas.agent_state import AgentState
 
 def traced(
     node_name: str,
-) -> Callable: # type: ignore
+) -> Callable:  # type: ignore
     """
     Wrap a LangGraph node with automatic execution tracing.
 
@@ -90,7 +87,6 @@ def traced(
                 return result
 
             except Exception as exc:
-
                 ExecutionTracer.fail_node(
                     trace,
                     node_name,
@@ -99,6 +95,6 @@ def traced(
 
                 raise
 
-        return wrapper 
+        return wrapper
 
-    return decorator       
+    return decorator

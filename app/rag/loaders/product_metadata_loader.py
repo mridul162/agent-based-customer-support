@@ -25,12 +25,13 @@ Those responsibilities belong to later ingestion stages.
 """
 
 import sys
-sys.stdout.reconfigure(encoding="utf-8") #type: ignore
 
+sys.stdout.reconfigure(encoding="utf-8")  # type: ignore
+
+import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Any, List
-import logging
+from typing import Any
 
 import yaml
 
@@ -41,6 +42,7 @@ logger = logging.getLogger(__name__)
 # DATA MODEL
 # ---------------------------------------------------------
 
+
 @dataclass
 class ProductMetadata:
     """
@@ -50,12 +52,13 @@ class ProductMetadata:
     product_id: str
     category: str
     path: Path
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 # ---------------------------------------------------------
 # PRODUCT METADATA LOADER
 # ---------------------------------------------------------
+
 
 class ProductMetadataLoader:
     """
@@ -75,7 +78,7 @@ class ProductMetadataLoader:
 
     # -----------------------------------------------------
 
-    def load(self) -> List[ProductMetadata]:
+    def load(self) -> list[ProductMetadata]:
         """
         Load all product metadata files.
 
@@ -89,11 +92,8 @@ class ProductMetadataLoader:
         yaml_files = self._discover_metadata_files()
 
         for yaml_file in yaml_files:
-
             try:
-                metadata_object = self._build_metadata_object(
-                    yaml_file
-                )
+                metadata_object = self._build_metadata_object(yaml_file)
 
                 metadata_objects.append(metadata_object)
 
@@ -105,30 +105,23 @@ class ProductMetadataLoader:
 
     # -----------------------------------------------------
 
-    def _discover_metadata_files(self) -> List[Path]:
+    def _discover_metadata_files(self) -> list[Path]:
         """
         Discover all product.yaml files recursively.
         """
 
-        return sorted(
-            self.kb_root.rglob(self.METADATA_FILENAME)
-        )
+        return sorted(self.kb_root.rglob(self.METADATA_FILENAME))
 
     # -----------------------------------------------------
 
-    def _build_metadata_object(
-        self,
-        yaml_file: Path
-    ) -> ProductMetadata:
+    def _build_metadata_object(self, yaml_file: Path) -> ProductMetadata:
         """
         Build ProductMetadata object from YAML file.
         """
 
         metadata = self._read_yaml(yaml_file)
 
-        category, product_id = self._extract_path_metadata(
-            yaml_file
-        )
+        category, product_id = self._extract_path_metadata(yaml_file)
 
         return ProductMetadata(
             product_id=product_id,
@@ -139,38 +132,25 @@ class ProductMetadataLoader:
 
     # -----------------------------------------------------
 
-    def _read_yaml(
-        self,
-        yaml_file: Path
-    ) -> Dict[str, Any]:
+    def _read_yaml(self, yaml_file: Path) -> dict[str, Any]:
         """
         Read YAML safely.
         """
 
-        with open(
-            yaml_file,
-            "r",
-            encoding="utf-8"
-        ) as f:
-
+        with open(yaml_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
         if data is None:
             return {}
 
         if not isinstance(data, dict):
-            raise ValueError(
-                f"YAML root must be a dictionary: {yaml_file}"
-            )
+            raise ValueError(f"YAML root must be a dictionary: {yaml_file}")
 
         return data
 
     # -----------------------------------------------------
 
-    def _extract_path_metadata(
-        self,
-        yaml_file: Path
-    ):
+    def _extract_path_metadata(self, yaml_file: Path):
         """
         Extract category and product_id from filesystem.
 
@@ -190,16 +170,12 @@ class ProductMetadataLoader:
         product_id -> sundarbans_kholisha
         """
 
-        relative_path = yaml_file.relative_to(
-            self.kb_root
-        )
+        relative_path = yaml_file.relative_to(self.kb_root)
 
         parts = relative_path.parts
 
         if len(parts) < 5:
-            raise ValueError(
-                f"Invalid KB structure for metadata file: {yaml_file}"
-            )
+            raise ValueError(f"Invalid KB structure for metadata file: {yaml_file}")
 
         category = parts[2]
         product_id = parts[3]
@@ -212,10 +188,7 @@ class ProductMetadataLoader:
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
-
-    loader = ProductMetadataLoader(
-        kb_root="knowledge_base"
-    )
+    loader = ProductMetadataLoader(kb_root="knowledge_base")
 
     metadata_objects = loader.load()
 
@@ -226,7 +199,6 @@ if __name__ == "__main__":
     print(f"Loaded metadata files: {len(metadata_objects)}")
 
     if metadata_objects:
-
         sample = metadata_objects[0]
 
         print("\nSample Metadata")

@@ -72,7 +72,6 @@ import logging
 import re
 
 from app.schemas.agent_state import AgentState
-from app.schemas.conversation_message import ConversationMessage
 from app.schemas.extracted_arguments import ExtractedArguments
 
 logger = logging.getLogger(__name__)
@@ -94,22 +93,22 @@ logger = logging.getLogger(__name__)
 # Matches: TICKET-123, TICKET-ABC123, TICKET-99999, TICKET-34D61027
 # Case-insensitive so "ticket-123" and "TICKET-123" both match.
 _TICKET_ID_PATTERN = re.compile(
-    r'\bTICKET-[A-Z0-9]+\b',
+    r"\bTICKET-[A-Z0-9]+\b",
     re.IGNORECASE,
 )
 
 _ORDER_ID_PATTERN = re.compile(
-    r'\bORD-[A-Z0-9]+\b',
+    r"\bORD-[A-Z0-9]+\b",
     re.IGNORECASE,
 )
 
 _NEW_ADDRESS_PATTERNS = (
     re.compile(
-        r'\b(?:new\s+address\s+is|address\s+to|deliver\s+to|ship\s+to)\s+(.+)$',
+        r"\b(?:new\s+address\s+is|address\s+to|deliver\s+to|ship\s+to)\s+(.+)$",
         re.IGNORECASE,
     ),
     re.compile(
-        r'\bto\s+(.+)$',
+        r"\bto\s+(.+)$",
         re.IGNORECASE,
     ),
 )
@@ -125,6 +124,7 @@ _NEW_ADDRESS_PATTERNS = (
 # ticket IDs, we take the first one. Ambiguous multi-entity messages are
 # a future problem (they may require clarification, not silent extraction).
 # ---------------------------------------------------------------------------
+
 
 def _extract_ticket_id(message: str) -> str | None:
     """
@@ -180,6 +180,7 @@ def _extract_new_address(message: str) -> str | None:
 #     The node function never changes.
 # ---------------------------------------------------------------------------
 
+
 def _extract_all(message: str) -> dict[str, str]:
     """
     Run all entity extractors against the message.
@@ -216,6 +217,7 @@ def _extract_all(message: str) -> dict[str, str]:
 # Deliberately does NOT read: state.tool_decision
 # This enforces message-driven extraction.
 # ---------------------------------------------------------------------------
+
 
 def _recover_ticket_id_from_history(
     history: list,
@@ -260,10 +262,7 @@ def argument_extraction_node(state: AgentState) -> AgentState:
 
     logger.info(
         "argument_extraction_node started",
-        extra={
-            "request_id": state.request_id,
-            "customer_id": state.customer_id
-        },
+        extra={"request_id": state.request_id, "customer_id": state.customer_id},
     )
 
     found = _extract_all(state.message)
@@ -280,7 +279,7 @@ def argument_extraction_node(state: AgentState) -> AgentState:
                 recovered,
                 extra={
                     "request_id": state.request_id,
-                    "customer_id": state.customer_id
+                    "customer_id": state.customer_id,
                 },
             )
 

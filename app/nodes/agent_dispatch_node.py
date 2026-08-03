@@ -86,7 +86,7 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
             },
         )
         state.needs_human = True
-        state.response    = _FALLBACK_RESPONSE
+        state.response = _FALLBACK_RESPONSE
         return state
 
     agent_name = state.routing_decision.agent_name
@@ -102,16 +102,16 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
             },
         )
         state.needs_human = True
-        state.response    = _FALLBACK_RESPONSE
+        state.response = _FALLBACK_RESPONSE
         return state
 
     logger.info(
         "agent_dispatch_node: invoking '%s'.",
         agent_name,
         extra={
-                "request_id": state.request_id,
-                "customer_id": state.customer_id,
-            },
+            "request_id": state.request_id,
+            "customer_id": state.customer_id,
+        },
     )
 
     try:
@@ -141,12 +141,14 @@ def agent_dispatch_node(state: AgentState) -> AgentState:
     except Exception as e:
         logger.error(
             "agent_dispatch_node: agent '%s' raised %s: %s",
-            agent_name, type(e).__name__, e,
+            agent_name,
+            type(e).__name__,
+            e,
             extra={
                 "request_id": state.request_id,
                 "customer_id": state.customer_id,
             },
         )
         state.needs_human = True
-        state.response    = _FALLBACK_RESPONSE
+        state.response = _FALLBACK_RESPONSE
         return state

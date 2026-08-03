@@ -40,5 +40,5 @@ class ConversationMessage(BaseModel):
         content: The raw text of the message or response.
     """
 
-    role:    Literal["user", "assistant"]
+    role: Literal["user", "assistant"]
     content: str

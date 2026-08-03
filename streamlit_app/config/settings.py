@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
 import os
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -19,10 +19,16 @@ class StreamlitSettings:
     navigation_button: str = "disabled"
     max_history_items: int = 50
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
-    openai_api_base: str = field(default_factory=lambda: os.getenv("OPENAI_API_BASE", ""))
-    data_dir: Path = field(default_factory=lambda: Path(os.getenv("DATA_DIR", Path.cwd() / "data")))
+    openai_api_base: str = field(
+        default_factory=lambda: os.getenv("OPENAI_API_BASE", "")
+    )
+    data_dir: Path = field(
+        default_factory=lambda: Path(os.getenv("DATA_DIR", Path.cwd() / "data"))
+    )
     log_level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
-    DEFAULT_API_BASE_URL: str = field(default_factory=lambda: os.getenv("API_BASE_URL", "http://localhost:8000"))
+    DEFAULT_API_BASE_URL: str = field(
+        default_factory=lambda: os.getenv("API_BASE_URL", "http://localhost:8000")
+    )
 
     @property
     def page_config(self) -> dict:

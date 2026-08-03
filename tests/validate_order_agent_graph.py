@@ -37,10 +37,9 @@ from app.nodes.agent_dispatch_node import agent_dispatch_node
 from app.schemas.agent_state import AgentState
 from app.schemas.execution_trace import ExecutionTrace
 from app.schemas.routing_decision import RoutingDecision
-from app.schemas.tool_spec import ToolSpec
 from app.schemas.tool_decision import ToolDecision
+from app.schemas.tool_spec import ToolSpec
 from app.tools import tool_registry
-
 
 PASS = "PASS"
 FAIL = "FAIL"
@@ -103,9 +102,8 @@ def fake_order_parse_chat_completion(**kwargs):
         tool_name = "cancel_order_tool"
         reasoning = "Customer wants to cancel an order."
 
-    elif (
-        "address" in message
-        and any(word in message for word in ("update", "change", "deliver", "ship"))
+    elif "address" in message and any(
+        word in message for word in ("update", "change", "deliver", "ship")
     ):
         tool_name = "update_delivery_address_tool"
         reasoning = "Customer wants to update a delivery address."
@@ -147,36 +145,38 @@ def fake_order_parse_chat_completion(**kwargs):
 def patched_order_tools():
     original = tool_registry.TOOL_REGISTRY.copy()
 
-    tool_registry.TOOL_REGISTRY.update({
-        "get_order_status_tool": ToolSpec(
-            name="get_order_status_tool",
-            tool_fn=fake_get_order_status_tool,
-            required_arguments=("order_id",),
-            argument_builder=tool_registry._build_get_order_status_arguments,
-            response_builder=tool_registry._build_get_order_status_response,
-        ),
-        "cancel_order_tool": ToolSpec(
-            name="cancel_order_tool",
-            tool_fn=fake_cancel_order_tool,
-            required_arguments=("order_id",),
-            argument_builder=tool_registry._build_cancel_order_arguments,
-            response_builder=tool_registry._build_cancel_order_response,
-        ),
-        "update_delivery_address_tool": ToolSpec(
-            name="update_delivery_address_tool",
-            tool_fn=fake_update_delivery_address_tool,
-            required_arguments=("order_id", "new_address"),
-            argument_builder=tool_registry._build_update_delivery_address_arguments,
-            response_builder=tool_registry._build_update_delivery_address_response,
-        ),
-        "estimate_delivery_time_tool": ToolSpec(
-            name="estimate_delivery_time_tool",
-            tool_fn=fake_estimate_delivery_time_tool,
-            required_arguments=("order_id",),
-            argument_builder=tool_registry._build_estimate_delivery_time_arguments,
-            response_builder=tool_registry._build_estimate_delivery_time_response,
-        ),
-    })
+    tool_registry.TOOL_REGISTRY.update(
+        {
+            "get_order_status_tool": ToolSpec(
+                name="get_order_status_tool",
+                tool_fn=fake_get_order_status_tool,
+                required_arguments=("order_id",),
+                argument_builder=tool_registry._build_get_order_status_arguments,
+                response_builder=tool_registry._build_get_order_status_response,
+            ),
+            "cancel_order_tool": ToolSpec(
+                name="cancel_order_tool",
+                tool_fn=fake_cancel_order_tool,
+                required_arguments=("order_id",),
+                argument_builder=tool_registry._build_cancel_order_arguments,
+                response_builder=tool_registry._build_cancel_order_response,
+            ),
+            "update_delivery_address_tool": ToolSpec(
+                name="update_delivery_address_tool",
+                tool_fn=fake_update_delivery_address_tool,
+                required_arguments=("order_id", "new_address"),
+                argument_builder=tool_registry._build_update_delivery_address_arguments,
+                response_builder=tool_registry._build_update_delivery_address_response,
+            ),
+            "estimate_delivery_time_tool": ToolSpec(
+                name="estimate_delivery_time_tool",
+                tool_fn=fake_estimate_delivery_time_tool,
+                required_arguments=("order_id",),
+                argument_builder=tool_registry._build_estimate_delivery_time_arguments,
+                response_builder=tool_registry._build_estimate_delivery_time_response,
+            ),
+        }
+    )
 
     with patch(
         "app.nodes.order_tool_decision_node.LLMService.parse_chat_completion",
@@ -218,8 +218,8 @@ def validate_status_lookup() -> None:
 
     check(state.tool_used == "get_order_status_tool", "Status tool selected")
     check(state.response is not None, "Response populated")
-    check("ORD-1001" in state.response, "Response includes order ID") #type: ignore
-    check("processing" in state.response, "Response includes order status") #type: ignore
+    check("ORD-1001" in state.response, "Response includes order ID")  # type: ignore
+    check("processing" in state.response, "Response includes order status")  # type: ignore
     check(state.execution_trace is not None, "ExecutionTrace preserved")
 
     if state.execution_trace is not None:
@@ -241,23 +241,21 @@ def validate_cancel_order() -> None:
 
     check(state.tool_used == "cancel_order_tool", "Cancel tool selected")
     check(state.response is not None, "Response populated")
-    check("cancelled" in state.response.lower(), "Cancellation confirmed") # type: ignore
+    check("cancelled" in state.response.lower(), "Cancellation confirmed")  # type: ignore
 
 
 def validate_update_address() -> None:
     print("[3] Update delivery address")
 
     with patched_order_tools():
-        state = invoke_order_agent(
-            "Change address for ORD-1001 to Khulna Sadar"
-        )
+        state = invoke_order_agent("Change address for ORD-1001 to Khulna Sadar")
 
     check(
         state.tool_used == "update_delivery_address_tool",
         "Update address tool selected",
     )
     check(state.response is not None, "Response populated")
-    check("Khulna Sadar" in state.response, "New address included") #type: ignore
+    check("Khulna Sadar" in state.response, "New address included")  # type: ignore
 
 
 def validate_delivery_estimate() -> None:
@@ -271,7 +269,7 @@ def validate_delivery_estimate() -> None:
         "Delivery estimate tool selected",
     )
     check(state.response is not None, "Response populated")
-    check("shipment" in state.response.lower(), "Estimate response returned") #type: ignore
+    check("shipment" in state.response.lower(), "Estimate response returned")  # type: ignore
 
 
 def validate_missing_order_id() -> None:

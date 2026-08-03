@@ -85,9 +85,7 @@ def build_router_graph() -> CompiledStateGraph:
     )
     graph.add_node(
         "escalation_agent",
-        traced("escalation_agent")(
-            subgraph_node(escalation_agent_graph)
-        ),
+        traced("escalation_agent")(subgraph_node(escalation_agent_graph)),
     )
     graph.add_node(
         "memory_writer_node",

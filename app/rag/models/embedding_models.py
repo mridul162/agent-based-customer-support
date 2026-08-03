@@ -21,12 +21,12 @@ Easy serialization and debugging.
 """
 
 from dataclasses import dataclass
-from typing import Dict, Any, List
+from typing import Any
 
 
 @dataclass
 class EmbeddedChunk:
     chunk_id: str
     text: str
-    embedding: List[float]
-    metadata: Dict[str, Any]
+    embedding: list[float]
+    metadata: dict[str, Any]

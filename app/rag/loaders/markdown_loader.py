@@ -24,10 +24,9 @@ This loader DOES NOT:
 Those responsibilities belong to later ingestion stages.
 """
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +34,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------
 # DATA MODEL
 # ---------------------------------------------------------
+
 
 @dataclass
 class RawDocument:
@@ -53,6 +53,7 @@ class RawDocument:
 # MARKDOWN LOADER
 # ---------------------------------------------------------
 
+
 class MarkdownLoader:
     """
     Filesystem markdown loader for the customer support knowledge base.
@@ -66,9 +67,7 @@ class MarkdownLoader:
         "__pycache__",
     }
 
-    IGNORED_FILES = {
-        "aliases.md"
-    }
+    IGNORED_FILES = {"aliases.md"}
 
     def __init__(self, kb_root: str):
         """
@@ -87,7 +86,7 @@ class MarkdownLoader:
 
     # -----------------------------------------------------
 
-    def load(self) -> List[RawDocument]:
+    def load(self) -> list[RawDocument]:
         """
         Load all markdown documents from the KB.
 
@@ -101,7 +100,6 @@ class MarkdownLoader:
         markdown_files = self._discover_markdown_files()
 
         for file_path in markdown_files:
-
             try:
                 document = self._build_document(file_path)
                 if document:
@@ -115,7 +113,7 @@ class MarkdownLoader:
 
     # -----------------------------------------------------
 
-    def _discover_markdown_files(self) -> List[Path]:
+    def _discover_markdown_files(self) -> list[Path]:
         """
         Discover all valid markdown files recursively.
         """
@@ -123,12 +121,8 @@ class MarkdownLoader:
         markdown_files = []
 
         for file_path in self.kb_root.rglob("*.md"):
-
             # Skip ignored folders
-            if any(
-                folder in file_path.parts
-                for folder in self.IGNORED_FOLDERS
-            ):
+            if any(folder in file_path.parts for folder in self.IGNORED_FOLDERS):
                 continue
 
             # Skip ignored files
@@ -149,9 +143,7 @@ class MarkdownLoader:
         if not content.strip():
             return None
 
-        category, document_id, file_type = self._extract_path_metadata(
-            file_path
-        )
+        category, document_id, file_type = self._extract_path_metadata(file_path)
 
         return RawDocument(
             document_id=document_id,
@@ -168,9 +160,7 @@ class MarkdownLoader:
         Read markdown file safely using UTF-8 encoding.
         """
 
-        return file_path.read_text(
-            encoding="utf-8"
-        )
+        return file_path.read_text(encoding="utf-8")
 
     # -----------------------------------------------------
 
@@ -197,15 +187,11 @@ class MarkdownLoader:
         parts = relative_path.parts
 
         if len(parts) < 2:
-            raise ValueError(
-                f"Invalid KB structure for file: {file_path}"
-            )
+            raise ValueError(f"Invalid KB structure for file: {file_path}")
 
         category = parts[0]
         file_type = file_path.stem
-        document_id = "_".join(
-            [*parts[:-1], file_path.stem]
-        ).replace(" ", "_").lower()
+        document_id = "_".join([*parts[:-1], file_path.stem]).replace(" ", "_").lower()
 
         return category, document_id, file_type
 
@@ -215,10 +201,7 @@ class MarkdownLoader:
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
-
-    loader = MarkdownLoader(
-        kb_root="knowledge_base"
-    )
+    loader = MarkdownLoader(kb_root="knowledge_base")
 
     documents = loader.load()
 
@@ -229,7 +212,6 @@ if __name__ == "__main__":
     print(f"Loaded documents: {len(documents)}")
 
     if documents:
-
         sample = documents[0]
 
         print("\nSample Document")

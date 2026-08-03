@@ -51,7 +51,7 @@ class TicketResponse(BaseModel):
     issue: str
     status: TicketStatus
     agent_response: str | None = None
-    
+
 
 class UpdateTicketRequest(BaseModel):
     """

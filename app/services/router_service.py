@@ -66,7 +66,7 @@ class RouterService:
     def run(
         self,
         customer_id: str,
-        message:     str,
+        message: str,
     ) -> AgentState:
         """
         Process a customer message through the full multi-agent pipeline.
@@ -87,29 +87,33 @@ class RouterService:
         logger.info(
             "RouterService: request started",
             extra={
-                "request_id":  request_id,
+                "request_id": request_id,
                 "customer_id": customer_id,
                 "message_len": len(message),
             },
         )
 
-        result = router_graph.invoke({
-            "customer_id": customer_id,
-            "message":     message,
-            "request_id":  request_id,
-        })
+        result = router_graph.invoke(
+            {
+                "customer_id": customer_id,
+                "message": message,
+                "request_id": request_id,
+            }
+        )
 
         state = AgentState(**result)
 
         logger.info(
             "RouterService: request completed",
             extra={
-                "request_id":    request_id,
-                "customer_id":   customer_id,
-                "agent_name":    state.routing_decision.agent_name if state.routing_decision else None,
-                "tool_used":     state.tool_used,
-                "ticket_id":     state.ticket_id,
-                "needs_human":   state.needs_human,
+                "request_id": request_id,
+                "customer_id": customer_id,
+                "agent_name": state.routing_decision.agent_name
+                if state.routing_decision
+                else None,
+                "tool_used": state.tool_used,
+                "ticket_id": state.ticket_id,
+                "needs_human": state.needs_human,
                 "needs_clarification": state.needs_clarification,
             },
         )

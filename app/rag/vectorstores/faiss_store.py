@@ -60,11 +60,13 @@ class FAISSStore:
                 )
 
             self.vector_store.append(chunk.embedding)
-            self.metadata_store.append({
-                "chunk_id": chunk.chunk_id,
-                "text": chunk.text,
-                "metadata": chunk.metadata,
-            })
+            self.metadata_store.append(
+                {
+                    "chunk_id": chunk.chunk_id,
+                    "text": chunk.text,
+                    "metadata": chunk.metadata,
+                }
+            )
 
         logger.info(
             "Added %s embeddings to vector store.",

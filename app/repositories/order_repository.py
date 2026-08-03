@@ -81,9 +81,7 @@ class OrderRepository:
             .order_by(Order.created_at.desc())
         )
 
-        return list(
-            self.session.scalars(statement).all()
-        )
+        return list(self.session.scalars(statement).all())
 
     def update_status(
         self,

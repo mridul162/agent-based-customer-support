@@ -55,12 +55,15 @@ def run_graph(customer_id: str, message: str) -> AgentState:
 # The core flow: extraction feeds executor feeds retrieval.
 # ---------------------------------------------------------------------------
 
+
 def validate_ticket_lookup() -> None:
     print("\n[Scenario 1] Create ticket → ask for status by ID")
 
     # Step 1: Create a real ticket via the tool directly.
     # This populates the in-memory service store so the graph can retrieve it.
-    created = create_ticket_tool(customer_id="C001", issue="My refund was not processed.")
+    created = create_ticket_tool(
+        customer_id="C001", issue="My refund was not processed."
+    )
     ticket_id = created.ticket_id
     print(f"  ℹ️  Created ticket: {ticket_id}")
 
@@ -71,44 +74,39 @@ def validate_ticket_lookup() -> None:
     )
 
     # LLM decision
-    check("tool_decision is populated",
-          state.tool_decision is not None)
+    check("tool_decision is populated", state.tool_decision is not None)
     assert state.tool_decision is not None
 
-    check("LLM chose get_ticket_tool",
-          state.tool_decision.tool_name == "get_ticket_tool")
-    check("tool_decision has reasoning",
-          bool(state.tool_decision.reasoning))
+    check(
+        "LLM chose get_ticket_tool", state.tool_decision.tool_name == "get_ticket_tool"
+    )
+    check("tool_decision has reasoning", bool(state.tool_decision.reasoning))
 
     # Extraction — this is the first test that extraction feeds execution
-    check("extracted_arguments is populated",
-          state.extracted_arguments is not None)
+    check("extracted_arguments is populated", state.extracted_arguments is not None)
     assert state.extracted_arguments is not None
 
-    check("ticket_id was extracted from message",
-          state.extracted_arguments.has("ticket_id"))
-    check("extracted ticket_id matches created ticket_id",
-          state.extracted_arguments.get("ticket_id") == ticket_id)
+    check(
+        "ticket_id was extracted from message",
+        state.extracted_arguments.has("ticket_id"),
+    )
+    check(
+        "extracted ticket_id matches created ticket_id",
+        state.extracted_arguments.get("ticket_id") == ticket_id,
+    )
 
     # Execution
-    check("tool_used is get_ticket_tool",
-          state.tool_used == "get_ticket_tool")
-    check("tool_result is populated",
-          state.tool_result is not None)
+    check("tool_used is get_ticket_tool", state.tool_used == "get_ticket_tool")
+    check("tool_result is populated", state.tool_result is not None)
     assert state.tool_result is not None
 
-    check("tool_result ticket_id matches",
-          state.tool_result.ticket_id == ticket_id)
-    check("tool_result has status",
-          bool(state.tool_result.status))
+    check("tool_result ticket_id matches", state.tool_result.ticket_id == ticket_id)
+    check("tool_result has status", bool(state.tool_result.status))
 
     # Response
-    check("response is populated",
-          bool(state.response))
-    check("ticket_id appears in response",
-          ticket_id in state.response) # type: ignore
-    check("needs_human is False",
-          state.needs_human is False)
+    check("response is populated", bool(state.response))
+    check("ticket_id appears in response", ticket_id in state.response)  # type: ignore
+    check("needs_human is False", state.needs_human is False)
 
     print(f"  ℹ️  LLM reasoning: {state.tool_decision.reasoning}")
     print(f"  ℹ️  Extracted ticket_id: {state.extracted_arguments.get('ticket_id')}")
@@ -120,6 +118,7 @@ def validate_ticket_lookup() -> None:
 # Validates the not-found path in the response builder.
 # ---------------------------------------------------------------------------
 
+
 def validate_ticket_not_found() -> None:
     print("\n[Scenario 2] Ask about non-existent ticket — not-found response")
 
@@ -129,24 +128,25 @@ def validate_ticket_not_found() -> None:
     )
 
     assert state.tool_decision is not None
-    check("LLM chose get_ticket_tool",
-          state.tool_decision.tool_name == "get_ticket_tool")
+    check(
+        "LLM chose get_ticket_tool", state.tool_decision.tool_name == "get_ticket_tool"
+    )
 
     assert state.extracted_arguments is not None
-    check("ticket_id extracted",
-          state.extracted_arguments.has("ticket_id"))
-    check("extracted ID is the fake one",
-          state.extracted_arguments.get("ticket_id") == "TICKET-DOESNOTEXIST")
+    check("ticket_id extracted", state.extracted_arguments.has("ticket_id"))
+    check(
+        "extracted ID is the fake one",
+        state.extracted_arguments.get("ticket_id") == "TICKET-DOESNOTEXIST",
+    )
 
     # tool_result should be None — ticket doesn't exist in the service
-    check("tool_result is None (ticket not found)",
-          state.tool_result is None)
+    check("tool_result is None (ticket not found)", state.tool_result is None)
 
     # Response node should produce a not-found message, not escalate
-    check("response is populated",
-          bool(state.response))
-    check("needs_human is False (not-found is not an error)",
-          state.needs_human is False)
+    check("response is populated", bool(state.response))
+    check(
+        "needs_human is False (not-found is not an error)", state.needs_human is False
+    )
 
     print(f"  ℹ️  Response: {state.response}")
 
@@ -156,8 +156,11 @@ def validate_ticket_not_found() -> None:
 # Adding get_ticket_tool must not break create_ticket_tool.
 # ---------------------------------------------------------------------------
 
+
 def validate_create_ticket_regression() -> None:
-    print("\n[Scenario 3] Create ticket regression — still works after adding get_ticket_tool")
+    print(
+        "\n[Scenario 3] Create ticket regression — still works after adding get_ticket_tool"
+    )
 
     state = run_graph(
         customer_id="C003",
@@ -165,14 +168,13 @@ def validate_create_ticket_regression() -> None:
     )
 
     assert state.tool_decision is not None
-    check("LLM still chooses create_ticket_tool for refund request",
-          state.tool_decision.tool_name == "create_ticket_tool")
-    check("tool_result is populated",
-          state.tool_result is not None)
-    check("ticket_id assigned",
-          bool(state.ticket_id))
-    check("response populated",
-          bool(state.response))
+    check(
+        "LLM still chooses create_ticket_tool for refund request",
+        state.tool_decision.tool_name == "create_ticket_tool",
+    )
+    check("tool_result is populated", state.tool_result is not None)
+    check("ticket_id assigned", bool(state.ticket_id))
+    check("response populated", bool(state.response))
 
     print(f"  ℹ️  Ticket ID: {state.ticket_id}")
 
@@ -180,6 +182,7 @@ def validate_create_ticket_regression() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 4: State completeness — all five artifacts present after retrieval
 # ---------------------------------------------------------------------------
+
 
 def validate_state_completeness_retrieval() -> None:
     print("\n[Scenario 4] State completeness after retrieval flow")
@@ -192,22 +195,25 @@ def validate_state_completeness_retrieval() -> None:
     )
 
     assert state.tool_decision is not None
-    check("tool_decision present",        state.tool_decision is not None)
-    check("extracted_arguments present",  state.extracted_arguments is not None)
-    check("tool_used present",            state.tool_used is not None)
-    check("response present",             bool(state.response))
+    check("tool_decision present", state.tool_decision is not None)
+    check("extracted_arguments present", state.extracted_arguments is not None)
+    check("tool_used present", state.tool_used is not None)
+    check("response present", bool(state.response))
 
     # customer_id and message must be untouched
-    check("customer_id unchanged",        state.customer_id == "C004")
-    check("message unchanged",            created.ticket_id in state.message)
+    check("customer_id unchanged", state.customer_id == "C004")
+    check("message unchanged", created.ticket_id in state.message)
 
-    print(f"  ℹ️  State: tool_decision ✓ extracted_arguments ✓ "
-          f"tool_used ✓ tool_result ✓ response ✓")
+    print(
+        "  ℹ️  State: tool_decision ✓ extracted_arguments ✓ "
+        "tool_used ✓ tool_result ✓ response ✓"
+    )
 
 
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print("=" * 60)

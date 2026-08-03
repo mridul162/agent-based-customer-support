@@ -68,9 +68,7 @@ class IngestionPipeline:
                 source_file=document.file_type,
             )
 
-            normalized_sections = self.normalizer.normalize_sections(
-                parsed_sections
-            )
+            normalized_sections = self.normalizer.normalize_sections(parsed_sections)
 
             self.artifact_writer.write_normalized_sections(
                 sections=normalized_sections,
@@ -85,10 +83,7 @@ class IngestionPipeline:
             )
 
             total_chunks += len(chunks)
-            chunk_word_counts.extend(
-                chunk.metadata["word_count"]
-                for chunk in chunks
-            )
+            chunk_word_counts.extend(chunk.metadata["word_count"] for chunk in chunks)
 
             self.artifact_writer.write_chunks(
                 chunks=chunks,
@@ -104,12 +99,14 @@ class IngestionPipeline:
             chunk_word_counts=chunk_word_counts,
         )
 
-        self.artifact_writer.write_pipeline_log({
-            "documents_processed": len(documents),
-            "sections_generated": total_sections,
-            "chunks_generated": total_chunks,
-            "status": "success",
-        })
+        self.artifact_writer.write_pipeline_log(
+            {
+                "documents_processed": len(documents),
+                "sections_generated": total_sections,
+                "chunks_generated": total_chunks,
+                "status": "success",
+            }
+        )
 
         print("\n[PIPELINE COMPLETED SUCCESSFULLY]")
 
@@ -138,10 +135,7 @@ class IngestionPipeline:
             print("\nChunk Word Counts:")
             print(f"  Min: {min(chunk_word_counts)}")
             print(f"  Max: {max(chunk_word_counts)}")
-            print(
-                f"  Avg: "
-                f"{sum(chunk_word_counts) / len(chunk_word_counts):.2f}"
-            )
+            print(f"  Avg: {sum(chunk_word_counts) / len(chunk_word_counts):.2f}")
 
         category_counter = Counter(doc.category for doc in documents)
 

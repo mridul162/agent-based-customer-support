@@ -37,7 +37,6 @@ from app.services import retrieval_service
 from app.services.retrieval_service import RetrievalService
 from app.tools.tool_registry import TOOL_REGISTRY
 
-
 PASS = "PASS"
 FAIL = "FAIL"
 
@@ -109,30 +108,32 @@ def _build_test_vector_artifacts(
 ) -> None:
     store = FAISSStore(embedding_dimension=FakeEmbedder.dimension)
 
-    store.add_embeddings([
-        EmbeddedChunk(
-            chunk_id="returns_refund__refund.md__0__0",
-            text="Refunds are reviewed after the returned item is received.",
-            embedding=[1.0, 0.0, 0.0],
-            metadata={
-                "document_id": "returns_refund",
-                "category": "returns",
-                "source_file": "refund.md",
-                "heading": "Refund Policy",
-            },
-        ),
-        EmbeddedChunk(
-            chunk_id="shipping_shipping__shipping.md__0__0",
-            text="Shipping updates are sent when an order is dispatched.",
-            embedding=[0.0, 1.0, 0.0],
-            metadata={
-                "document_id": "shipping_shipping",
-                "category": "shipping",
-                "source_file": "shipping.md",
-                "heading": "Shipping",
-            },
-        ),
-    ])
+    store.add_embeddings(
+        [
+            EmbeddedChunk(
+                chunk_id="returns_refund__refund.md__0__0",
+                text="Refunds are reviewed after the returned item is received.",
+                embedding=[1.0, 0.0, 0.0],
+                metadata={
+                    "document_id": "returns_refund",
+                    "category": "returns",
+                    "source_file": "refund.md",
+                    "heading": "Refund Policy",
+                },
+            ),
+            EmbeddedChunk(
+                chunk_id="shipping_shipping__shipping.md__0__0",
+                text="Shipping updates are sent when an order is dispatched.",
+                embedding=[0.0, 1.0, 0.0],
+                metadata={
+                    "document_id": "shipping_shipping",
+                    "category": "shipping",
+                    "source_file": "shipping.md",
+                    "heading": "Shipping",
+                },
+            ),
+        ]
+    )
 
     store.save(
         index_path=index_path,
@@ -145,9 +146,7 @@ def validate_ingestion_outputs() -> None:
 
     IngestionPipeline(kb_root=settings.knowledge_base_path).run()
 
-    chunks = ChunkArtifactLoader(
-        chunk_root=settings.chunk_artifacts_path
-    ).load()
+    chunks = ChunkArtifactLoader(chunk_root=settings.chunk_artifacts_path).load()
 
     check(len(chunks) > 0, "Chunk artifacts were generated")
     check(
@@ -245,10 +244,13 @@ def validate_service_and_tool_wiring() -> None:
         try:
             retrieval_service._get_answer_generator.cache_clear()
 
-            with patch(
-                "app.rag.pipelines.retrieval_pipeline.OpenAIEmbedder",
-                FakeEmbedder,
-            ), patch.object(retrieval_service.logger, "exception"):
+            with (
+                patch(
+                    "app.rag.pipelines.retrieval_pipeline.OpenAIEmbedder",
+                    FakeEmbedder,
+                ),
+                patch.object(retrieval_service.logger, "exception"),
+            ):
                 answer = RetrievalService.answer_question(
                     "What is your warranty policy?"
                 )

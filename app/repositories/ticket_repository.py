@@ -85,9 +85,9 @@ class TicketRepository:
 
     def create_ticket(
         self,
-        ticket_id:   str,
+        ticket_id: str,
         customer_id: str,
-        issue:       str,
+        issue: str,
     ) -> TicketResponse:
         """
         Insert a new ticket row and return it as a TicketResponse.
@@ -141,8 +141,8 @@ class TicketRepository:
 
     def update_status(
         self,
-        ticket_id:      str,
-        status:         TicketStatus,
+        ticket_id: str,
+        status: TicketStatus,
         agent_response: str | None = None,
     ) -> TicketResponse | None:
         """
@@ -154,7 +154,7 @@ class TicketRepository:
         ticket = self._session.get(Ticket, ticket_id)
         if ticket is None:
             return None
-        
+
         ticket.status = status
 
         return self._to_response(ticket)
@@ -167,5 +167,5 @@ class TicketRepository:
             customer_id=ticket.customer_id,
             issue=ticket.issue,
             status=ticket.status,
-            agent_response=None,   # not stored in DB yet — future migration adds this column
+            agent_response=None,  # not stored in DB yet — future migration adds this column
         )

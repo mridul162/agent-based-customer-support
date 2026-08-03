@@ -54,7 +54,7 @@ def argument_validation_node(state: AgentState) -> AgentState:
         return state
 
     tool_name = state.tool_decision.tool_name
-    spec      = TOOL_REGISTRY.get(tool_name)
+    spec = TOOL_REGISTRY.get(tool_name)
 
     if spec is None or not spec.required_arguments:
         logger.debug(
@@ -68,12 +68,13 @@ def argument_validation_node(state: AgentState) -> AgentState:
         extra={
             "request_id": state.request_id,
             "customer_id": state.customer_id,
-            "tool_name": tool_name
+            "tool_name": tool_name,
         },
     )
 
     missing: list[str] = [
-        arg for arg in spec.required_arguments
+        arg
+        for arg in spec.required_arguments
         if (
             state.extracted_arguments is None
             or state.extracted_arguments.get(arg) is None
@@ -82,15 +83,16 @@ def argument_validation_node(state: AgentState) -> AgentState:
 
     if missing:
         state.needs_clarification = True
-        state.missing_arguments   = missing
+        state.missing_arguments = missing
         logger.info(
             "argument_validation_node: missing required args %s for tool '%s'.",
-            missing, tool_name,
+            missing,
+            tool_name,
             extra={"customer_id": state.customer_id},
         )
     else:
         state.needs_clarification = False
-        state.missing_arguments   = []
+        state.missing_arguments = []
         logger.info(
             "argument_validation_node: all required args present for '%s'.",
             tool_name,

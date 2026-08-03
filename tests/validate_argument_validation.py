@@ -51,6 +51,7 @@ def run_graph(customer_id: str, message: str) -> AgentState:
 # Unit: validation node in isolation — missing ticket_id
 # ---------------------------------------------------------------------------
 
+
 def validate_unit_missing_ticket_id() -> None:
     print("\n[Unit 1] Validation node — get_ticket_tool with no ticket_id extracted")
 
@@ -65,19 +66,18 @@ def validate_unit_missing_ticket_id() -> None:
     )
     state = argument_validation_node(state)
 
-    check("needs_clarification is True",
-          state.needs_clarification is True)
-    check("missing_arguments contains ticket_id",
-          "ticket_id" in state.missing_arguments)
-    check("tool_result not touched",
-          state.tool_result is None)
-    check("response not touched",
-          state.response is None)
+    check("needs_clarification is True", state.needs_clarification is True)
+    check(
+        "missing_arguments contains ticket_id", "ticket_id" in state.missing_arguments
+    )
+    check("tool_result not touched", state.tool_result is None)
+    check("response not touched", state.response is None)
 
 
 # ---------------------------------------------------------------------------
 # Unit: validation node in isolation — ticket_id present
 # ---------------------------------------------------------------------------
+
 
 def validate_unit_ticket_id_present() -> None:
     print("\n[Unit 2] Validation node — get_ticket_tool with ticket_id extracted")
@@ -93,15 +93,14 @@ def validate_unit_ticket_id_present() -> None:
     )
     state = argument_validation_node(state)
 
-    check("needs_clarification is False",
-          state.needs_clarification is False)
-    check("missing_arguments is empty",
-          state.missing_arguments == [])
+    check("needs_clarification is False", state.needs_clarification is False)
+    check("missing_arguments is empty", state.missing_arguments == [])
 
 
 # ---------------------------------------------------------------------------
 # Unit: validation node — create_ticket_tool has no extraction requirements
 # ---------------------------------------------------------------------------
+
 
 def validate_unit_create_ticket_no_requirements() -> None:
     print("\n[Unit 3] Validation node — create_ticket_tool always passes validation")
@@ -117,15 +116,17 @@ def validate_unit_create_ticket_no_requirements() -> None:
     )
     state = argument_validation_node(state)
 
-    check("needs_clarification is False (no extraction required)",
-          state.needs_clarification is False)
-    check("missing_arguments is empty",
-          state.missing_arguments == [])
+    check(
+        "needs_clarification is False (no extraction required)",
+        state.needs_clarification is False,
+    )
+    check("missing_arguments is empty", state.missing_arguments == [])
 
 
 # ---------------------------------------------------------------------------
 # Unit: validation node — no_tool skips validation entirely
 # ---------------------------------------------------------------------------
+
 
 def validate_unit_no_tool_skips_validation() -> None:
     print("\n[Unit 4] Validation node — no_tool skips validation")
@@ -140,16 +141,15 @@ def validate_unit_no_tool_skips_validation() -> None:
     )
     state = argument_validation_node(state)
 
-    check("needs_clarification remains False",
-          state.needs_clarification is False)
-    check("missing_arguments remains empty",
-          state.missing_arguments == [])
+    check("needs_clarification remains False", state.needs_clarification is False)
+    check("missing_arguments remains empty", state.missing_arguments == [])
 
 
 # ---------------------------------------------------------------------------
 # Integration: full graph — ambiguous ticket request (no ID in message)
 # Validates: execution skipped, clarification response produced
 # ---------------------------------------------------------------------------
+
 
 def validate_graph_missing_ticket_id() -> None:
     print("\n[Integration 1] Graph — 'What is the status of my ticket?' (no ID)")
@@ -160,23 +160,20 @@ def validate_graph_missing_ticket_id() -> None:
     )
 
     assert state.tool_decision is not None
-    check("LLM chose get_ticket_tool",
-          state.tool_decision.tool_name == "get_ticket_tool")
+    check(
+        "LLM chose get_ticket_tool", state.tool_decision.tool_name == "get_ticket_tool"
+    )
 
-    check("needs_clarification is True",
-          state.needs_clarification is True)
-    check("ticket_id in missing_arguments",
-          "ticket_id" in state.missing_arguments)
-    check("execution was skipped (tool_used is None)",
-          state.tool_used is None)
-    check("tool_result is None (execution skipped)",
-          state.tool_result is None)
-    check("response is a clarification prompt",
-          bool(state.response))
-    check("response mentions ticket ID",
-          "ticket" in state.response.lower()) # type: ignore
-    check("needs_human is False (missing arg is not a system error)",
-          state.needs_human is False)
+    check("needs_clarification is True", state.needs_clarification is True)
+    check("ticket_id in missing_arguments", "ticket_id" in state.missing_arguments)
+    check("execution was skipped (tool_used is None)", state.tool_used is None)
+    check("tool_result is None (execution skipped)", state.tool_result is None)
+    check("response is a clarification prompt", bool(state.response))
+    check("response mentions ticket ID", "ticket" in state.response.lower())  # type: ignore
+    check(
+        "needs_human is False (missing arg is not a system error)",
+        state.needs_human is False,
+    )
 
     print(f"  ℹ️  Response: {state.response}")
 
@@ -184,6 +181,7 @@ def validate_graph_missing_ticket_id() -> None:
 # ---------------------------------------------------------------------------
 # Integration: full graph — ticket request WITH ID (regression: still works)
 # ---------------------------------------------------------------------------
+
 
 def validate_graph_with_ticket_id() -> None:
     print("\n[Integration 2] Graph — ticket request with ID (validation passes)")
@@ -197,18 +195,14 @@ def validate_graph_with_ticket_id() -> None:
     )
 
     assert state.tool_decision is not None
-    check("LLM chose get_ticket_tool",
-          state.tool_decision.tool_name == "get_ticket_tool")
-    check("needs_clarification is False",
-          state.needs_clarification is False)
-    check("missing_arguments is empty",
-          state.missing_arguments == [])
-    check("execution ran (tool_used populated)",
-          state.tool_used == "get_ticket_tool")
-    check("tool_result is populated",
-          state.tool_result is not None)
-    check("response contains ticket ID",
-          ticket_id in state.response) # type: ignore
+    check(
+        "LLM chose get_ticket_tool", state.tool_decision.tool_name == "get_ticket_tool"
+    )
+    check("needs_clarification is False", state.needs_clarification is False)
+    check("missing_arguments is empty", state.missing_arguments == [])
+    check("execution ran (tool_used populated)", state.tool_used == "get_ticket_tool")
+    check("tool_result is populated", state.tool_result is not None)
+    check("response contains ticket ID", ticket_id in state.response)  # type: ignore
 
     print(f"  ℹ️  Ticket ID: {ticket_id}")
     print(f"  ℹ️  Response:\n{state.response}")
@@ -217,6 +211,7 @@ def validate_graph_with_ticket_id() -> None:
 # ---------------------------------------------------------------------------
 # Integration: create_ticket regression — validation must not block it
 # ---------------------------------------------------------------------------
+
 
 def validate_graph_create_ticket_regression() -> None:
     print("\n[Integration 3] Graph — create_ticket regression after validation added")
@@ -227,16 +222,16 @@ def validate_graph_create_ticket_regression() -> None:
     )
 
     assert state.tool_decision is not None
-    check("LLM chose create_ticket_tool",
-          state.tool_decision.tool_name == "create_ticket_tool")
-    check("needs_clarification is False",
-          state.needs_clarification is False)
-    check("execution ran (tool_used populated)",
-          state.tool_used == "create_ticket_tool")
-    check("ticket created",
-          bool(state.ticket_id))
-    check("response populated",
-          bool(state.response))
+    check(
+        "LLM chose create_ticket_tool",
+        state.tool_decision.tool_name == "create_ticket_tool",
+    )
+    check("needs_clarification is False", state.needs_clarification is False)
+    check(
+        "execution ran (tool_used populated)", state.tool_used == "create_ticket_tool"
+    )
+    check("ticket created", bool(state.ticket_id))
+    check("response populated", bool(state.response))
 
     print(f"  ℹ️  Ticket ID: {state.ticket_id}")
 
@@ -244,6 +239,7 @@ def validate_graph_create_ticket_regression() -> None:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print("=" * 60)

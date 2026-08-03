@@ -3,7 +3,6 @@ from app.schemas.order_summary import OrderSummary
 
 
 class OrderMapper:
-
     @staticmethod
     def to_summary(order: Order) -> OrderSummary:
         return OrderSummary(

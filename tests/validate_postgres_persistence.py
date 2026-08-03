@@ -52,6 +52,7 @@ def check(label: str, condition: bool) -> None:
 # Scenario 1: Create and retrieve a ticket via fresh service instances
 # ---------------------------------------------------------------------------
 
+
 def validate_ticket_persistence() -> None:
     print("\n[Scenario 1] Ticket persists across service instances")
 
@@ -108,6 +109,7 @@ def validate_ticket_persistence() -> None:
 # Scenario 2: get_ticket returns None for unknown ID
 # ---------------------------------------------------------------------------
 
+
 def validate_ticket_not_found() -> None:
     print("\n[Scenario 2] get_ticket returns None for unknown ticket")
 
@@ -124,6 +126,7 @@ def validate_ticket_not_found() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 3: Conversation history persists across service instances
 # ---------------------------------------------------------------------------
+
 
 def validate_conversation_persistence() -> None:
     print("\n[Scenario 3] Conversation history persists across service instances")
@@ -157,10 +160,7 @@ def validate_conversation_persistence() -> None:
         "TICKET-TEST123" in history[1].content,
     )
 
-    print(
-        f"  ℹ️  Customer: {customer_id}, "
-        f"messages: {len(history)}"
-    )
+    print(f"  ℹ️  Customer: {customer_id}, messages: {len(history)}")
 
     service2.clear_history(customer_id)
 
@@ -168,6 +168,7 @@ def validate_conversation_persistence() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 4: Multiple turns accumulate in order
 # ---------------------------------------------------------------------------
+
 
 def validate_conversation_ordering() -> None:
     print("\n[Scenario 4] Conversation messages are ordered chronologically")
@@ -206,21 +207,16 @@ def validate_conversation_ordering() -> None:
 
     service.clear_history(customer_id)
 
-    print(
-        f"  ℹ️  Customer: {customer_id}, "
-        f"verified order of {len(history)} messages"
-    )
+    print(f"  ℹ️  Customer: {customer_id}, verified order of {len(history)} messages")
 
 
 # ---------------------------------------------------------------------------
 # Scenario 5: Two different customers have isolated history
 # ---------------------------------------------------------------------------
 
+
 def validate_customer_isolation() -> None:
-    print(
-        "\n[Scenario 5] Different customers have isolated "
-        "conversation histories"
-    )
+    print("\n[Scenario 5] Different customers have isolated conversation histories")
 
     c1 = f"ISO-A-{uuid.uuid4().hex[:4]}"
     c2 = f"ISO-B-{uuid.uuid4().hex[:4]}"
@@ -271,6 +267,7 @@ def validate_customer_isolation() -> None:
 # Scenario 6: get_session automatically commits transactions
 # ---------------------------------------------------------------------------
 
+
 def validate_transaction_commit() -> None:
     print("\n[Scenario 6] get_session automatically commits transactions")
 
@@ -313,6 +310,7 @@ def validate_transaction_commit() -> None:
 # Entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     print("=" * 60)
     print("  Milestone 11.5 — PostgreSQL Persistence Validation")
@@ -325,10 +323,7 @@ def main() -> None:
 
     except Exception as e:
         print(f"\n  ❌  Could not connect to PostgreSQL: {e}")
-        print(
-            "  Make sure PostgreSQL is running and "
-            "DATABASE_URL is set in .env"
-        )
+        print("  Make sure PostgreSQL is running and DATABASE_URL is set in .env")
         sys.exit(1)
 
     try:
@@ -357,4 +352,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

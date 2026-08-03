@@ -32,7 +32,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from app.schemas.agent_state import AgentState
-from app.schemas.escalation import CreateEscalationRequest, EscalationQueue
+from app.schemas.escalation import EscalationQueue
 from app.tools.escalation_tools import create_escalation_tool
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def escalate_node(state: AgentState) -> AgentState:
     Writes: state.escalation_response, state.response
     """
     reason = state.escalation_reason or "Human assistance requested."
-    queue  = state.escalation_queue  or EscalationQueue.GENERAL.value
+    queue = state.escalation_queue or EscalationQueue.GENERAL.value
 
     try:
         escalation = create_escalation_tool(
@@ -71,18 +71,19 @@ def escalate_node(state: AgentState) -> AgentState:
         logger.info(
             "escalate_node: escalation created.",
             extra={
-                "request_id":    state.request_id,
-                "customer_id":   state.customer_id,
+                "request_id": state.request_id,
+                "customer_id": state.customer_id,
                 "escalation_id": escalation.escalation_id,
-                "queue":         queue,
+                "queue": queue,
             },
         )
 
     except Exception as e:
         logger.error(
-            "escalate_node: failed to create escalation: %s", repr(e),
+            "escalate_node: failed to create escalation: %s",
+            repr(e),
             extra={
-                "request_id":  state.request_id,
+                "request_id": state.request_id,
                 "customer_id": state.customer_id,
             },
         )

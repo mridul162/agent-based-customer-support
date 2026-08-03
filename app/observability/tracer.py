@@ -103,9 +103,7 @@ class ExecutionTracer:
         finished = datetime.now(UTC)
 
         node.finished_at = finished
-        node.duration_ms = (
-            finished - node.started_at
-        ).total_seconds() * 1000
+        node.duration_ms = (finished - node.started_at).total_seconds() * 1000
 
         node.status = "completed"
 
@@ -128,9 +126,7 @@ class ExecutionTracer:
         finished = datetime.now(UTC)
 
         node.finished_at = finished
-        node.duration_ms = (
-            finished - node.started_at
-        ).total_seconds() * 1000
+        node.duration_ms = (finished - node.started_at).total_seconds() * 1000
 
         node.status = "failed"
         node.error = f"{type(error).__name__}: {error}"
@@ -148,10 +144,7 @@ class ExecutionTracer:
         """
 
         for node in reversed(trace.nodes):
-            if (
-                node.node_name == node_name
-                and node.status == "running"
-            ):
+            if node.node_name == node_name and node.status == "running":
                 return node
 
         return None

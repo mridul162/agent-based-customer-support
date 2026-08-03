@@ -12,11 +12,7 @@ from evaluation.runners.multiagent_workflow_runner import (
 
 
 def run_evaluation() -> str:
-    dataset = (
-        Path(__file__).parent.parent
-        / "datasets"
-        / "multiagent_workflow.json"
-    )
+    dataset = Path(__file__).parent.parent / "datasets" / "multiagent_workflow.json"
 
     runner = MultiAgentWorkflowRunner(
         dataset_path=str(dataset),
@@ -24,9 +20,7 @@ def run_evaluation() -> str:
     )
 
     execution_results = runner.run()
-    evaluation_results = MultiAgentWorkflowEvaluator().evaluate(
-        execution_results
-    )
+    evaluation_results = MultiAgentWorkflowEvaluator().evaluate(execution_results)
     summary = EvaluationMetrics().compute(evaluation_results)
 
     return ReportGenerator().generate(

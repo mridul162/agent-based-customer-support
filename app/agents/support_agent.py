@@ -37,11 +37,11 @@ Key rule:
     AgentResponse = external contract         (the only thing callers see).
 """
 
-from typing import Callable
+from collections.abc import Callable
 
+from app.agents.intent_classifier import classifier
 from app.schemas.agent import AgentResponse, Intent
 from app.schemas.agent_state import AgentState
-from app.agents.intent_classifier import classifier
 from app.tools.ticket_tools import create_ticket_tool
 
 # Type alias for handler functions (nodes).
@@ -113,9 +113,9 @@ class SupportAgent:
             customer_id=state.customer_id,
             issue=state.message,
         )
-        state.tool_used  = "create_ticket_tool"
-        state.ticket_id  = ticket.ticket_id
-        state.response   = (
+        state.tool_used = "create_ticket_tool"
+        state.ticket_id = ticket.ticket_id
+        state.response = (
             f"I've raised a refund request for you. "
             f"Your ticket ID is {ticket.ticket_id}. "
             f"Our team will review it and get back to you shortly."
@@ -127,9 +127,9 @@ class SupportAgent:
             customer_id=state.customer_id,
             issue=state.message,
         )
-        state.tool_used  = "create_ticket_tool"
-        state.ticket_id  = ticket.ticket_id
-        state.response   = (
+        state.tool_used = "create_ticket_tool"
+        state.ticket_id = ticket.ticket_id
+        state.response = (
             f"I've logged a delivery issue for you. "
             f"Your ticket ID is {ticket.ticket_id}. "
             f"We'll investigate and update you as soon as possible."
@@ -141,9 +141,9 @@ class SupportAgent:
             customer_id=state.customer_id,
             issue=state.message,
         )
-        state.tool_used  = "create_ticket_tool"
-        state.ticket_id  = ticket.ticket_id
-        state.response   = (
+        state.tool_used = "create_ticket_tool"
+        state.ticket_id = ticket.ticket_id
+        state.response = (
             f"I've created a support ticket for your order issue. "
             f"Your ticket ID is {ticket.ticket_id}. "
             f"A support specialist will follow up with you soon."
@@ -174,9 +174,9 @@ class SupportAgent:
     @property
     def _INTENT_HANDLERS(self) -> dict[Intent, HandlerFn]:
         return {
-            Intent.REFUND_REQUEST:  self._handle_refund_request,
-            Intent.DELIVERY_ISSUE:  self._handle_delivery_issue,
-            Intent.ORDER_ISSUE:     self._handle_order_issue,
+            Intent.REFUND_REQUEST: self._handle_refund_request,
+            Intent.DELIVERY_ISSUE: self._handle_delivery_issue,
+            Intent.ORDER_ISSUE: self._handle_order_issue,
             Intent.GENERAL_INQUIRY: self._handle_general_inquiry,
         }
 

@@ -34,11 +34,13 @@ from app.schemas.ticket import TicketStatus
 class Ticket(Base):
     __tablename__ = "tickets"
 
-    ticket_id:   Mapped[str]          = mapped_column(String,           primary_key=True)
-    customer_id: Mapped[str]          = mapped_column(String,           nullable=False, index=True)
-    issue:       Mapped[str]          = mapped_column(Text,             nullable=False)
-    status:      Mapped[TicketStatus] = mapped_column(Enum(TicketStatus), nullable=False, default=TicketStatus.OPEN)
-    created_at:  Mapped[datetime]     = mapped_column(
+    ticket_id: Mapped[str] = mapped_column(String, primary_key=True)
+    customer_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    issue: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[TicketStatus] = mapped_column(
+        Enum(TicketStatus), nullable=False, default=TicketStatus.OPEN
+    )
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.now(timezone.utc),

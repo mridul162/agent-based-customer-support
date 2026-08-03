@@ -18,5 +18,5 @@ from enum import Enum
 
 class AgentType(str, Enum):
     TICKET = "ticket_agent"
-    ORDER  = "order_agent"
-    FAQ    = "faq_agent"
+    ORDER = "order_agent"
+    FAQ = "faq_agent"

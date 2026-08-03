@@ -41,14 +41,15 @@ import sys
 
 from fastapi import FastAPI
 
-from app.api.routes.support import build_health_report, router as support_router
+from app.api.routes.support import build_health_report
+from app.api.routes.support import router as support_router
 from app.config.settings import settings
 from app.database.init_db import init_db
-
 
 # ---------------------------------------------------------------------------
 # Logging Configuration
 # ---------------------------------------------------------------------------
+
 
 def configure_logging() -> None:
     """
@@ -68,9 +69,9 @@ def configure_logging() -> None:
 
         def filter(self, record: logging.LogRecord) -> bool:
             if not hasattr(record, "request_id"):
-                record.request_id = "-"      # type: ignore[attr-defined]
+                record.request_id = "-"  # type: ignore[attr-defined]
             if not hasattr(record, "customer_id"):
-                record.customer_id = "-"     # type: ignore[attr-defined]
+                record.customer_id = "-"  # type: ignore[attr-defined]
             return True
 
     formatter = logging.Formatter(
@@ -106,6 +107,7 @@ logger = logging.getLogger(__name__)
 # Application Factory
 # ---------------------------------------------------------------------------
 
+
 def create_app() -> FastAPI:
     application = FastAPI(
         title="Multi-Agent Customer Support Platform",
@@ -125,13 +127,19 @@ def create_app() -> FastAPI:
         logger.info("Application startup: validating deployment dependencies.")
         if settings.app_env == "production":
             failed_checks = [
-                name for name, check in health_report["checks"].items() if check["status"] != "ok"
+                name
+                for name, check in health_report["checks"].items()
+                if check["status"] != "ok"
             ]
             if failed_checks:
-                raise RuntimeError(f"Startup validation failed: {', '.join(failed_checks)}")
+                raise RuntimeError(
+                    f"Startup validation failed: {', '.join(failed_checks)}"
+                )
 
         if health_report["status"] != "ok":
-            logger.warning("Startup validation reported degraded health: %s", health_report)
+            logger.warning(
+                "Startup validation reported degraded health: %s", health_report
+            )
 
         logger.info("Application startup: initialising database tables.")
         init_db()

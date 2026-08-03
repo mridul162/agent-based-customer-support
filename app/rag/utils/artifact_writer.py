@@ -35,26 +35,20 @@ import sys
 sys.stdout.reconfigure(encoding="utf-8")
 
 from pathlib import Path
-from typing import List
-
 
 # ---------------------------------------------------------
 # ARTIFACT WRITER
 # ---------------------------------------------------------
+
 
 class ArtifactWriter:
     """
     Writes ingestion artifacts to disk.
     """
 
-    def __init__(
-        self,
-        artifacts_root: str = "artifacts"
-    ):
+    def __init__(self, artifacts_root: str = "artifacts"):
 
-        self.artifacts_root = Path(
-            artifacts_root
-        )
+        self.artifacts_root = Path(artifacts_root)
 
         self._initialize_directories()
 
@@ -74,29 +68,15 @@ class ArtifactWriter:
         artifact_data = []
 
         for section in sections:
-
-            artifact_data.append({
-
-                "heading": (
-                    section.heading
-                ),
-
-                "level": (
-                    section.level
-                ),
-
-                "section_id": (
-                    section.section_id
-                ),
-
-                "heading_path": (
-                    section.heading_path
-                ),
-
-                "content": (
-                    section.content
-                ),
-            })
+            artifact_data.append(
+                {
+                    "heading": (section.heading),
+                    "level": (section.level),
+                    "section_id": (section.section_id),
+                    "heading_path": (section.heading_path),
+                    "content": (section.content),
+                }
+            )
 
         output_path = (
             self.artifacts_root
@@ -106,10 +86,7 @@ class ArtifactWriter:
             / f"{source_file}.json"
         )
 
-        self._write_json(
-            output_path,
-            artifact_data
-        )
+        self._write_json(output_path, artifact_data)
 
     # -----------------------------------------------------
 
@@ -127,29 +104,15 @@ class ArtifactWriter:
         artifact_data = []
 
         for section in sections:
-
-            artifact_data.append({
-
-                "heading": (
-                    section.heading
-                ),
-
-                "level": (
-                    section.level
-                ),
-
-                "section_id": (
-                    section.section_id
-                ),
-
-                "heading_path": (
-                    section.heading_path
-                ),
-
-                "content": (
-                    section.content
-                ),
-            })
+            artifact_data.append(
+                {
+                    "heading": (section.heading),
+                    "level": (section.level),
+                    "section_id": (section.section_id),
+                    "heading_path": (section.heading_path),
+                    "content": (section.content),
+                }
+            )
 
         output_path = (
             self.artifacts_root
@@ -159,10 +122,7 @@ class ArtifactWriter:
             / f"{source_file}.json"
         )
 
-        self._write_json(
-            output_path,
-            artifact_data
-        )
+        self._write_json(output_path, artifact_data)
 
     # -----------------------------------------------------
 
@@ -180,21 +140,13 @@ class ArtifactWriter:
         artifact_data = []
 
         for chunk in chunks:
-
-            artifact_data.append({
-
-                "chunk_id": (
-                    chunk.chunk_id
-                ),
-
-                "text": (
-                    chunk.text
-                ),
-
-                "metadata": (
-                    chunk.metadata
-                ),
-            })
+            artifact_data.append(
+                {
+                    "chunk_id": (chunk.chunk_id),
+                    "text": (chunk.text),
+                    "metadata": (chunk.metadata),
+                }
+            )
 
         output_path = (
             self.artifacts_root
@@ -204,10 +156,7 @@ class ArtifactWriter:
             / f"{source_file}.json"
         )
 
-        self._write_json(
-            output_path,
-            artifact_data
-        )
+        self._write_json(output_path, artifact_data)
 
     # -----------------------------------------------------
 
@@ -220,16 +169,9 @@ class ArtifactWriter:
         Persist pipeline execution logs.
         """
 
-        output_path = (
-            self.artifacts_root
-            / "pipeline_logs"
-            / filename
-        )
+        output_path = self.artifacts_root / "pipeline_logs" / filename
 
-        self._write_json(
-            output_path,
-            log_data
-        )
+        self._write_json(output_path, log_data)
 
     # -----------------------------------------------------
 
@@ -247,12 +189,7 @@ class ArtifactWriter:
             exist_ok=True,
         )
 
-        with open(
-            output_path,
-            "w",
-            encoding="utf-8"
-        ) as f:
-
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(
                 data,
                 f,
@@ -262,30 +199,20 @@ class ArtifactWriter:
 
     # -----------------------------------------------------
 
-    def _initialize_directories(
-        self
-    ):
+    def _initialize_directories(self):
         """
         Create artifact directory structure.
         """
 
         directories = [
-
             "parsed",
-
             "normalized",
-
             "chunked",
-
             "pipeline_logs",
         ]
 
         for directory in directories:
-
-            path = (
-                self.artifacts_root
-                / directory
-            )
+            path = self.artifacts_root / directory
 
             path.mkdir(
                 parents=True,
@@ -298,9 +225,8 @@ class ArtifactWriter:
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
-
     from dataclasses import dataclass
-    from typing import Dict, Any, Optional
+    from typing import Any
 
     # -----------------------------------------------------
     # Mock Models
@@ -308,67 +234,41 @@ if __name__ == "__main__":
 
     @dataclass
     class ParsedSection:
-
         heading: str
         level: int
         content: str
-        heading_path: List[str]
-        section_id: Optional[str] = None
+        heading_path: list[str]
+        section_id: str | None = None
 
     @dataclass
     class Chunk:
-
         chunk_id: str
         text: str
-        metadata: Dict[str, Any]
+        metadata: dict[str, Any]
 
     # -----------------------------------------------------
     # Sample Data
     # -----------------------------------------------------
 
     sections = [
-
         ParsedSection(
-
             heading="Benefits",
-
             level=2,
-
             section_id="benefits",
-
-            heading_path=[
-                "Overview",
-                "Benefits"
-            ],
-
-            content=(
-                "Rich in natural antioxidants."
-            )
+            heading_path=["Overview", "Benefits"],
+            content=("Rich in natural antioxidants."),
         )
     ]
 
     chunks = [
-
         Chunk(
-
             chunk_id="chunk_001",
-
-            text=(
-                "Rich in natural antioxidants."
-            ),
-
+            text=("Rich in natural antioxidants."),
             metadata={
-
-                "product_id": (
-                    "kholisha_honey"
-                ),
-
+                "product_id": ("kholisha_honey"),
                 "category": "honey",
-
-                "source_file": (
-                    "benefits.md"
-                ),
-            }
+                "source_file": ("benefits.md"),
+            },
         )
     ]
 
@@ -379,37 +279,22 @@ if __name__ == "__main__":
     writer = ArtifactWriter()
 
     writer.write_parsed_sections(
-
-        sections=sections,
-
-        product_id="kholisha_honey",
-
-        source_file="benefits"
+        sections=sections, product_id="kholisha_honey", source_file="benefits"
     )
 
     writer.write_normalized_sections(
-
-        sections=sections,
-
-        product_id="kholisha_honey",
-
-        source_file="benefits"
+        sections=sections, product_id="kholisha_honey", source_file="benefits"
     )
 
     writer.write_chunks(
-
-        chunks=chunks,
-
-        product_id="kholisha_honey",
-
-        source_file="benefits"
+        chunks=chunks, product_id="kholisha_honey", source_file="benefits"
     )
 
-    writer.write_pipeline_log({
-
-        "status": "success",
-
-        "documents_processed": 1,
-    })
+    writer.write_pipeline_log(
+        {
+            "status": "success",
+            "documents_processed": 1,
+        }
+    )
 
     print("\nArtifacts written successfully.")

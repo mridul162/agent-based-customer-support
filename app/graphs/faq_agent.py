@@ -73,9 +73,7 @@ def faq_answer_node(state: AgentState) -> AgentState:
                     tool_name=_TOOL_NAME,
                     started_at=started,
                     finished_at=finished,
-                    duration_ms=(
-                        finished - started
-                    ).total_seconds() * 1000,
+                    duration_ms=(finished - started).total_seconds() * 1000,
                     success=True,
                 )
             )
@@ -100,9 +98,7 @@ def faq_answer_node(state: AgentState) -> AgentState:
                     tool_name=_TOOL_NAME,
                     started_at=started,
                     finished_at=finished,
-                    duration_ms=(
-                        finished - started
-                    ).total_seconds() * 1000,
+                    duration_ms=(finished - started).total_seconds() * 1000,
                     success=False,
                     error=str(exc),
                 )

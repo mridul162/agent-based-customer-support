@@ -77,9 +77,7 @@ class BaseEvaluator(ABC):
         results: list[EvaluationResult] = []
 
         for execution_result in execution_results:
-            results.append(
-                self._evaluate_case(execution_result)
-            )
+            results.append(self._evaluate_case(execution_result))
 
         return results
 

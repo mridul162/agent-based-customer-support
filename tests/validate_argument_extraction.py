@@ -44,26 +44,30 @@ def run_extraction(message: str) -> AgentState:
 # Case 1: Standard uppercase ticket ID
 # ---------------------------------------------------------------------------
 
+
 def validate_standard_ticket_id() -> None:
     print('\n[Case 1] Standard ticket ID — "TICKET-123"')
 
     state = run_extraction("What's the status of ticket TICKET-123?")
 
-    check("extracted_arguments is populated",
-          state.extracted_arguments is not None)
+    check("extracted_arguments is populated", state.extracted_arguments is not None)
     assert state.extracted_arguments is not None
 
-    check("ticket_id is found",
-          state.extracted_arguments.has("ticket_id"))
-    check("ticket_id value is correct",
-          state.extracted_arguments.get("ticket_id") == "TICKET-123")
-    check("no extra keys extracted",
-          list(state.extracted_arguments.values.keys()) == ["ticket_id"])
+    check("ticket_id is found", state.extracted_arguments.has("ticket_id"))
+    check(
+        "ticket_id value is correct",
+        state.extracted_arguments.get("ticket_id") == "TICKET-123",
+    )
+    check(
+        "no extra keys extracted",
+        list(state.extracted_arguments.values.keys()) == ["ticket_id"],
+    )
 
 
 # ---------------------------------------------------------------------------
 # Case 2: Lowercase ticket ID — normalised to uppercase
 # ---------------------------------------------------------------------------
+
 
 def validate_lowercase_ticket_id() -> None:
     print('\n[Case 2] Lowercase ticket ID normalised — "ticket-abc123"')
@@ -71,15 +75,17 @@ def validate_lowercase_ticket_id() -> None:
     state = run_extraction("I have a question about ticket-abc123")
 
     assert state.extracted_arguments is not None
-    check("ticket_id is found",
-          state.extracted_arguments.has("ticket_id"))
-    check("ticket_id normalised to uppercase",
-          state.extracted_arguments.get("ticket_id") == "TICKET-ABC123")
+    check("ticket_id is found", state.extracted_arguments.has("ticket_id"))
+    check(
+        "ticket_id normalised to uppercase",
+        state.extracted_arguments.get("ticket_id") == "TICKET-ABC123",
+    )
 
 
 # ---------------------------------------------------------------------------
 # Case 3: Alphanumeric ticket ID (matches real generated IDs like TICKET-34D61027)
 # ---------------------------------------------------------------------------
+
 
 def validate_alphanumeric_ticket_id() -> None:
     print('\n[Case 3] Alphanumeric ticket ID — "TICKET-34D61027"')
@@ -87,15 +93,17 @@ def validate_alphanumeric_ticket_id() -> None:
     state = run_extraction("Can you update ticket TICKET-34D61027 for me?")
 
     assert state.extracted_arguments is not None
-    check("ticket_id is found",
-          state.extracted_arguments.has("ticket_id"))
-    check("ticket_id value is correct",
-          state.extracted_arguments.get("ticket_id") == "TICKET-34D61027")
+    check("ticket_id is found", state.extracted_arguments.has("ticket_id"))
+    check(
+        "ticket_id value is correct",
+        state.extracted_arguments.get("ticket_id") == "TICKET-34D61027",
+    )
 
 
 # ---------------------------------------------------------------------------
 # Case 4: No ticket ID in message — empty extraction is valid
 # ---------------------------------------------------------------------------
+
 
 def validate_no_ticket_id() -> None:
     print('\n[Case 4] No entity in message — "Hello"')
@@ -103,28 +111,27 @@ def validate_no_ticket_id() -> None:
     state = run_extraction("Hello")
 
     assert state.extracted_arguments is not None
-    check("extracted_arguments is populated (even when empty)",
-          state.extracted_arguments is not None)
-    check("no ticket_id found",
-          not state.extracted_arguments.has("ticket_id"))
-    check("values dict is empty",
-          state.extracted_arguments.values == {})
+    check(
+        "extracted_arguments is populated (even when empty)",
+        state.extracted_arguments is not None,
+    )
+    check("no ticket_id found", not state.extracted_arguments.has("ticket_id"))
+    check("values dict is empty", state.extracted_arguments.values == {})
 
 
 # ---------------------------------------------------------------------------
 # Case 5: Refund message with no ticket ID — extraction finds nothing
 # ---------------------------------------------------------------------------
 
+
 def validate_refund_no_ticket() -> None:
-    print('\n[Case 5] Refund request without ticket ID — empty extraction')
+    print("\n[Case 5] Refund request without ticket ID — empty extraction")
 
     state = run_extraction("I want a refund for my last order.")
 
     assert state.extracted_arguments is not None
-    check("no ticket_id extracted",
-          not state.extracted_arguments.has("ticket_id"))
-    check("values dict is empty",
-          state.extracted_arguments.values == {})
+    check("no ticket_id extracted", not state.extracted_arguments.has("ticket_id"))
+    check("values dict is empty", state.extracted_arguments.values == {})
 
 
 # ---------------------------------------------------------------------------
@@ -134,8 +141,9 @@ def validate_refund_no_ticket() -> None:
 # and confirm ticket_id is still extracted if present.
 # ---------------------------------------------------------------------------
 
+
 def validate_extraction_independent_of_tool_decision() -> None:
-    print('\n[Case 6] Extraction independent of tool_decision')
+    print("\n[Case 6] Extraction independent of tool_decision")
 
     # tool_decision is deliberately left None — simulating a state
     # where the decision node hasn't run yet or chose no_tool.
@@ -148,84 +156,98 @@ def validate_extraction_independent_of_tool_decision() -> None:
     state = argument_extraction_node(state)
 
     assert state.extracted_arguments is not None
-    check("ticket_id extracted even with no tool_decision",
-          state.extracted_arguments.has("ticket_id"))
-    check("ticket_id value correct",
-          state.extracted_arguments.get("ticket_id") == "TICKET-999")
-    check("tool_decision still None (extraction didn't touch it)",
-          state.tool_decision is None)
+    check(
+        "ticket_id extracted even with no tool_decision",
+        state.extracted_arguments.has("ticket_id"),
+    )
+    check(
+        "ticket_id value correct",
+        state.extracted_arguments.get("ticket_id") == "TICKET-999",
+    )
+    check(
+        "tool_decision still None (extraction didn't touch it)",
+        state.tool_decision is None,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Case 7: Ticket ID mid-sentence, no surrounding whitespace boundary issues
 # ---------------------------------------------------------------------------
 
+
 def validate_ticket_id_mid_sentence() -> None:
-    print('\n[Case 7] Ticket ID embedded in sentence')
+    print("\n[Case 7] Ticket ID embedded in sentence")
 
     state = run_extraction("Please check TICKET-XYZ999 as soon as possible.")
 
     assert state.extracted_arguments is not None
-    check("ticket_id found mid-sentence",
-          state.extracted_arguments.has("ticket_id"))
-    check("ticket_id value correct",
-          state.extracted_arguments.get("ticket_id") == "TICKET-XYZ999")
+    check("ticket_id found mid-sentence", state.extracted_arguments.has("ticket_id"))
+    check(
+        "ticket_id value correct",
+        state.extracted_arguments.get("ticket_id") == "TICKET-XYZ999",
+    )
 
 
 # ---------------------------------------------------------------------------
 # Case 8: get() convenience method returns default for missing keys
 # ---------------------------------------------------------------------------
 
+
 def validate_get_default() -> None:
-    print('\n[Case 8] .get() returns default for missing entity')
+    print("\n[Case 8] .get() returns default for missing entity")
 
     state = run_extraction("I need help with my account.")
 
     assert state.extracted_arguments is not None
     result = state.extracted_arguments.get("ticket_id", "NOT_FOUND")
-    check(".get() returns default when key absent",
-          result == "NOT_FOUND")
+    check(".get() returns default when key absent", result == "NOT_FOUND")
 
     result_none = state.extracted_arguments.get("order_id")
-    check(".get() returns None by default when key absent",
-          result_none is None)
+    check(".get() returns None by default when key absent", result_none is None)
 
 
 # ---------------------------------------------------------------------------
 # Case 9: State fields not written by extraction remain untouched
 # ---------------------------------------------------------------------------
 
+
 def validate_state_isolation() -> None:
-    print('\n[Case 9] Extraction only writes extracted_arguments — other fields untouched')
+    print(
+        "\n[Case 9] Extraction only writes extracted_arguments — other fields untouched"
+    )
 
     state = run_extraction("Check ticket TICKET-555 please.")
 
-    check("customer_id unchanged",       state.customer_id == "TEST")
-    check("message unchanged",           "TICKET-555" in state.message)
-    check("tool_decision still None",    state.tool_decision is None)
-    check("tool_result still None",      state.tool_result is None)
-    check("tool_used still None",        state.tool_used is None)
-    check("response still None",         state.response is None)
-    check("needs_human still False",     state.needs_human is False)
-    check("ticket_id on state still None",  state.ticket_id is None)
+    check("customer_id unchanged", state.customer_id == "TEST")
+    check("message unchanged", "TICKET-555" in state.message)
+    check("tool_decision still None", state.tool_decision is None)
+    check("tool_result still None", state.tool_result is None)
+    check("tool_used still None", state.tool_used is None)
+    check("response still None", state.response is None)
+    check("needs_human still False", state.needs_human is False)
+    check("ticket_id on state still None", state.ticket_id is None)
 
 
 # ---------------------------------------------------------------------------
 # Case 10: Multiple ticket IDs — first match wins (business decision)
 # ---------------------------------------------------------------------------
 
+
 def validate_first_match_wins() -> None:
-    print('\n[Case 10] Multiple ticket IDs — first match wins')
+    print("\n[Case 10] Multiple ticket IDs — first match wins")
 
     state = run_extraction("Check TICKET-111 and also TICKET-222 please.")
 
     assert state.extracted_arguments is not None
-    check("ticket_id is found",
-          state.extracted_arguments.has("ticket_id"))
-    check("first ticket ID is returned (TICKET-111, not TICKET-222)",
-          state.extracted_arguments.get("ticket_id") == "TICKET-111")
-    check("only one ticket_id key present (no TICKET-222)",
-          list(state.extracted_arguments.values.keys()) == ["ticket_id"])
+    check("ticket_id is found", state.extracted_arguments.has("ticket_id"))
+    check(
+        "first ticket ID is returned (TICKET-111, not TICKET-222)",
+        state.extracted_arguments.get("ticket_id") == "TICKET-111",
+    )
+    check(
+        "only one ticket_id key present (no TICKET-222)",
+        list(state.extracted_arguments.values.keys()) == ["ticket_id"],
+    )
 
     # Why first-match-wins?
     # When a customer mentions two ticket IDs, it's ambiguous which one
@@ -238,6 +260,7 @@ def validate_first_match_wins() -> None:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print("=" * 60)

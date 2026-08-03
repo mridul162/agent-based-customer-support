@@ -90,11 +90,11 @@ def router_node(state: AgentState) -> AgentState:
 
         completion = client.beta.chat.completions.parse(
             model=settings.openai_model,
-            temperature=0,      # Routing is deterministic — same message, same agent.
-            max_tokens=150,     # agent_name + reasoning is very short.
+            temperature=0,  # Routing is deterministic — same message, same agent.
+            max_tokens=150,  # agent_name + reasoning is very short.
             messages=[
                 {"role": "system", "content": ROUTER_SYSTEM_PROMPT},
-                {"role": "user",   "content": state.message},
+                {"role": "user", "content": state.message},
             ],
             response_format=RoutingDecision,
         )
@@ -107,7 +107,8 @@ def router_node(state: AgentState) -> AgentState:
     except Exception as e:
         logger.error(
             "router_node failed: %s — falling back to '%s'.",
-            repr(e), _FALLBACK_AGENT,
+            repr(e),
+            _FALLBACK_AGENT,
             extra={
                 "request_id": state.request_id,
                 "customer_id": state.customer_id,
@@ -131,7 +132,7 @@ def router_node(state: AgentState) -> AgentState:
             "request_id": state.request_id,
             "customer_id": state.customer_id,
             "agent_name": routing_decision.agent_name,
-            "reasoning":  routing_decision.reasoning,
+            "reasoning": routing_decision.reasoning,
         },
     )
 

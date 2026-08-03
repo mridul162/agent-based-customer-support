@@ -31,7 +31,6 @@ from app.rag.generators.answer_generator import AnswerGenerator
 from app.rag.models.retrieval_models import RetrievedChunk
 from app.schemas.execution_trace import ExecutionTrace
 
-
 PASS = "PASS"
 FAIL = "FAIL"
 
@@ -125,11 +124,7 @@ class FakeChatCompletions:
             answer = "I couldn't find that information in the knowledge base."
 
         return SimpleNamespace(
-            choices=[
-                SimpleNamespace(
-                    message=SimpleNamespace(content=answer)
-                )
-            ],
+            choices=[SimpleNamespace(message=SimpleNamespace(content=answer))],
             usage=SimpleNamespace(
                 prompt_tokens=120,
                 completion_tokens=35,
@@ -140,9 +135,7 @@ class FakeChatCompletions:
 
 class FakeOpenAIClient:
     def __init__(self):
-        self.chat = SimpleNamespace(
-            completions=FakeChatCompletions()
-        )
+        self.chat = SimpleNamespace(completions=FakeChatCompletions())
 
 
 def build_trace() -> ExecutionTrace:
@@ -158,7 +151,7 @@ def generate_answer(
 ) -> tuple[str, ExecutionTrace, float]:
     trace = build_trace()
     generator = AnswerGenerator(
-        retrieval_pipeline=FakeRetrievalPipeline(), #type: ignore
+        retrieval_pipeline=FakeRetrievalPipeline(),  # type: ignore
         model_name="gpt-4o-mini",
     )
 
@@ -207,9 +200,7 @@ def validate_shipping_answer() -> None:
 def validate_unknown_answer() -> None:
     print("[3] Unknown grounded answer")
 
-    answer, _, _ = generate_answer(
-        "What is your office location in New York?"
-    )
+    answer, _, _ = generate_answer("What is your office location in New York?")
     lowered = answer.lower()
 
     check(

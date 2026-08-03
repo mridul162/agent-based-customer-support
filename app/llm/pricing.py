@@ -88,13 +88,8 @@ class ModelPricing:
 
 PRICING: dict[str, dict[str, ModelPricing]] = {
     "openai": {
-        "gpt-4o": ModelPricing(
-            input_price=2.50, 
-            output_price=10.00),
-            
-        "gpt-4o-mini": ModelPricing(
-            input_price=0.15, 
-            output_price=0.60),
+        "gpt-4o": ModelPricing(input_price=2.50, output_price=10.00),
+        "gpt-4o-mini": ModelPricing(input_price=0.15, output_price=0.60),
     },
     # "anthropic": {...},
     # "google": {...},
@@ -130,10 +125,7 @@ def estimate_cost(
         Returns None if pricing information is unavailable.
     """
 
-    if (
-        prompt_tokens is None
-        or completion_tokens is None
-    ):
+    if prompt_tokens is None or completion_tokens is None:
         return None
 
     provider = provider.lower()
@@ -146,13 +138,9 @@ def estimate_cost(
     if pricing is None:
         return None
 
-    input_cost = (
-        prompt_tokens / 1_000_000
-    ) * pricing.input_price
+    input_cost = (prompt_tokens / 1_000_000) * pricing.input_price
 
-    output_cost = (
-        completion_tokens / 1_000_000
-    ) * pricing.output_price
+    output_cost = (completion_tokens / 1_000_000) * pricing.output_price
 
     return round(
         input_cost + output_cost,

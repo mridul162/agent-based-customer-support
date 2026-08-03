@@ -25,30 +25,43 @@ def extract_execution_details(response: Any) -> dict[str, Any]:
             "needs_clarification": None,
         }
 
-    execution = response.get("execution") if isinstance(response.get("execution"), dict) else None
+    execution = (
+        response.get("execution")
+        if isinstance(response.get("execution"), dict)
+        else None
+    )
     if execution is None:
-        execution = response.get("metadata") if isinstance(response.get("metadata"), dict) else None
+        execution = (
+            response.get("metadata")
+            if isinstance(response.get("metadata"), dict)
+            else None
+        )
     if execution is None:
-        execution = response.get("result") if isinstance(response.get("result"), dict) else None
+        execution = (
+            response.get("result") if isinstance(response.get("result"), dict) else None
+        )
     if execution is None:
-        execution = response.get("execution_trace") if isinstance(response.get("execution_trace"), dict) else None
+        execution = (
+            response.get("execution_trace")
+            if isinstance(response.get("execution_trace"), dict)
+            else None
+        )
 
-    agent_name = response.get("agent_name") or (
-        execution.get("agent_name") if execution else None
-    ) or (
-        execution.get("agent") if execution else None
+    agent_name = (
+        response.get("agent_name")
+        or (execution.get("agent_name") if execution else None)
+        or (execution.get("agent") if execution else None)
     )
-    tool_used = response.get("tool_used") or (
-        execution.get("tool_used") if execution else None
-    ) or (
-        execution.get("tool") if execution else None
+    tool_used = (
+        response.get("tool_used")
+        or (execution.get("tool_used") if execution else None)
+        or (execution.get("tool") if execution else None)
     )
-    latency_ms = response.get("latency_ms") or (
-        execution.get("latency_ms") if execution else None
-    ) or (
-        execution.get("latency") if execution else None
-    ) or (
-        execution.get("total_duration_ms") if execution else None
+    latency_ms = (
+        response.get("latency_ms")
+        or (execution.get("latency_ms") if execution else None)
+        or (execution.get("latency") if execution else None)
+        or (execution.get("total_duration_ms") if execution else None)
     )
 
     return {
@@ -63,7 +76,7 @@ def extract_execution_details(response: Any) -> dict[str, Any]:
 
 def render_trace_panel(response: dict) -> None:
     details = extract_execution_details(response)
-    
+
     st.subheader("Execution Details")
 
     latency = details.get("latency_ms")

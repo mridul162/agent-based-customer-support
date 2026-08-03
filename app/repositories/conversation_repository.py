@@ -58,6 +58,7 @@ behavior.
 ConversationMessage is the clean schema type already used by
 the rest of the application.
 """
+
 from datetime import datetime, timezone
 
 from sqlalchemy import asc
@@ -68,7 +69,6 @@ from app.schemas.conversation_message import ConversationMessage
 
 
 class ConversationRepository:
-    
     """
     Manages persistence for conversation history.
 
@@ -86,8 +86,8 @@ class ConversationRepository:
 
     def append_turn(
         self,
-        customer_id:        str,
-        user_message:       str,
+        customer_id: str,
+        user_message: str,
         assistant_response: str,
     ) -> None:
         """
@@ -103,18 +103,22 @@ class ConversationRepository:
         """
         now = datetime.now(timezone.utc)
 
-        self._session.add(ConversationMessageDB(
-            customer_id=customer_id,
-            role="user",
-            content=user_message,
-            created_at=now,
-        ))
-        self._session.add(ConversationMessageDB(
-            customer_id=customer_id,
-            role="assistant",
-            content=assistant_response,
-            created_at=now,
-        ))
+        self._session.add(
+            ConversationMessageDB(
+                customer_id=customer_id,
+                role="user",
+                content=user_message,
+                created_at=now,
+            )
+        )
+        self._session.add(
+            ConversationMessageDB(
+                customer_id=customer_id,
+                role="assistant",
+                content=assistant_response,
+                created_at=now,
+            )
+        )
 
     def get_history(self, customer_id: str) -> list[ConversationMessage]:
         """
@@ -138,14 +142,12 @@ class ConversationRepository:
             ConversationMessage(role=row.role, content=row.content)  # type: ignore[arg-type]
             for row in rows
         ]
-    
+
     def clear_history(self, customer_id: str) -> None:
         """
         Delete all messages for a customer.
         Primarily used by tests.
         """
-        self._session.query(
-            ConversationMessageDB
-        ).filter(
+        self._session.query(ConversationMessageDB).filter(
             ConversationMessageDB.customer_id == customer_id
         ).delete()

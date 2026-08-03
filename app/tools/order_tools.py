@@ -62,8 +62,8 @@ def get_order_status_tool(
         service = OrderService(session)
 
         return service.get_order_status(
-            order_id=order_id, 
-        ) #type: ignore
+            order_id=order_id,
+        )  # type: ignore
 
 
 def cancel_order_tool(
@@ -80,7 +80,7 @@ def cancel_order_tool(
 
         return service.cancel_order(
             order_id=order_id,
-        ) #type: ignore
+        )  # type: ignore
 
 
 def update_delivery_address_tool(
@@ -99,7 +99,7 @@ def update_delivery_address_tool(
         return service.update_delivery_address(
             order_id=order_id,
             new_address=new_address,
-        ) #type: ignore
+        )  # type: ignore
 
 
 def estimate_delivery_time_tool(
@@ -116,4 +116,4 @@ def estimate_delivery_time_tool(
 
         return service.estimate_delivery_time(
             order_id=order_id,
-        ) #type: ignore
+        )  # type: ignore

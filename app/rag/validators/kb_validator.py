@@ -26,18 +26,18 @@ Those belong to later stages.
 """
 
 import sys
-sys.stdout.reconfigure(encoding="utf-8") #type: ignore
+
+sys.stdout.reconfigure(encoding="utf-8")  # type: ignore
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Set
 
 import yaml
-
 
 # ---------------------------------------------------------
 # VALIDATION DATA MODELS
 # ---------------------------------------------------------
+
 
 @dataclass
 class ValidationIssue:
@@ -45,7 +45,7 @@ class ValidationIssue:
     Represents a single validation issue.
     """
 
-    severity: str   # INFO | WARNING | ERROR
+    severity: str  # INFO | WARNING | ERROR
     product_id: str
     message: str
     path: Path
@@ -60,14 +60,15 @@ class ValidationReport:
     valid: bool
     total_products: int
 
-    errors: List[ValidationIssue] = field(default_factory=list)
-    warnings: List[ValidationIssue] = field(default_factory=list)
-    infos: List[ValidationIssue] = field(default_factory=list)
+    errors: list[ValidationIssue] = field(default_factory=list)
+    warnings: list[ValidationIssue] = field(default_factory=list)
+    infos: list[ValidationIssue] = field(default_factory=list)
 
 
 # ---------------------------------------------------------
 # KB VALIDATOR
 # ---------------------------------------------------------
+
 
 class KBValidator:
     """
@@ -100,7 +101,7 @@ class KBValidator:
         self.warnings = []
         self.infos = []
 
-        self.seen_product_ids: Set[str] = set()
+        self.seen_product_ids: set[str] = set()
 
     # -----------------------------------------------------
 
@@ -112,10 +113,7 @@ class KBValidator:
         product_dirs = self._discover_product_directories()
 
         for product_dir in product_dirs:
-
-            self._validate_product_directory(
-                product_dir
-            )
+            self._validate_product_directory(product_dir)
 
         valid = len(self.errors) == 0
 
@@ -129,22 +127,16 @@ class KBValidator:
 
     # -----------------------------------------------------
 
-    def _discover_product_directories(self) -> List[Path]:
+    def _discover_product_directories(self) -> list[Path]:
         """
         Discover all product directories containing product.yaml
         """
 
-        return [
-            path.parent
-            for path in self.kb_root.rglob("product.yaml")
-        ]
+        return [path.parent for path in self.kb_root.rglob("product.yaml")]
 
     # -----------------------------------------------------
 
-    def _validate_product_directory(
-        self,
-        product_dir: Path
-    ):
+    def _validate_product_directory(self, product_dir: Path):
 
         metadata_path = product_dir / "product.yaml"
 
@@ -155,7 +147,6 @@ class KBValidator:
         # -------------------------------------------------
 
         if not metadata_path.exists():
-
             self._add_error(
                 product_id,
                 "Missing product.yaml",
@@ -169,13 +160,9 @@ class KBValidator:
         # -------------------------------------------------
 
         try:
-
-            metadata = self._load_yaml(
-                metadata_path
-            )
+            metadata = self._load_yaml(metadata_path)
 
         except Exception as e:
-
             self._add_error(
                 product_id,
                 f"Invalid YAML: {e}",
@@ -198,14 +185,10 @@ class KBValidator:
         # Validate duplicate product IDs
         # -------------------------------------------------
 
-        metadata_product_id = metadata.get(
-            "product_id"
-        )
+        metadata_product_id = metadata.get("product_id")
 
         if metadata_product_id:
-
             if metadata_product_id in self.seen_product_ids:
-
                 self._add_error(
                     product_id,
                     f"Duplicate product_id: {metadata_product_id}",
@@ -213,9 +196,7 @@ class KBValidator:
                 )
 
             else:
-                self.seen_product_ids.add(
-                    metadata_product_id
-                )
+                self.seen_product_ids.add(metadata_product_id)
 
         # -------------------------------------------------
         # Validate required markdown files
@@ -239,27 +220,16 @@ class KBValidator:
 
     # -----------------------------------------------------
 
-    def _load_yaml(
-        self,
-        yaml_path: Path
-    ) -> Dict:
+    def _load_yaml(self, yaml_path: Path) -> dict:
 
-        with open(
-            yaml_path,
-            "r",
-            encoding="utf-8"
-        ) as f:
-
+        with open(yaml_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
         if data is None:
             return {}
 
         if not isinstance(data, dict):
-
-            raise ValueError(
-                "YAML root must be a dictionary"
-            )
+            raise ValueError("YAML root must be a dictionary")
 
         return data
 
@@ -268,14 +238,12 @@ class KBValidator:
     def _validate_required_metadata_fields(
         self,
         product_id: str,
-        metadata: Dict,
+        metadata: dict,
         metadata_path: Path,
     ):
 
         for field in self.REQUIRED_METADATA_FIELDS:
-
             if field not in metadata:
-
                 self._add_error(
                     product_id,
                     f"Missing required metadata field: {field}",
@@ -291,11 +259,9 @@ class KBValidator:
     ):
 
         for filename in self.REQUIRED_MARKDOWN_FILES:
-
             file_path = product_dir / filename
 
             if not file_path.exists():
-
                 self._add_warning(
                     product_id,
                     f"Missing recommended markdown file: {filename}",
@@ -307,7 +273,7 @@ class KBValidator:
     def _validate_metadata_consistency(
         self,
         product_id: str,
-        metadata: Dict,
+        metadata: dict,
         product_dir: Path,
         metadata_path: Path,
     ):
@@ -316,14 +282,10 @@ class KBValidator:
         # Validate product_id consistency
         # -------------------------------------------------
 
-        metadata_product_id = metadata.get(
-            "product_id"
-        )
+        metadata_product_id = metadata.get("product_id")
 
         if metadata_product_id:
-
             if metadata_product_id != product_id:
-
                 self._add_warning(
                     product_id,
                     (
@@ -340,14 +302,10 @@ class KBValidator:
 
         folder_category = product_dir.parent.name
 
-        metadata_category = metadata.get(
-            "category"
-        )
+        metadata_category = metadata.get("category")
 
         if metadata_category:
-
             if metadata_category != folder_category:
-
                 self._add_warning(
                     product_id,
                     (
@@ -368,7 +326,6 @@ class KBValidator:
     ):
 
         self.errors.append(
-
             ValidationIssue(
                 severity="ERROR",
                 product_id=product_id,
@@ -387,7 +344,6 @@ class KBValidator:
     ):
 
         self.warnings.append(
-
             ValidationIssue(
                 severity="WARNING",
                 product_id=product_id,
@@ -406,7 +362,6 @@ class KBValidator:
     ):
 
         self.infos.append(
-
             ValidationIssue(
                 severity="INFO",
                 product_id=product_id,
@@ -420,9 +375,8 @@ class KBValidator:
 # VALIDATION REPORT PRINTER
 # ---------------------------------------------------------
 
-def print_validation_report(
-    report: ValidationReport
-):
+
+def print_validation_report(report: ValidationReport):
 
     print("\n" + "=" * 70)
     print("KNOWLEDGE BASE VALIDATION REPORT")
@@ -439,18 +393,12 @@ def print_validation_report(
     # -----------------------------------------------------
 
     if report.errors:
-
         print("\n" + "-" * 70)
         print("ERRORS")
         print("-" * 70)
 
         for issue in report.errors:
-
-            print(
-                f"[ERROR] "
-                f"{issue.product_id} | "
-                f"{issue.message}"
-            )
+            print(f"[ERROR] {issue.product_id} | {issue.message}")
 
             print(f"Path: {issue.path}")
 
@@ -459,18 +407,12 @@ def print_validation_report(
     # -----------------------------------------------------
 
     if report.warnings:
-
         print("\n" + "-" * 70)
         print("WARNINGS")
         print("-" * 70)
 
         for issue in report.warnings:
-
-            print(
-                f"[WARNING] "
-                f"{issue.product_id} | "
-                f"{issue.message}"
-            )
+            print(f"[WARNING] {issue.product_id} | {issue.message}")
 
             print(f"Path: {issue.path}")
 
@@ -480,10 +422,7 @@ def print_validation_report(
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
-
-    validator = KBValidator(
-        kb_root="knowledge_base"
-    )
+    validator = KBValidator(kb_root="knowledge_base")
 
     report = validator.validate()
 

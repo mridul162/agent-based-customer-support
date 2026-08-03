@@ -1,5 +1,4 @@
 import streamlit as st
-
 from components.chat_message import render_chat_message, render_trace_panel
 from services.api_client import ApiClientError, get_api_client
 
@@ -25,7 +24,9 @@ def render_chat_page() -> None:
             st.warning(str(exc))
 
     with st.form("message_form", clear_on_submit=True):
-        customer_id = st.text_input("Customer ID", value=st.session_state.chat_customer_id)
+        customer_id = st.text_input(
+            "Customer ID", value=st.session_state.chat_customer_id
+        )
         message = st.text_area(
             "Message",
             height=120,
@@ -43,10 +44,16 @@ def render_chat_page() -> None:
 
     if send_clicked and message.strip():
         try:
-            response = client.send_message(customer_id=customer_id.strip(), message=message.strip())
-            response_payload = response if isinstance(response, dict) else {"response": str(response)}
+            response = client.send_message(
+                customer_id=customer_id.strip(), message=message.strip()
+            )
+            response_payload = (
+                response if isinstance(response, dict) else {"response": str(response)}
+            )
             st.session_state.last_response = response_payload
-            st.session_state.chat_messages.append({"role": "user", "content": message.strip()})
+            st.session_state.chat_messages.append(
+                {"role": "user", "content": message.strip()}
+            )
             st.session_state.chat_messages.append(
                 {"role": "assistant", "content": response_payload.get("response", "")}
             )

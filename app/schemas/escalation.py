@@ -23,29 +23,30 @@ from pydantic import BaseModel
 
 
 class EscalationStatus(str, Enum):
-    OPEN        = "open"
+    OPEN = "open"
     IN_PROGRESS = "in_progress"
-    RESOLVED    = "resolved"
+    RESOLVED = "resolved"
 
 
 class EscalationQueue(str, Enum):
     """Which human team receives this escalation."""
-    GENERAL  = "general"
-    LEGAL    = "legal"
-    SAFETY   = "safety"
-    BILLING  = "billing"
+
+    GENERAL = "general"
+    LEGAL = "legal"
+    SAFETY = "safety"
+    BILLING = "billing"
 
 
 class CreateEscalationRequest(BaseModel):
     customer_id: str
-    reason:      str
-    queue:       EscalationQueue = EscalationQueue.GENERAL
+    reason: str
+    queue: EscalationQueue = EscalationQueue.GENERAL
 
 
 class EscalationResponse(BaseModel):
     escalation_id: str
-    customer_id:   str
-    reason:        str
-    queue:         EscalationQueue
-    status:        EscalationStatus
-    created_at:    datetime | None = None
+    customer_id: str
+    reason: str
+    queue: EscalationQueue
+    status: EscalationStatus
+    created_at: datetime | None = None

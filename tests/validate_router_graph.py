@@ -43,30 +43,30 @@ def run_router(customer_id: str, message: str) -> AgentState:
 # Scenario 1: Refund request → ticket_agent → ticket created
 # ---------------------------------------------------------------------------
 
+
 def validate_ticket_agent_routing() -> None:
     print("\n[Scenario 1] Refund request → routed to ticket_agent")
 
     state = run_router(customer_id="C001", message="I want a refund for my order.")
 
     # Routing layer
-    check("routing_decision is populated",
-          state.routing_decision is not None)
+    check("routing_decision is populated", state.routing_decision is not None)
     assert state.routing_decision is not None
 
-    check("Router selected ticket_agent",
-          state.routing_decision.agent_name == "ticket_agent")
-    check("routing_decision has reasoning",
-          bool(state.routing_decision.reasoning))
+    check(
+        "Router selected ticket_agent",
+        state.routing_decision.agent_name == "ticket_agent",
+    )
+    check("routing_decision has reasoning", bool(state.routing_decision.reasoning))
 
     # Ticket agent pipeline ran
-    check("tool_decision is populated (ticket agent ran LLM decision)",
-          state.tool_decision is not None)
-    check("ticket was created",
-          bool(state.ticket_id))
-    check("response is populated",
-          bool(state.response))
-    check("needs_human is False",
-          state.needs_human is False)
+    check(
+        "tool_decision is populated (ticket agent ran LLM decision)",
+        state.tool_decision is not None,
+    )
+    check("ticket was created", bool(state.ticket_id))
+    check("response is populated", bool(state.response))
+    check("needs_human is False", state.needs_human is False)
 
     print(f"  ℹ️  Routed to: {state.routing_decision.agent_name}")
     print(f"  ℹ️  Ticket ID: {state.ticket_id}")
@@ -77,6 +77,7 @@ def validate_ticket_agent_routing() -> None:
 # Scenario 2: FAQ question → faq_agent stub
 # ---------------------------------------------------------------------------
 
+
 def validate_faq_agent_routing() -> None:
     print("\n[Scenario 2] FAQ question → routed to faq_agent")
 
@@ -85,20 +86,20 @@ def validate_faq_agent_routing() -> None:
         message="What is your return policy?",
     )
 
-    check("routing_decision is populated",
-          state.routing_decision is not None)
+    check("routing_decision is populated", state.routing_decision is not None)
     assert state.routing_decision is not None
 
-    check("Router selected faq_agent",
-          state.routing_decision.agent_name == "faq_agent")
-    check("response is populated",
-          bool(state.response))
-    check("faq stub response mentions help center or ticket",
-        state.response is not None and (
+    check("Router selected faq_agent", state.routing_decision.agent_name == "faq_agent")
+    check("response is populated", bool(state.response))
+    check(
+        "faq stub response mentions help center or ticket",
+        state.response is not None
+        and (
             "faq" in state.response.lower()
             or "help" in state.response.lower()
             or "ticket" in state.response.lower()
-        ))
+        ),
+    )
 
     print(f"  ℹ️  Routed to: {state.routing_decision.agent_name}")
     print(f"  ℹ️  Response: {state.response}")
@@ -107,6 +108,7 @@ def validate_faq_agent_routing() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 3: Ticket lookup through router → ticket_agent handles retrieval
 # ---------------------------------------------------------------------------
+
 
 def validate_ticket_lookup_through_router() -> None:
     print("\n[Scenario 3] Ticket status request → ticket_agent → get_ticket_tool")
@@ -120,16 +122,21 @@ def validate_ticket_lookup_through_router() -> None:
     )
 
     assert state.routing_decision is not None
-    check("Router selected ticket_agent",
-          state.routing_decision.agent_name == "ticket_agent")
-    check("extracted ticket_id matches",
-          state.extracted_arguments is not None and
-          state.extracted_arguments.get("ticket_id") == ticket_id)
-    check("tool_used is get_ticket_tool",
-          state.tool_used == "get_ticket_tool")
+    check(
+        "Router selected ticket_agent",
+        state.routing_decision.agent_name == "ticket_agent",
+    )
+    check(
+        "extracted ticket_id matches",
+        state.extracted_arguments is not None
+        and state.extracted_arguments.get("ticket_id") == ticket_id,
+    )
+    check("tool_used is get_ticket_tool", state.tool_used == "get_ticket_tool")
     # After
-    check("response contains ticket ID",
-        state.response is not None and ticket_id in state.response)
+    check(
+        "response contains ticket ID",
+        state.response is not None and ticket_id in state.response,
+    )
 
     print(f"  ℹ️  Ticket ID: {ticket_id}")
     print(f"  ℹ️  Response:\n{state.response}")
@@ -138,6 +145,7 @@ def validate_ticket_lookup_through_router() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 4: Ambiguous ticket request (no ID) → clarification through router
 # ---------------------------------------------------------------------------
+
 
 def validate_clarification_through_router() -> None:
     print("\n[Scenario 4] Ambiguous ticket request → clarification through router")
@@ -148,14 +156,13 @@ def validate_clarification_through_router() -> None:
     )
 
     assert state.routing_decision is not None
-    check("Router selected ticket_agent",
-          state.routing_decision.agent_name == "ticket_agent")
-    check("needs_clarification is True",
-          state.needs_clarification is True)
-    check("execution skipped (tool_used is None)",
-          state.tool_used is None)
-    check("clarification response populated",
-          bool(state.response))
+    check(
+        "Router selected ticket_agent",
+        state.routing_decision.agent_name == "ticket_agent",
+    )
+    check("needs_clarification is True", state.needs_clarification is True)
+    check("execution skipped (tool_used is None)", state.tool_used is None)
+    check("clarification response populated", bool(state.response))
 
     print(f"  ℹ️  Response: {state.response}")
 
@@ -163,6 +170,7 @@ def validate_clarification_through_router() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 5: routing_decision preserved in final state
 # ---------------------------------------------------------------------------
+
 
 def validate_routing_decision_preserved() -> None:
     print("\n[Scenario 5] routing_decision preserved after specialist agent runs")
@@ -172,20 +180,23 @@ def validate_routing_decision_preserved() -> None:
         message="I was charged twice for my order.",
     )
 
-    check("routing_decision still present after ticket_agent ran",
-          state.routing_decision is not None)
+    check(
+        "routing_decision still present after ticket_agent ran",
+        state.routing_decision is not None,
+    )
     assert state.routing_decision is not None
-    check("agent_name still ticket_agent",
-          state.routing_decision.agent_name == "ticket_agent")
-    check("customer_id unchanged",
-          state.customer_id == "C005")
-    check("ticket created",
-          bool(state.ticket_id))
+    check(
+        "agent_name still ticket_agent",
+        state.routing_decision.agent_name == "ticket_agent",
+    )
+    check("customer_id unchanged", state.customer_id == "C005")
+    check("ticket created", bool(state.ticket_id))
 
 
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print("=" * 60)

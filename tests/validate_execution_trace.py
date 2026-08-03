@@ -54,9 +54,7 @@ def main() -> None:
         message="I would like a refund for my order.",
     )
 
-    result = AgentState(
-        **router_graph.invoke(state.model_dump())
-    )
+    result = AgentState(**router_graph.invoke(state.model_dump()))
 
     trace = result.execution_trace
 
@@ -66,50 +64,50 @@ def main() -> None:
     )
 
     assert_pass(
-        trace.request_id == state.request_id, #type: ignore
+        trace.request_id == state.request_id,  # type: ignore
         "request_id propagated",
     )
 
     assert_pass(
-        trace.customer_id == state.customer_id, #type: ignore
+        trace.customer_id == state.customer_id,  # type: ignore
         "customer_id propagated",
     )
 
     assert_pass(
-        trace.started_at is not None, #type: ignore
+        trace.started_at is not None,  # type: ignore
         "started_at populated",
     )
 
     assert_pass(
-        trace.finished_at is not None, #type: ignore
+        trace.finished_at is not None,  # type: ignore
         "finished_at populated",
     )
 
     assert_pass(
-        trace.total_duration_ms is not None, #type: ignore
+        trace.total_duration_ms is not None,  # type: ignore
         "total_duration_ms calculated",
     )
 
     assert_pass(
-        trace.total_duration_ms >= 0, #type: ignore
+        trace.total_duration_ms >= 0,  # type: ignore
         "duration is non-negative",
     )
 
-    print(f"\n  ℹ️  Total duration: {trace.total_duration_ms:.2f} ms") #type: ignore
+    print(f"\n  ℹ️  Total duration: {trace.total_duration_ms:.2f} ms")  # type: ignore
 
     print("\n[Regression] Ticket workflow")
 
     assert_pass(
-        result.ticket_id is not None, #type: ignore
+        result.ticket_id is not None,  # type: ignore
         "ticket created",
     )
 
     assert_pass(
-        result.response is not None, #type: ignore
+        result.response is not None,  # type: ignore
         "customer response generated",
     )
 
-    print(f"\n  ℹ️  Ticket ID: {result.ticket_id}") #type: ignore
+    print(f"\n  ℹ️  Ticket ID: {result.ticket_id}")  # type: ignore
 
     print("\n" + "=" * 60)
     print("  ExecutionTrace initialization      ✅")

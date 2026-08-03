@@ -21,68 +21,41 @@ No business logic.
 
 import json
 import logging
-
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 
 class ChunkArtifactLoader:
-
     def __init__(
         self,
         chunk_root: str,
     ):
-        self.chunk_root = Path(
-            chunk_root
-        )
+        self.chunk_root = Path(chunk_root)
 
     def load(self) -> list[dict]:
 
         chunk_records = []
 
-        chunk_files = sorted(
+        chunk_files = sorted(self.chunk_root.rglob("*.json"))
 
-            self.chunk_root.rglob(
-                "*.json"
-            )
-        )
-
-        logger.info(
-            f"Found {len(chunk_files)} "
-            f"chunk artifact files."
-        )
+        logger.info(f"Found {len(chunk_files)} chunk artifact files.")
 
         for file_path in chunk_files:
-
-            with open(
-                file_path,
-                "r",
-                encoding="utf-8"
-            ) as f:
-
+            with open(file_path, "r", encoding="utf-8") as f:
                 chunks = json.load(f)
 
-            chunk_records.extend(
-                chunks
-            )
+            chunk_records.extend(chunks)
 
-        logger.info(
-            f"Loaded "
-            f"{len(chunk_records)} "
-            f"chunks."
-        )
+        logger.info(f"Loaded {len(chunk_records)} chunks.")
 
         return chunk_records
-    
+
 
 if __name__ == "__main__":
-    from app.rag.pipelines.chunk_loader import (
-        ChunkArtifactLoader)
-    
-    loader = ChunkArtifactLoader(
-        chunk_root="artifacts/chunked"
-    )
+    from app.rag.pipelines.chunk_loader import ChunkArtifactLoader
+
+    loader = ChunkArtifactLoader(chunk_root="artifacts/chunked")
 
     chunks = loader.load()
 

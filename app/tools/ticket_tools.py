@@ -18,13 +18,11 @@ Mental model:
 
 from app.schemas.ticket import (
     CreateTicketRequest,
-    UpdateTicketRequest,
     TicketResponse,
     TicketStatus,
+    UpdateTicketRequest,
 )
-
 from app.services.ticket_service import TicketService
-
 
 # ---------------------------------------------------------------------------
 # Module-level service instance.

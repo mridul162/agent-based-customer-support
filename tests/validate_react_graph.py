@@ -43,10 +43,12 @@ def run_graph(customer_id: str, message: str) -> AgentState:
     and returns the final state dict. We reconstruct AgentState
     from that dict for typed field access in assertions.
     """
-    result = react_graph.invoke({
-        "customer_id": customer_id,
-        "message":     message,
-    })
+    result = react_graph.invoke(
+        {
+            "customer_id": customer_id,
+            "message": message,
+        }
+    )
     # LangGraph returns a dict — reconstruct as AgentState for typed access.
     return AgentState(**result)
 
@@ -60,54 +62,56 @@ def run_graph(customer_id: str, message: str) -> AgentState:
 #   response_node      → response contains ticket ID, needs_human = False
 # ---------------------------------------------------------------------------
 
+
 def validate_refund_request() -> None:
     print("\n[Scenario 1] Refund Request — 'I want a refund.'")
 
     state = run_graph(customer_id="C001", message="I want a refund.")
 
     # llm_decision_node output
-    check("tool_decision is populated",
-          state.tool_decision is not None)
+    check("tool_decision is populated", state.tool_decision is not None)
 
     # Explicit None guard for Pylance type narrowing.
     # check() above already asserts this — the guard makes the narrowing
     # explicit so Pylance can track it through subsequent attribute access.
     assert state.tool_decision is not None
 
-    check("LLM chose create_ticket_tool",
-          state.tool_decision.tool_name == "create_ticket_tool")
-    check("tool_decision has reasoning",
-          bool(state.tool_decision.reasoning))
-    check("tool_decision is not no_tool",
-          not state.tool_decision.is_no_tool())
+    check(
+        "LLM chose create_ticket_tool",
+        state.tool_decision.tool_name == "create_ticket_tool",
+    )
+    check("tool_decision has reasoning", bool(state.tool_decision.reasoning))
+    check("tool_decision is not no_tool", not state.tool_decision.is_no_tool())
 
     # tool_executor_node output
-    check("tool_used is populated",
-          state.tool_used is not None)
-    check("tool_used matches decision",
-          state.tool_used == state.tool_decision.tool_name)
-    check("tool_result is populated",
-          state.tool_result is not None)
-    check("tool_result has ticket_id",
-          bool(getattr(state.tool_result, "ticket_id", None)))
+    check("tool_used is populated", state.tool_used is not None)
+    check(
+        "tool_used matches decision", state.tool_used == state.tool_decision.tool_name
+    )
+    check("tool_result is populated", state.tool_result is not None)
+    check(
+        "tool_result has ticket_id", bool(getattr(state.tool_result, "ticket_id", None))
+    )
 
     # response_node output
-    check("response is populated",
-          bool(state.response))
-    check("ticket_id extracted into state",
-          bool(state.ticket_id))
-    check("ticket_id in state matches tool_result",
-          state.ticket_id == state.tool_result.ticket_id)  # type: ignore
-    check("needs_human is False on success",
-          state.needs_human is False)
+    check("response is populated", bool(state.response))
+    check("ticket_id extracted into state", bool(state.ticket_id))
+    check(
+        "ticket_id in state matches tool_result",
+        state.ticket_id == state.tool_result.ticket_id,
+    )  # type: ignore
+    check("needs_human is False on success", state.needs_human is False)
 
     # State preservation — prior node contributions must survive
-    check("tool_decision preserved after executor ran",
-          state.tool_decision is not None)
-    check("extracted_arguments populated by extraction node",
-          state.extracted_arguments is not None)
-    check("tool_result not mutated (still a TicketResponse)",
-          hasattr(state.tool_result, "ticket_id"))
+    check("tool_decision preserved after executor ran", state.tool_decision is not None)
+    check(
+        "extracted_arguments populated by extraction node",
+        state.extracted_arguments is not None,
+    )
+    check(
+        "tool_result not mutated (still a TicketResponse)",
+        hasattr(state.tool_result, "ticket_id"),
+    )
 
     print(f"  ℹ️  Ticket ID: {state.ticket_id}")
     print(f"  ℹ️  LLM reasoning: {state.tool_decision.reasoning}")  # narrowed above
@@ -123,34 +127,27 @@ def validate_refund_request() -> None:
 #   response_node      → clarification message, needs_human = False
 # ---------------------------------------------------------------------------
 
+
 def validate_greeting() -> None:
     print("\n[Scenario 2] Greeting — 'Hello'")
 
     state = run_graph(customer_id="C002", message="Hello")
 
     # llm_decision_node output
-    check("tool_decision is populated",
-          state.tool_decision is not None)
+    check("tool_decision is populated", state.tool_decision is not None)
     assert state.tool_decision is not None  # Pylance narrowing
 
-    check("LLM chose no_tool",
-          state.tool_decision.tool_name == NO_TOOL)
-    check("tool_decision.is_no_tool() returns True",
-          state.tool_decision.is_no_tool())
+    check("LLM chose no_tool", state.tool_decision.tool_name == NO_TOOL)
+    check("tool_decision.is_no_tool() returns True", state.tool_decision.is_no_tool())
 
     # tool_executor_node output — should have skipped execution
-    check("tool_used is None (no tool executed)",
-          state.tool_used is None)
-    check("tool_result is None (no execution happened)",
-          state.tool_result is None)
-    check("ticket_id is None",
-          state.ticket_id is None)
+    check("tool_used is None (no tool executed)", state.tool_used is None)
+    check("tool_result is None (no execution happened)", state.tool_result is None)
+    check("ticket_id is None", state.ticket_id is None)
 
     # response_node output
-    check("response is populated",
-          bool(state.response))
-    check("needs_human is False for greeting",
-          state.needs_human is False)
+    check("response is populated", bool(state.response))
+    check("needs_human is False for greeting", state.needs_human is False)
 
     print(f"  ℹ️  Response: {state.response}")
 
@@ -159,18 +156,22 @@ def validate_greeting() -> None:
 # Scenario 3: Delivery issue — confirms ticket created for non-refund issues
 # ---------------------------------------------------------------------------
 
+
 def validate_delivery_issue() -> None:
     print("\n[Scenario 3] Delivery Issue — 'My package never arrived.'")
 
     state = run_graph(customer_id="C003", message="My package never arrived.")
 
-    check("tool_decision is populated",           state.tool_decision is not None)
+    check("tool_decision is populated", state.tool_decision is not None)
     assert state.tool_decision is not None  # Pylance narrowing
-    check("LLM chose create_ticket_tool",         state.tool_decision.tool_name == "create_ticket_tool")
-    check("tool_result is populated",             state.tool_result is not None)
-    check("ticket_id is assigned",                bool(state.ticket_id))
-    check("response is populated",                bool(state.response))
-    check("needs_human is False",                 state.needs_human is False)
+    check(
+        "LLM chose create_ticket_tool",
+        state.tool_decision.tool_name == "create_ticket_tool",
+    )
+    check("tool_result is populated", state.tool_result is not None)
+    check("ticket_id is assigned", bool(state.ticket_id))
+    check("response is populated", bool(state.response))
+    check("needs_human is False", state.needs_human is False)
 
     print(f"  ℹ️  Ticket ID: {state.ticket_id}")
 
@@ -182,31 +183,43 @@ def validate_delivery_issue() -> None:
 # non-destructive record — no node overwrote another's contribution.
 # ---------------------------------------------------------------------------
 
+
 def validate_state_completeness() -> None:
     print("\n[Scenario 4] State Completeness — all node contributions preserved")
 
     state = run_graph(customer_id="C004", message="I was charged twice.")
 
     # Every node's output must coexist in the final state.
-    check("tool_decision (from llm_decision_node) present",        state.tool_decision is not None)
+    check(
+        "tool_decision (from llm_decision_node) present",
+        state.tool_decision is not None,
+    )
     assert state.tool_decision is not None  # Pylance narrowing
-    check("extracted_arguments (from extraction node) present",    state.extracted_arguments is not None)
-    check("tool_used (from tool_executor_node) present",           state.tool_used is not None)
-    check("tool_result (from tool_executor_node) present",         state.tool_result is not None)
-    check("response (from response_node) present",                 bool(state.response))
-    check("ticket_id (from response_node) present",                bool(state.ticket_id))
+    check(
+        "extracted_arguments (from extraction node) present",
+        state.extracted_arguments is not None,
+    )
+    check("tool_used (from tool_executor_node) present", state.tool_used is not None)
+    check(
+        "tool_result (from tool_executor_node) present", state.tool_result is not None
+    )
+    check("response (from response_node) present", bool(state.response))
+    check("ticket_id (from response_node) present", bool(state.ticket_id))
 
     # Input fields must be untouched
-    check("customer_id unchanged",    state.customer_id == "C004")
-    check("message unchanged",        state.message == "I was charged twice.")
+    check("customer_id unchanged", state.customer_id == "C004")
+    check("message unchanged", state.message == "I was charged twice.")
 
-    print(f"  ℹ️  State fields populated: tool_decision ✓ extracted_arguments ✓ "
-          f"tool_used ✓ tool_result ✓ response ✓ ticket_id ✓")
+    print(
+        "  ℹ️  State fields populated: tool_decision ✓ extracted_arguments ✓ "
+        "tool_used ✓ tool_result ✓ response ✓ ticket_id ✓"
+    )
 
 
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print("=" * 60)

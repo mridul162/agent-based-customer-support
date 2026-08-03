@@ -65,18 +65,11 @@ class EvaluationMetrics:
 
         total_cases = len(results)
 
-        passed_cases = sum(
-            result.passed
-            for result in results
-        )
+        passed_cases = sum(result.passed for result in results)
 
         failed_cases = total_cases - passed_cases
 
-        accuracy = (
-            (passed_cases / total_cases) * 100
-            if total_cases > 0
-            else 0.0
-        )
+        accuracy = (passed_cases / total_cases) * 100 if total_cases > 0 else 0.0
 
         average_latency_ms = (
             sum(result.latency_ms for result in results) / total_cases
@@ -84,10 +77,7 @@ class EvaluationMetrics:
             else 0.0
         )
 
-        execution_errors = sum(
-            result.execution_error is not None
-            for result in results
-        )
+        execution_errors = sum(result.execution_error is not None for result in results)
 
         return EvaluationSummary(
             total_cases=total_cases,

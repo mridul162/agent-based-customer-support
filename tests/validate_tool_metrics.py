@@ -61,11 +61,7 @@ def main() -> None:
 
     result = router_graph.invoke(state)
 
-    state = (
-        result
-        if isinstance(result, AgentState)
-        else AgentState(**result)
-    )
+    state = result if isinstance(result, AgentState) else AgentState(**result)
 
     trace = state.execution_trace
 
@@ -100,8 +96,7 @@ def main() -> None:
     )
 
     check(
-        tool.duration_ms is not None
-        and tool.duration_ms >= 0,
+        tool.duration_ms is not None and tool.duration_ms >= 0,
         "Execution duration recorded",
     )
 

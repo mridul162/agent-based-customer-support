@@ -30,10 +30,11 @@ Those belong to other milestone validation scripts.
 
 from __future__ import annotations
 
+from uuid import uuid4
+
 from app.database.init_db import init_db
 from app.graphs.router_graph import router_graph
 from app.schemas.agent_state import AgentState
-from uuid import uuid4
 
 
 def print_result(success: bool, message: str) -> None:
@@ -65,9 +66,7 @@ def main() -> None:
         message="I want a refund for my last order.",
     )
 
-    result = AgentState(
-        **router_graph.invoke(state.model_dump())
-    )
+    result = AgentState(**router_graph.invoke(state.model_dump()))
 
     trace = result.execution_trace
 
@@ -88,10 +87,7 @@ def main() -> None:
     # Expected nodes
     # ----------------------------------------------------------
 
-    node_names = {
-        node.node_name
-        for node in trace.nodes
-    }
+    node_names = {node.node_name for node in trace.nodes}
 
     expected_nodes = {
         "memory_loader_node",
@@ -111,10 +107,7 @@ def main() -> None:
     # Timing validation
     # ----------------------------------------------------------
 
-    all_started = all(
-        node.started_at is not None
-        for node in trace.nodes
-    )
+    all_started = all(node.started_at is not None for node in trace.nodes)
 
     print("\nNode details:\n")
 
@@ -134,7 +127,6 @@ def main() -> None:
     print("  ℹ️  Nodes executed:\n")
 
     for node in trace.nodes:
-
         print(
             f"      "
             f"{node.node_name:<35}"

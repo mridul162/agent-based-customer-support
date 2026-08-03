@@ -75,21 +75,45 @@ class IntentClassifier:
     # Delivery keywords require an unambiguous missing/late shipment signal.
     # ------------------------------------------------------------------
 
-    _REFUND_KEYWORDS: frozenset[str] = frozenset({
-        "refund", "charged", "overcharged", "money back", "reimburs",
-    })
+    _REFUND_KEYWORDS: frozenset[str] = frozenset(
+        {
+            "refund",
+            "charged",
+            "overcharged",
+            "money back",
+            "reimburs",
+        }
+    )
 
-    _DELIVERY_KEYWORDS: frozenset[str] = frozenset({
-        "never arrived", "not arrived", "not delivered",
-        "missing package", "lost package", "where is my package",
-        "shipping delay", "not received", "delivery delay",
-        "late delivery", "shipment",
-    })
+    _DELIVERY_KEYWORDS: frozenset[str] = frozenset(
+        {
+            "never arrived",
+            "not arrived",
+            "not delivered",
+            "missing package",
+            "lost package",
+            "where is my package",
+            "shipping delay",
+            "not received",
+            "delivery delay",
+            "late delivery",
+            "shipment",
+        }
+    )
 
-    _ORDER_KEYWORDS: frozenset[str] = frozenset({
-        "order", "purchase", "bought", "item", "product",
-        "wrong", "incorrect", "damaged", "broken",
-    })
+    _ORDER_KEYWORDS: frozenset[str] = frozenset(
+        {
+            "order",
+            "purchase",
+            "bought",
+            "item",
+            "product",
+            "wrong",
+            "incorrect",
+            "damaged",
+            "broken",
+        }
+    )
 
     def classify(self, message: str) -> Intent:
         """

@@ -52,7 +52,6 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.mappers.order_mapper import OrderMapper
-from app.mappers.order_mapper import OrderMapper
 from app.models.order import Order, OrderStatus
 from app.repositories.order_repository import OrderRepository
 
@@ -139,7 +138,7 @@ class OrderService:
         self.session.commit()
         self.session.refresh(order)
 
-        return OrderMapper.to_summary(order) #type: ignore
+        return OrderMapper.to_summary(order)  # type: ignore
 
     def update_delivery_address(
         self,
@@ -175,8 +174,7 @@ class OrderService:
             OrderStatus.CANCELLED,
         ):
             raise ValueError(
-                f"Delivery address cannot be updated "
-                f"for a {order.status.value} order."
+                f"Delivery address cannot be updated for a {order.status.value} order."
             )
 
         self.repository.update_address(
@@ -189,7 +187,7 @@ class OrderService:
         self.session.commit()
         self.session.refresh(order)
 
-        return OrderMapper.to_summary(order) #type: ignore
+        return OrderMapper.to_summary(order)  # type: ignore
 
     # ------------------------------------------------------------------
     # Business Logic
@@ -217,16 +215,11 @@ class OrderService:
             return None
 
         match order.status:
-
             case OrderStatus.PENDING:
-                return (
-                    "Your order is awaiting processing."
-                )
+                return "Your order is awaiting processing."
 
             case OrderStatus.PROCESSING:
-                return (
-                    "Your order is being prepared for shipment."
-                )
+                return "Your order is being prepared for shipment."
 
             case OrderStatus.SHIPPED:
                 return (
@@ -235,13 +228,9 @@ class OrderService:
                 )
 
             case OrderStatus.DELIVERED:
-                return (
-                    "Your order has already been delivered."
-                )
+                return "Your order has already been delivered."
 
             case OrderStatus.CANCELLED:
-                return (
-                    "This order has been cancelled."
-                )
+                return "This order has been cancelled."
 
         return None

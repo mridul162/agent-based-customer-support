@@ -41,18 +41,20 @@ def check(label: str, condition: bool) -> None:
 # Scenario 1: Health check
 # ---------------------------------------------------------------------------
 
+
 def validate_health_check() -> None:
     print("\n[Scenario 1] Health check endpoint")
 
     response = client.get("/health")
 
-    check("Status 200",           response.status_code == 200)
+    check("Status 200", response.status_code == 200)
     check("Status field is 'ok'", response.json()["status"] == "ok")
 
 
 # ---------------------------------------------------------------------------
 # Scenario 2: Process a message — refund request
 # ---------------------------------------------------------------------------
+
 
 def validate_process_message() -> None:
     print("\n[Scenario 2] POST /support/message — refund request")
@@ -63,16 +65,16 @@ def validate_process_message() -> None:
     }
     response = client.post("/support/message", json=payload)
 
-    check("Status 200",                response.status_code == 200)
+    check("Status 200", response.status_code == 200)
 
     data = response.json()
 
-    check("request_id is present",     bool(data.get("request_id")))
-    check("customer_id matches",       data["customer_id"] == payload["customer_id"])
-    check("response is populated",     bool(data.get("response")))
-    check("agent_name is present",     bool(data.get("agent_name")))
-    check("needs_human is False",      data["needs_human"] is False)
-    check("ticket_id is present",      bool(data.get("ticket_id")))
+    check("request_id is present", bool(data.get("request_id")))
+    check("customer_id matches", data["customer_id"] == payload["customer_id"])
+    check("response is populated", bool(data.get("response")))
+    check("agent_name is present", bool(data.get("agent_name")))
+    check("needs_human is False", data["needs_human"] is False)
+    check("ticket_id is present", bool(data.get("ticket_id")))
 
     print(f"  ℹ️  request_id: {data['request_id']}")
     print(f"  ℹ️  agent_name: {data['agent_name']}")
@@ -83,6 +85,7 @@ def validate_process_message() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 3: GET /support/tickets/{ticket_id} — existing ticket
 # ---------------------------------------------------------------------------
+
 
 def validate_get_ticket() -> None:
     print("\n[Scenario 3] GET /support/tickets/{ticket_id}")
@@ -95,18 +98,18 @@ def validate_get_ticket() -> None:
     create_response = client.post("/support/message", json=payload)
     ticket_id = create_response.json().get("ticket_id")
 
-    check("Ticket created in setup",   bool(ticket_id))
+    check("Ticket created in setup", bool(ticket_id))
 
     # Retrieve it directly
     get_response = client.get(f"/support/tickets/{ticket_id}")
 
-    check("Status 200",                get_response.status_code == 200)
+    check("Status 200", get_response.status_code == 200)
 
     data = get_response.json()
-    check("ticket_id matches",         data["ticket_id"] == ticket_id)
-    check("customer_id matches",       data["customer_id"] == payload["customer_id"])
-    check("status is present",         bool(data.get("status")))
-    check("issue is present",          bool(data.get("issue")))
+    check("ticket_id matches", data["ticket_id"] == ticket_id)
+    check("customer_id matches", data["customer_id"] == payload["customer_id"])
+    check("status is present", bool(data.get("status")))
+    check("issue is present", bool(data.get("issue")))
 
     print(f"  ℹ️  ticket_id: {ticket_id}, status: {data['status']}")
 
@@ -115,18 +118,20 @@ def validate_get_ticket() -> None:
 # Scenario 4: GET /support/tickets/{ticket_id} — not found returns 404
 # ---------------------------------------------------------------------------
 
+
 def validate_ticket_not_found() -> None:
     print("\n[Scenario 4] GET /support/tickets/TICKET-NOTEXIST — 404")
 
     response = client.get("/support/tickets/TICKET-NOTEXIST")
 
-    check("Status 404",                response.status_code == 404)
-    check("Detail field present",      "detail" in response.json())
+    check("Status 404", response.status_code == 404)
+    check("Detail field present", "detail" in response.json())
 
 
 # ---------------------------------------------------------------------------
 # Scenario 5: DI override works — the core testing benefit
 # ---------------------------------------------------------------------------
+
 
 def validate_di_override() -> None:
     print("\n[Scenario 5] Dependency injection override works")
@@ -137,7 +142,6 @@ def validate_di_override() -> None:
     class FakeTicketService(TicketService):
         def get_ticket(self, ticket_id: str):  # type: ignore
             called_with.append(ticket_id)
-            return None  # simulate not found
 
     from app.api.dependencies import get_ticket_service
 
@@ -146,10 +150,14 @@ def validate_di_override() -> None:
 
     try:
         response = client.get("/support/tickets/TICKET-TEST")
-        check("Override returned 404 (fake service returned None)",
-              response.status_code == 404)
-        check("Fake service was called with correct ticket_id",
-              called_with == ["TICKET-TEST"])
+        check(
+            "Override returned 404 (fake service returned None)",
+            response.status_code == 404,
+        )
+        check(
+            "Fake service was called with correct ticket_id",
+            called_with == ["TICKET-TEST"],
+        )
     finally:
         # Always restore overrides — don't pollute other tests
         app.dependency_overrides.clear()
@@ -160,6 +168,7 @@ def validate_di_override() -> None:
 # ---------------------------------------------------------------------------
 # Scenario 6: request_id is unique per request
 # ---------------------------------------------------------------------------
+
 
 def validate_request_id_uniqueness() -> None:
     print("\n[Scenario 6] request_id is unique per request")
@@ -173,8 +182,8 @@ def validate_request_id_uniqueness() -> None:
     id1 = r1.json().get("request_id")
     id2 = r2.json().get("request_id")
 
-    check("Both request_ids present",      bool(id1) and bool(id2))
-    check("request_ids are different",     id1 != id2)
+    check("Both request_ids present", bool(id1) and bool(id2))
+    check("request_ids are different", id1 != id2)
 
     print(f"  ℹ️  request_id 1: {id1}")
     print(f"  ℹ️  request_id 2: {id2}")
@@ -183,6 +192,7 @@ def validate_request_id_uniqueness() -> None:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print("=" * 60)

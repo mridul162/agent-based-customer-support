@@ -62,12 +62,12 @@ LangGraph execution model:
 """
 
 from langgraph.graph import END, START, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from app.agents.intent_classifier import classifier
+from app.schemas.agent import Intent
 from app.schemas.agent_state import AgentState
 from app.tools.ticket_tools import create_ticket_tool
-from app.schemas.agent import Intent
-from langgraph.graph.state import CompiledStateGraph
 
 # ---------------------------------------------------------------------------
 # Node: detect_intent
@@ -79,6 +79,7 @@ from langgraph.graph.state import CompiledStateGraph
 #
 # LangGraph node contract: (state) -> updated_state
 # ---------------------------------------------------------------------------
+
 
 def detect_intent_node(state: AgentState) -> AgentState:
     """
@@ -114,6 +115,7 @@ def detect_intent_node(state: AgentState) -> AgentState:
 # Keeping these as plain strings makes the graph wiring explicit and readable.
 # ---------------------------------------------------------------------------
 
+
 def route_by_intent(state: AgentState) -> str:
     """
     Routing function — determines which handler node executes next.
@@ -127,12 +129,12 @@ def route_by_intent(state: AgentState) -> str:
     """
 
     routing_map: dict[Intent, str] = {
-        Intent.REFUND_REQUEST:  "refund_node",
-        Intent.DELIVERY_ISSUE:  "delivery_node",
-        Intent.ORDER_ISSUE:     "order_node",
+        Intent.REFUND_REQUEST: "refund_node",
+        Intent.DELIVERY_ISSUE: "delivery_node",
+        Intent.ORDER_ISSUE: "order_node",
         Intent.GENERAL_INQUIRY: "general_node",
     }
-    
+
     if state.intent is None:
         return "general_node"
 
@@ -158,6 +160,7 @@ def route_by_intent(state: AgentState) -> str:
 # SupportAgent's handlers are no longer called — this replaces them.
 # ---------------------------------------------------------------------------
 
+
 def refund_node(state: AgentState) -> AgentState:
     """
     Node: handle refund request.
@@ -171,7 +174,7 @@ def refund_node(state: AgentState) -> AgentState:
     )
     state.tool_used = "create_ticket_tool"
     state.ticket_id = ticket.ticket_id
-    state.response  = (
+    state.response = (
         f"I've raised a refund request for you. "
         f"Your ticket ID is {ticket.ticket_id}. "
         f"Our team will review it and get back to you shortly."
@@ -192,7 +195,7 @@ def delivery_node(state: AgentState) -> AgentState:
     )
     state.tool_used = "create_ticket_tool"
     state.ticket_id = ticket.ticket_id
-    state.response  = (
+    state.response = (
         f"I've logged a delivery issue for you. "
         f"Your ticket ID is {ticket.ticket_id}. "
         f"We'll investigate and update you as soon as possible."
@@ -213,7 +216,7 @@ def order_node(state: AgentState) -> AgentState:
     )
     state.tool_used = "create_ticket_tool"
     state.ticket_id = ticket.ticket_id
-    state.response  = (
+    state.response = (
         f"I've created a support ticket for your order issue. "
         f"Your ticket ID is {ticket.ticket_id}. "
         f"A support specialist will follow up with you soon."
@@ -248,6 +251,7 @@ def general_node(state: AgentState) -> AgentState:
 #   4. Compile into a runnable.
 # ---------------------------------------------------------------------------
 
+
 def build_support_graph() -> CompiledStateGraph:
     """
     Construct and compile the customer support workflow graph.
@@ -267,10 +271,10 @@ def build_support_graph() -> CompiledStateGraph:
     # ------------------------------------------------------------------
 
     graph.add_node("detect_intent", detect_intent_node)
-    graph.add_node("refund_node",   refund_node)
+    graph.add_node("refund_node", refund_node)
     graph.add_node("delivery_node", delivery_node)
-    graph.add_node("order_node",    order_node)
-    graph.add_node("general_node",  general_node)
+    graph.add_node("order_node", order_node)
+    graph.add_node("general_node", general_node)
 
     # ------------------------------------------------------------------
     # Define Edges
@@ -282,10 +286,10 @@ def build_support_graph() -> CompiledStateGraph:
         "detect_intent",
         route_by_intent,
         {
-            "refund_node":   "refund_node",
+            "refund_node": "refund_node",
             "delivery_node": "delivery_node",
-            "order_node":    "order_node",
-            "general_node":  "general_node",
+            "order_node": "order_node",
+            "general_node": "general_node",
         },
     )
 

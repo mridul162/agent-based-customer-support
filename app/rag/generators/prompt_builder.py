@@ -36,7 +36,6 @@ deterministic, and easy to debug.
 """
 
 import logging
-from typing import List
 
 from app.rag.models.retrieval_models import RetrievedChunk
 
@@ -59,9 +58,7 @@ class PromptBuilder:
     ) -> str:
 
         if history is None:
-            return (
-                "No previous conversation."
-            )
+            return "No previous conversation."
 
         messages = getattr(history, "messages", history)
 
@@ -71,23 +68,14 @@ class PromptBuilder:
         lines = []
 
         for message in messages:
-
             role = getattr(message, "role", None)
             content = getattr(message, "content", None)
 
-            lines.append(
-
-                f"{str(role).title()}: "
-
-                f"{content}"
-            )
+            lines.append(f"{str(role).title()}: {content}")
 
         return "\n".join(lines)
 
-    def format_context(
-        self,
-        chunks: List[RetrievedChunk]
-    ) -> str:
+    def format_context(self, chunks: list[RetrievedChunk]) -> str:
         """
         Convert retrieved chunks into a structured context block.
         """
@@ -98,18 +86,13 @@ class PromptBuilder:
         documents = []
 
         for idx, chunk in enumerate(chunks, start=1):
-
             metadata = chunk.metadata or {}
 
             document_id = metadata.get(
-                "document_id",
-                metadata.get("product_id", "Unknown Document")
+                "document_id", metadata.get("product_id", "Unknown Document")
             )
 
-            heading = metadata.get(
-                "heading",
-                "General Information"
-            )
+            heading = metadata.get("heading", "General Information")
 
             document = (
                 f"[Document {idx}]\n\n"
@@ -120,18 +103,14 @@ class PromptBuilder:
 
             documents.append(document)
 
-        separator = (
-            "\n\n"
-            + "-" * 50
-            + "\n\n"
-        )
+        separator = "\n\n" + "-" * 50 + "\n\n"
 
         return separator.join(documents)
 
     def build_user_prompt(
         self,
         query: str,
-        chunks: List[RetrievedChunk],
+        chunks: list[RetrievedChunk],
         history: None,
     ) -> str:
         """
@@ -140,11 +119,7 @@ class PromptBuilder:
 
         context = self.format_context(chunks)
 
-        conversation_history = (
-            self.format_history(
-                history
-            )
-        )
+        conversation_history = self.format_history(history)
         logger.debug(
             "Built grounded answer prompt.",
             extra={
@@ -163,8 +138,8 @@ class PromptBuilder:
     def build_messages(
         self,
         query: str,
-        chunks: List[RetrievedChunk],
-        history:None,
+        chunks: list[RetrievedChunk],
+        history: None,
     ) -> list[dict]:
         """
         Build OpenAI-compatible messages.

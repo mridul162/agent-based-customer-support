@@ -20,7 +20,6 @@ Minimal implementation requirements.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
 
 
 class BaseEmbedder(ABC):
@@ -29,15 +28,13 @@ class BaseEmbedder(ABC):
     """
 
     @abstractmethod
-    def embed_text(self, text: str) -> List[float]:
+    def embed_text(self, text: str) -> list[float]:
         """
         Generate an embedding for a single text.
         """
-        pass
 
     @abstractmethod
-    def embed_batch(self, texts: List[str]) -> List[List[float]]:
+    def embed_batch(self, texts: list[str]) -> list[list[float]]:
         """
         Generate embeddings for multiple texts.
         """
-        pass

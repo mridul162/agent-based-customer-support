@@ -55,10 +55,12 @@ router = APIRouter()
 # These schemas define what the HTTP client sends and receives.
 # ---------------------------------------------------------------------------
 
+
 class MessageRequest(BaseModel):
     """Incoming customer message."""
+
     customer_id: str
-    message:     str
+    message: str
 
 
 class MessageResponse(BaseModel):
@@ -66,23 +68,25 @@ class MessageResponse(BaseModel):
     Response returned to the client after processing.
     Extracts only the fields relevant to the external contract.
     """
-    request_id:          str | None
-    customer_id:         str
-    response:            str
-    ticket_id:           str | None = None
-    agent_name:          str | None = None
-    tool_used:           str | None = None
-    latency_ms:          float | None = None
-    needs_human:         bool = False
+
+    request_id: str | None
+    customer_id: str
+    response: str
+    ticket_id: str | None = None
+    agent_name: str | None = None
+    tool_used: str | None = None
+    latency_ms: float | None = None
+    needs_human: bool = False
     needs_clarification: bool = False
 
 
 class TicketResponse(BaseModel):
     """Ticket details returned by GET /tickets/{ticket_id}."""
-    ticket_id:   str
+
+    ticket_id: str
     customer_id: str
-    issue:       str
-    status:      str
+    issue: str
+    status: str
 
 
 class HealthResponse(BaseModel):
@@ -163,10 +167,12 @@ def build_health_report() -> HealthReport:
 # Endpoints
 # ---------------------------------------------------------------------------
 
+
 @router.get("/version", response_model=RootResponse, tags=["System"])
 def version() -> RootResponse:
     """Return the current application version."""
     return RootResponse(name="Multi-Agent Customer Support Platform", status="ok")
+
 
 @router.get("/", response_model=RootResponse, tags=["System"])
 def root() -> RootResponse:
@@ -178,10 +184,12 @@ def root() -> RootResponse:
 def health_check() -> HealthResponse:
     """Service liveness check."""
     report = build_health_report()
-    return HealthResponse(status=report["status"], checks=report["checks"]) # type: ignore
+    return HealthResponse(status=report["status"], checks=report["checks"])  # type: ignore
 
 
-@router.get("/evaluation/summary", response_model=EvaluationSummaryResponse, tags=["Evaluation"])
+@router.get(
+    "/evaluation/summary", response_model=EvaluationSummaryResponse, tags=["Evaluation"]
+)
 def evaluation_summary() -> EvaluationSummaryResponse:
     """
     Return the latest evaluation summary for dashboard display.
@@ -196,7 +204,9 @@ def evaluation_summary() -> EvaluationSummaryResponse:
             total_cases = int(data.get("total_cases", data.get("total", 0)))
             passed_cases = int(data.get("passed_cases", data.get("passed", 0)))
             failed_cases = int(
-                data.get("failed_cases", data.get("failures", total_cases - passed_cases))
+                data.get(
+                    "failed_cases", data.get("failures", total_cases - passed_cases)
+                )
             )
             accuracy = float(
                 data.get(
@@ -233,7 +243,7 @@ def database_health_check() -> HealthResponse:
     report = build_health_report()
     return HealthResponse(
         status="ok" if report["checks"]["database"]["status"] == "ok" else "degraded",
-        checks={"database": report["checks"]["database"]}, # type: ignore
+        checks={"database": report["checks"]["database"]},  # type: ignore
     )
 
 
@@ -243,13 +253,13 @@ def openai_health_check() -> HealthResponse:
     report = build_health_report()
     return HealthResponse(
         status="ok" if report["checks"]["openai"]["status"] == "ok" else "degraded",
-        checks={"openai": report["checks"]["openai"]}, # type: ignore
+        checks={"openai": report["checks"]["openai"]},  # type: ignore
     )
 
 
 @router.post("/support/message", response_model=MessageResponse, tags=["Support"])
 def process_message(
-    request:        MessageRequest,
+    request: MessageRequest,
     router_service: RouterService = Depends(get_router_service),
 ) -> MessageResponse:
     """
@@ -273,13 +283,11 @@ def process_message(
         response=state.response or "I was unable to process your request.",
         ticket_id=state.ticket_id,
         agent_name=(
-            state.routing_decision.agent_name
-            if state.routing_decision else None
+            state.routing_decision.agent_name if state.routing_decision else None
         ),
         tool_used=state.tool_used,
         latency_ms=(
-            state.execution_trace.total_duration_ms
-            if state.execution_trace else None
+            state.execution_trace.total_duration_ms if state.execution_trace else None
         ),
         needs_human=state.needs_human,
         needs_clarification=state.needs_clarification,
@@ -329,7 +337,7 @@ def list_tickets(
     tags=["Support"],
 )
 def get_ticket(
-    ticket_id:      str,
+    ticket_id: str,
     ticket_service: TicketService = Depends(get_ticket_service),
 ) -> TicketResponse:
     """

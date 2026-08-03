@@ -16,6 +16,5 @@ if str(ROOT) not in sys.path:
 
 from evaluation.pipelines.multiagent_workflow_evaluation import main
 
-
 if __name__ == "__main__":
     main()

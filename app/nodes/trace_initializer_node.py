@@ -32,9 +32,9 @@ memory_loader_node
 ...
 """
 
-from app.observability.tracer import ExecutionTracer
-from app.schemas.agent_state import AgentState
 from datetime import UTC, datetime
+
+from app.schemas.agent_state import AgentState
 from app.schemas.execution_trace import ExecutionTrace
 
 
@@ -44,7 +44,7 @@ def trace_initializer_node(state: AgentState) -> AgentState:
     """
 
     state.execution_trace = ExecutionTrace(
-        request_id=state.request_id, # type: ignore
+        request_id=state.request_id,  # type: ignore
         customer_id=state.customer_id,
         started_at=datetime.now(UTC),
     )

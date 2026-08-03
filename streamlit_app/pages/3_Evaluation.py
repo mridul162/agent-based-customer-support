@@ -1,10 +1,8 @@
 import streamlit as st
-
 from components.metrics import render_metric_row
 from components.sidebar import render_sidebar
 from components.styles import apply_styles
 from services.api_client import ApiClientError, get_api_client
-
 
 st.set_page_config(page_title="Evaluation", page_icon="EV", layout="wide")
 apply_styles()

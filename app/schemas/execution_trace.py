@@ -48,9 +48,9 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 from app.schemas.execution_metrics import ExecutionMetrics
+from app.schemas.llm_metrics import LLMMetrics
 from app.schemas.node_trace import NodeTrace
 from app.schemas.tool_metrics import ToolMetrics
-from app.schemas.llm_metrics import LLMMetrics
 
 
 class ExecutionTrace(BaseModel):

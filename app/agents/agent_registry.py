@@ -16,7 +16,6 @@ from app.graphs.faq_agent import faq_agent_graph
 from app.graphs.order_agent import order_agent_graph
 from app.graphs.react_graph import react_graph
 
-
 AGENT_REGISTRY: dict[str, CompiledStateGraph] = {
     "ticket_agent": react_graph,
     "faq_agent": faq_agent_graph,

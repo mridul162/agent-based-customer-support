@@ -14,16 +14,12 @@ from app.database.connection import get_session
 from app.repositories.escalation_repository import EscalationRepository
 from app.schemas.escalation import (
     CreateEscalationRequest,
-    EscalationQueue,
     EscalationResponse,
 )
 
 
 class EscalationService:
-
-    def create_escalation(
-        self, request: CreateEscalationRequest
-    ) -> EscalationResponse:
+    def create_escalation(self, request: CreateEscalationRequest) -> EscalationResponse:
         escalation_id = f"ESC-{uuid.uuid4().hex[:8].upper()}"
         with get_session() as session:
             return EscalationRepository(session).create(

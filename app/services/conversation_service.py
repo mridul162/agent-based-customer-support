@@ -50,7 +50,6 @@ Transaction ownership belongs to the service layer.
 """
 
 from app.database.connection import get_session
-from app.models.conversation_message_model import ConversationMessageDB
 from app.repositories.conversation_repository import ConversationRepository
 from app.schemas.conversation_message import ConversationMessage
 
