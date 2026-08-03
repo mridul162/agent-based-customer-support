@@ -1,0 +1,171 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  ####################################################################
+  # Quality Checks
+  ####################################################################
+
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/dev.txt
+
+      - name: Validate FastAPI application import
+        run: |
+          python -c "from app.main import app"
+
+      - name: Lint source code
+        run: |
+          ruff check .
+
+      - name: Run unit tests
+        run: |
+          pytest -v || \
+          if [ $? -eq 5 ]; then
+            echo "No tests collected."
+            exit 0
+          else
+            exit 1
+          fi
+
+  ####################################################################
+  # Docker Build Verification
+  ####################################################################
+
+  docker:
+    name: Build Docker Images
+
+    needs: quality
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Build FastAPI Docker image
+        run: |
+          docker build \
+            -f docker/Dockerfile.api \
+            -t customer-support-api .
+
+      - name: Build Streamlit Docker image
+        run: |
+          docker build \
+            -f docker/Dockerfile.streamlit \
+            -t customer-support-streamlit .
+
+####################################################################
+# Smoke Test
+####################################################################
+
+  # smoke-test:
+  #   name: Smoke Test
+
+  #   needs: docker
+
+  #   runs-on: ubuntu-latest
+
+  #   timeout-minutes: 10
+
+  #   steps:
+
+  #     - uses: actions/checkout@v4
+
+  #     - name: Build API image
+  #       run: |
+  #         docker build \
+  #           -f docker/Dockerfile.api \
+  #           -t customer-support-api .
+
+  #     - name: Start API container
+  #       run: |
+  #         docker run -d \
+  #           --name api \
+  #           -p 8000:8000 \
+  #           -e APP_ENV=production \
+  #           -e OPENAI_API_KEY=dummy \
+  #           -e DATABASE_URL=sqlite:///tmp.db \
+  #           customer-support-api
+
+  #     - name: Wait for application startup
+  #       run: sleep 15
+
+  #     - name: Verify health endpoint
+  #       run: |
+  #         curl --fail http://localhost:8000/health
+
+  ####################################################################
+  # Evaluation
+  ####################################################################
+
+  evaluation:
+    name: Evaluation Pipeline
+
+    if: github.event_name == 'workflow_dispatch'
+
+    needs: quality
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 40
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/dev.txt
+
+      - name: Run Multi-Agent Workflow Evaluation
+        run: |
+          python -m evaluation.pipelines.multiagent_workflow_evaluation
