@@ -75,18 +75,7 @@ class KBValidator:
     Knowledge base validator for Hasanah Mart RAG ingestion.
     """
 
-    REQUIRED_MARKDOWN_FILES = {
-        "overview.md",
-    }
 
-    REQUIRED_METADATA_FIELDS = {
-        "schema_version",
-        "product_id",
-        "name",
-        "category",
-        "languages_supported",
-        "retrieval",
-    }
 
     def __init__(self, kb_root: str):
 
@@ -100,6 +89,19 @@ class KBValidator:
         self.errors = []
         self.warnings = []
         self.infos = []
+
+        self.REQUIRED_MARKDOWN_FILES = {
+            "overview.md",
+        }
+
+        self.REQUIRED_METADATA_FIELDS = {
+            "schema_version",
+            "product_id",
+            "name",
+            "category",
+            "languages_supported",
+            "retrieval",
+        }
 
         self.seen_product_ids: set[str] = set()
 
@@ -242,11 +244,11 @@ class KBValidator:
         metadata_path: Path,
     ):
 
-        for field in self.REQUIRED_METADATA_FIELDS:
-            if field not in metadata:
+        for required_field in self.REQUIRED_METADATA_FIELDS:
+            if required_field not in metadata:
                 self._add_error(
                     product_id,
-                    f"Missing required metadata field: {field}",
+                    f"Missing required metadata field: {required_field}",
                     metadata_path,
                 )
 
@@ -284,17 +286,16 @@ class KBValidator:
 
         metadata_product_id = metadata.get("product_id")
 
-        if metadata_product_id:
-            if metadata_product_id != product_id:
-                self._add_warning(
-                    product_id,
-                    (
-                        f"Folder name '{product_id}' "
-                        f"does not match metadata product_id "
-                        f"'{metadata_product_id}'"
-                    ),
-                    metadata_path,
-                )
+        if metadata_product_id and metadata_product_id != product_id:
+            self._add_warning(
+                product_id,
+                (
+                    f"Folder name '{product_id}' "
+                    f"does not match metadata product_id "
+                    f"'{metadata_product_id}'"
+                ),
+                metadata_path,
+            )
 
         # -------------------------------------------------
         # Validate category consistency
@@ -304,17 +305,16 @@ class KBValidator:
 
         metadata_category = metadata.get("category")
 
-        if metadata_category:
-            if metadata_category != folder_category:
-                self._add_warning(
-                    product_id,
-                    (
-                        f"Folder category '{folder_category}' "
-                        f"does not match metadata category "
-                        f"'{metadata_category}'"
-                    ),
-                    metadata_path,
-                )
+        if metadata_category and metadata_category != folder_category:
+            self._add_warning(
+                product_id,
+                (
+                    f"Folder category '{folder_category}' "
+                    f"does not match metadata category "
+                    f"'{metadata_category}'"
+                ),
+                metadata_path,
+            )
 
     # -----------------------------------------------------
 

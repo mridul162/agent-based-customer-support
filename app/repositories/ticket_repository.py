@@ -58,7 +58,7 @@ Mapping to TicketResponse keeps SQLAlchemy isolated inside the
 repository layer.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
@@ -105,7 +105,7 @@ class TicketRepository:
             customer_id=customer_id,
             issue=issue,
             status=TicketStatus.OPEN,
-            created_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
         )
 
         self._session.add(ticket)

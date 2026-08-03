@@ -508,10 +508,7 @@ class SemanticChunker:
             return True
 
         # HTML table
-        if "<table" in stripped.lower():
-            return True
-
-        return False
+        return "<table" in stripped.lower()
 
     # -----------------------------------------------------
 

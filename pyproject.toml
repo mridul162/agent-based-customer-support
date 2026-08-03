@@ -1,0 +1,17 @@
+[tool.ruff]
+
+line-length = 88
+target-version = "py312"
+
+exclude = [
+    ".venv",
+    "artifacts",
+]
+
+[tool.ruff.lint]
+
+ignore = [
+    "B008",
+    "BLE001",
+    "TRY004",
+]

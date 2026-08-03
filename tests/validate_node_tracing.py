@@ -107,8 +107,6 @@ def main() -> None:
     # Timing validation
     # ----------------------------------------------------------
 
-    all_started = all(node.started_at is not None for node in trace.nodes)
-
     print("\nNode details:\n")
 
     for node in trace.nodes:

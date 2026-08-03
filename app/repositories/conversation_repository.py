@@ -59,7 +59,7 @@ ConversationMessage is the clean schema type already used by
 the rest of the application.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import asc
 from sqlalchemy.orm import Session
@@ -101,7 +101,7 @@ class ConversationRepository:
             user_message:       The raw customer message text.
             assistant_response: The agent's response text.
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         self._session.add(
             ConversationMessageDB(

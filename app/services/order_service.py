@@ -47,7 +47,7 @@ Design Notes:
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -133,7 +133,7 @@ class OrderService:
             OrderStatus.CANCELLED,
         )
 
-        order.updated_at = datetime.utcnow()
+        order.updated_at = datetime.now(UTC)
 
         self.session.commit()
         self.session.refresh(order)
@@ -182,7 +182,7 @@ class OrderService:
             new_address,
         )
 
-        order.updated_at = datetime.utcnow()
+        order.updated_at = datetime.now(UTC)
 
         self.session.commit()
         self.session.refresh(order)

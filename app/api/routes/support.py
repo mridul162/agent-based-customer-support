@@ -32,6 +32,7 @@ from typing import TypedDict, cast
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.dependencies import (
     get_conversation_service,
@@ -135,7 +136,7 @@ def build_health_report() -> HealthReport:
             conn.execute(text("SELECT 1"))
         database_ok = True
         database_detail = "ready"
-    except Exception as exc:  # pragma: no cover - exercised in runtime checks
+    except SQLAlchemyError as exc:
         database_detail = str(exc)
 
     checks["database"] = {

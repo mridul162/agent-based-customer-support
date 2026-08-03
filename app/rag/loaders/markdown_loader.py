@@ -59,16 +59,6 @@ class MarkdownLoader:
     Filesystem markdown loader for the customer support knowledge base.
     """
 
-    # Files/folders to ignore during loading
-    IGNORED_FOLDERS = {
-        "media",
-        "translations",
-        "qa",
-        "__pycache__",
-    }
-
-    IGNORED_FILES = {"aliases.md"}
-
     def __init__(self, kb_root: str):
         """
         Parameters
@@ -83,6 +73,15 @@ class MarkdownLoader:
             raise FileNotFoundError(
                 f"Knowledge base path does not exist: {self.kb_root}"
             )
+
+        self.IGNORED_FOLDERS = {
+            "media",
+            "translations",
+            "qa",
+            "__pycache__",
+        }
+
+        self.IGNORED_FILES = {"aliases.md"}
 
     # -----------------------------------------------------
 

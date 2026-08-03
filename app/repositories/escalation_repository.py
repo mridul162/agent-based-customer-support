@@ -10,7 +10,7 @@ Transaction ownership: get_session() in the service layer.
 This repository never calls commit() or rollback().
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -35,7 +35,7 @@ class EscalationRepository:
             reason=reason,
             queue=queue,
             status=EscalationStatus.OPEN,
-            created_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
         )
         self._session.add(escalation)
         self._session.flush()
