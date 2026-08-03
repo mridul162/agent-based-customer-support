@@ -2,7 +2,7 @@ services:
   - type: web
     name: customer-support-api
     runtime: docker
-    dockerfilePath: ./docker/Dockerfile
+    dockerfilePath: ./docker/Dockerfile.api
 
   - type: web
     name: customer-support-streamlit
