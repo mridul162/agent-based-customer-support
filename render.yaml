@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: customer-support-api
+    runtime: docker
+    dockerfilePath: ./docker/Dockerfile
+
+  - type: web
+    name: customer-support-streamlit
+    runtime: docker
+    dockerfilePath: ./docker/Dockerfile.streamlit

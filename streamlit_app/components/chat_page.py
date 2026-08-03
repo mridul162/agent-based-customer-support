@@ -28,7 +28,6 @@ def render_chat_page() -> None:
         customer_id = st.text_input("Customer ID", value=st.session_state.chat_customer_id)
         message = st.text_area(
             "Message",
-            value="Where is my order ORD-48213?",
             height=120,
         )
         col_send, col_history = st.columns([1, 5])

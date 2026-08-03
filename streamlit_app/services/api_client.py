@@ -1,10 +1,11 @@
 import os
 from typing import Any
+from config.settings import settings
 
 import requests
 
 
-DEFAULT_API_BASE_URL = "http://localhost:8000"
+DEFAULT_API_BASE_URL = settings.DEFAULT_API_BASE_URL
 
 
 class ApiClientError(RuntimeError):
@@ -51,7 +52,7 @@ class SupportApiClient:
         except requests.HTTPError as exc:
             detail = None
             try:
-                detail = exc.response.json().get("detail")
+                detail = exc.response.json().get("detail") #type: ignore
             except Exception:
                 detail = exc.response.text if exc.response is not None else None
             raise ApiClientError(detail or str(exc)) from exc

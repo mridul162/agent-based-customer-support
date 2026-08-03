@@ -1,10 +1,9 @@
-version: "3.9"
 
 services:
   api:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.api
 
     env_file:
       - ../.env.docker
@@ -28,6 +27,20 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  streamlit:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.streamlit
+
+    env_file:
+      - ../.env.docker
+
+    ports:
+      - "8501:8501"
+
+    depends_on:
+      - api
 
 volumes:
   postgres_data:

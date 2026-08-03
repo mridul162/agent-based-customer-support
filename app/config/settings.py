@@ -62,5 +62,8 @@ class Settings(BaseSettings):
             f"{self.postgres_db}"
         )
 
+    # API
+    API_BASE_URL: str = "http://localhost:8000"  # Default value, can be overridden by environment variable
+
 
 settings = Settings()  # type: ignore[arg-type]
