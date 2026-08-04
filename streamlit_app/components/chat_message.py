@@ -2,16 +2,31 @@ from typing import Any
 
 import streamlit as st
 
+from .styles import status_chip
+
 
 def render_chat_message(role: str, content: str) -> None:
-    avatar = "user" if role == "user" else "assistant"
-    label = "Customer" if role == "user" else "Assistant"
+    is_user = role == "user"
+    avatar = "🧑" if is_user else "🤖"
+    label = "Customer" if is_user else "Assistant"
+    bubble_class = "user" if is_user else "assistant"
+
     with st.chat_message(avatar):
-        st.markdown(f"**{label}**")
+        st.markdown(
+            f'<div class="chat-role-label">{label}</div>', unsafe_allow_html=True
+        )
         if isinstance(content, dict):
+            st.markdown(
+                f'<div class="chat-bubble {bubble_class}">', unsafe_allow_html=True
+            )
             st.json(content)
+            st.markdown("</div>", unsafe_allow_html=True)
         else:
-            st.write(content)
+            safe_content = str(content).replace("<", "&lt;").replace(">", "&gt;")
+            st.markdown(
+                f'<div class="chat-bubble {bubble_class}">{safe_content}</div>',
+                unsafe_allow_html=True,
+            )
 
 
 def extract_execution_details(response: Any) -> dict[str, Any]:
@@ -77,26 +92,37 @@ def extract_execution_details(response: Any) -> dict[str, Any]:
 def render_trace_panel(response: dict) -> None:
     details = extract_execution_details(response)
 
-    st.subheader("Execution Details")
+    st.markdown(
+        '<div class="nav-eyebrow">Execution details</div>', unsafe_allow_html=True
+    )
 
     latency = details.get("latency_ms")
     latency_value = f"{latency:.0f} ms" if isinstance(latency, (int, float)) else "n/a"
 
-    # Stacked vertically to ensure full readability inside narrow side panels
-    st.metric("Agent Selected", details.get("agent_name") or "n/a")
-    st.metric("Tool Used", details.get("tool_used") or "none")
-    st.metric("Latency", latency_value)
-
+    rows = [
+        ("Agent selected", details.get("agent_name") or "n/a"),
+        ("Tool used", details.get("tool_used") or "none"),
+        ("Latency", latency_value),
+    ]
     ticket_id = details.get("ticket_id")
     if ticket_id:
-        st.metric("Ticket", str(ticket_id))
+        rows.append(("Ticket", str(ticket_id)))
+
+    rows_html = "".join(
+        f'<div class="kv-row"><span class="kv-label">{k}</span>'
+        f'<span class="kv-value">{v}</span></div>'
+        for k, v in rows
+    )
+    st.markdown(f'<div class="panel-card">{rows_html}</div>', unsafe_allow_html=True)
 
     needs_human = details.get("needs_human")
     needs_clarification = details.get("needs_clarification")
     if needs_human or needs_clarification:
-        status_parts = []
+        chips = ""
         if needs_human:
-            status_parts.append("⚠️ Needs human support")
+            chips += status_chip("Needs human support", "warn")
         if needs_clarification:
-            status_parts.append("❓ Needs clarification")
-        st.warning(" • ".join(status_parts))
+            chips += " " + status_chip("Needs clarification", "neutral")
+        st.markdown(
+            f"<div style='margin-top: 0.4rem;'>{chips}</div>", unsafe_allow_html=True
+        )

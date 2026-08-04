@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 scripts/
-docs/
+# docs/
 .env.docker
 project_planning.txt
 future_improvements.txt

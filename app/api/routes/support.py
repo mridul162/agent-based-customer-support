@@ -228,10 +228,10 @@ def evaluation_summary() -> EvaluationSummaryResponse:
             pass
 
     return EvaluationSummaryResponse(
-        accuracy=92.0,
-        passed_cases=276,
-        total_cases=300,
-        failed_cases=24,
+        accuracy=100,
+        passed_cases=8,
+        total_cases=8,
+        failed_cases=0,
         average_latency_ms=None,
         execution_errors=None,
         source="demo_baseline",

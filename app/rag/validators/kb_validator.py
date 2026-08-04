@@ -75,8 +75,6 @@ class KBValidator:
     Knowledge base validator for Hasanah Mart RAG ingestion.
     """
 
-
-
     def __init__(self, kb_root: str):
 
         self.kb_root = Path(kb_root)

@@ -1,6 +1,6 @@
 <div align="center">
 
-# Agent-Based Customer Support
+# Multi-Agent Customer Support Platform
 
 ### Production-Ready Multi-Agent AI Customer Support Platform
 
@@ -25,6 +25,34 @@ A production-grade multi-agent customer support platform built with **FastAPI**,
 This project demonstrates how to build a **production-ready multi-agent customer support platform** using modern AI engineering practices. The system routes customer requests to specialized LangGraph agents, performs structured tool calling, retrieves knowledge through RAG, persists business data in PostgreSQL, exposes a FastAPI REST backend, provides a Streamlit operations dashboard, and includes an automated evaluation framework and CI pipeline.
 
 Rather than focusing solely on prompt engineering, this project emphasizes **building AI systems as production-quality software** — with layered architecture, dependency injection, repository patterns, observability, and continuous evaluation.
+
+---
+
+## Live Demo
+
+Swagger UI:
+https://agent-based-customer-support.onrender.com/docs
+
+Streamlit:
+https://agent-based-customer-support-streamlit.onrender.com
+
+
+<details>
+<summary>Screenshots</summary>
+
+#### Chat
+![Chat](docs/screenshots/chat.png)
+
+#### Tickets
+![Tickets](docs/screenshots/tickets.png)
+
+#### Evaluation
+![Evaluation](docs/screenshots/evaluation.png)
+
+#### Health
+![Health](docs/screenshots/health.png)
+
+</details>
 
 ---
 
